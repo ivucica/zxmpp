@@ -18,9 +18,14 @@ zxmppClass.prototype.packet = function (zxmpp)
 	this.xml_body = this.xml.firstChild;
 	this.xml_body.setAttribute('content','text/html; charset=utf-8');
 
+	// parsed stanzas
+	this.iq = false;
+	this.message = false;
+	this.presence;
+	
 	
 	/* functions */
-	var iq = function(idtype, type, to)
+	this.addIq = function(idtype, type, to)
 	{
 		// generate an iq in this packet
 		
@@ -34,10 +39,39 @@ zxmppClass.prototype.packet = function (zxmpp)
 	}
 	
 	
-	var send = function()
+	this.send = function()
 	{	
+		var body = this.xml_body;
+		
+		// assign a sequential request id
 		this.rid = this.zxmpp.stream.assignRID();
-		this.xml_body.setAttribute(this.rid);
+		body.setAttribute('rid', this.rid);
+		
+		// assign a sid, if it's known
+		// (earliest packets don't have a sid)
+		if(this.zxmpp.stream.sid)
+		{
+			body.setAttribute('sid',this.zxmpp.stream.sid);
+		}
+		
+		// assign cryptographic key(s) from 
+		// part 15 of XEP-0124
+		var keys = this.zxmpp.stream.assignKey();
+		body.setAttribute('key', keys.key);
+		if(keys.newKey)
+			body.setAttribute('newkey', keys.newkey);
+		
+		
+		// serialize xml, for output on wire
+		var outxml = this.zxmpp.util.serializedXML(this.xml);
+		
+		// output to wire
+		this.zxmpp.stream.transmitPacket(outxml);
+	}
+	
+	
+	this.parseXML = function(xml)
+	{
 		
 	}
 }
