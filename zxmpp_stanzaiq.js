@@ -9,10 +9,26 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 {
 	this.zxmpp = zxmpp;
 	
-	this.query = this
+	this.iq = false;
+	this.query = false;
 
-	var attachToPacket = function()
+	var appendQueryToPacket = function(packet, namespace)
 	{
+		// For a given packet initialized with an <iq>,
+		// append a <query>, initializing this.query
+		
+		// Also, attach that <iq> to this class, 
+		// initializing this.iq
+		var iq = this.iq = packet.iq;
+		var query = this.query = packet.createElementNS(namespace, "query");
+		iq.appendChild(query);	
+	}
+
+	var setType = function(aType)
+	{
+		// sets the type: get, set, result
+		// requires this.iq to be valid
 	}
 	
 }
+

@@ -22,7 +22,7 @@ zxmppClass.prototype.packet = function (zxmpp)
 
 	
 	/* functions */
-	var iq(idtype, type, to)
+	var iq = function(idtype, type, to)
 	{
 		// generate an iq in this packet
 		

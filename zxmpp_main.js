@@ -7,6 +7,11 @@
  
 function zxmppClass() 
 {
+	// this.util, this.stream, etc, are classes.
+	// We need instances of these classes that know
+	// who their creator (this) is.
+	// Let's replace classes with their instances.
+	 
 	this.util = new this.util(this);
 	this.stream = new this.stream(this);
 }
