@@ -16,9 +16,7 @@ zxmppClass.prototype.packet = function (zxmpp)
 	// set default attributes for body, if needed
 	// prefer setting them just before sending
 	this.xml_body = this.xml.firstChild;
-
-	//example how to set attrib: 
-	//this.xml_body.setAttribute('content','text/html; charset=utf-8');
+	this.xml_body.setAttribute('content','text/html; charset=utf-8');
 
 	
 	/* functions */
@@ -33,5 +31,13 @@ zxmppClass.prototype.packet = function (zxmpp)
 			iq.setAttribute("to", to);
 				
 		return iq;
+	}
+	
+	
+	var send = function()
+	{	
+		this.rid = this.zxmpp.stream.assignRID();
+		this.xml_body.setAttribute(this.rid);
+		
 	}
 }

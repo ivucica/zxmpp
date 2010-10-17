@@ -59,6 +59,10 @@ zxmppClass.prototype.stream = function (zxmpp)
 		packet.send();
 	}
 	
-	
+	this.assignRID = function()
+	{
+		// stub
+		return 0;
+	}
 
 }
