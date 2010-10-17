@@ -1,0 +1,7 @@
+<IfModule mod_rewrite.c>
+RewriteEngine On
+#RewriteRule http-poll/ http://zatemas.zrs.hr:5280/http-poll/ [P]
+
+RewriteRule http-bind/ http://%{SERVER_NAME}:5280/http-bind/ [P]
+</IfModule>
+
