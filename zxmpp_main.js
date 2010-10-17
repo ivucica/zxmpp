@@ -7,6 +7,8 @@
  
 function zxmppClass() 
 {
+	// Setup session-specific singletons
+	
 	// this.util, this.stream, etc, are classes.
 	// We need instances of these classes that know
 	// who their creator (this) is.
@@ -27,7 +29,6 @@ zxmppClass.prototype.init = function(uiOwner, configDict)
 
 zxmppClass.prototype.main = function(uiOwner, configDict)
 {	
-	alert("execing main");
 	this.init(uiOwner, configDict);
-	
+	this.stream.establish();	
 }
