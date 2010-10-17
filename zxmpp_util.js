@@ -61,7 +61,7 @@ zxmppClass.prototype.util = function (zxmpp)
 	
 	
 	// adapted from w3schools
-	this.XMLparsedDocument = function(txt)
+	this.parsedXMLDocument = function(txt)
 	{
 		if(window.DOMParser)
 		{
@@ -375,3 +375,20 @@ zxmppClass.prototype.util = function (zxmpp)
 	 
 	}
 };
+
+
+
+
+if(!console)
+{
+	console = function()
+	{
+		this.log = function(msg)
+		{
+			// stub
+		}
+		this.warn = this.log;
+		this.error = this.log;
+	};
+
+}
