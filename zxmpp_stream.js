@@ -26,7 +26,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 	this.connectionsPoll.push(new XMLHttpRequest());
 	this.connectionsPoll.push(new XMLHttpRequest());
 	
-	/* functions */
+	/* state handling functions */
 	this.uniqueId = function(idType)
 	{
 		// return a unique id with type "idType"
@@ -39,6 +39,26 @@ zxmppClass.prototype.stream = function (zxmpp)
 		this.uniqueIds["zxmpp" + idType + "_" + id]=true;
 		return "zxmpp" + idType + "_" + id;
 	}
+	
+	
+	/* connection/stream functions */
+	this.establish = function()
+	{
+		var packet = new this.zxmpp.packet(this.zxmpp);
+		var body = packet.xml_body;
+		
+		body.setAttribute('ver','1.6');
+		body.setAttribute('wait','60');
+		body.setAttribute('xmlns:xmpp','urn:xmpp:xbosh');
+		body.setAttribute('xmpp:version','1.0');
+		body.setAttribute('hold','1');
+		body.setAttribute('secure','false');
+		body.setAttribute('to',this.zxmpp.cfg['server']);
+		body.setAttribute('route',this.zxmpp.cfg['server'] + ':5222');
+
+		packet.send();
+	}
+	
 	
 
 }

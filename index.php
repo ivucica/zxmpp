@@ -19,8 +19,8 @@ function go()
 	};
 	
 	var zxmpp = new zxmppClass();
-	//zxmpp.main(document.getElementById("zxmpp_root"), cfg);
-	var pack = new zxmpp.packet(zxmpp);
+	zxmpp.main(document.getElementById("zxmpp_root"), cfg);
+	//var pack = new zxmpp.packet(zxmpp);
 }
 
 go();
