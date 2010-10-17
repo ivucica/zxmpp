@@ -23,8 +23,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 
 	/* prepare connections */
 	this.connectionsHold.push(new XMLHttpRequest());
-	this.connectionsPoll.push(new XMLHttpRequest());
-	this.connectionsPoll.push(new XMLHttpRequest());
+	this.connectionsPoll.push(new XMLHttpRequest(), new XMLHttpRequest());
 	
 	/* state handling functions */
 	this.uniqueId = function(idType)
