@@ -12,7 +12,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 	this.iq = false;
 	this.query = false;
 
-	var appendQueryToPacket = function(packet, namespace)
+	this.appendQueryToPacket = function(packet, namespace)
 	{
 		// For a given packet initialized with an <iq>,
 		// append a <query>, initializing this.query
@@ -24,7 +24,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		iq.appendChild(query);	
 	}
 
-	var setType = function(aType)
+	this.setType = function(aType)
 	{
 		// sets the type: get, set, result
 		// requires this.iq to be valid
@@ -49,7 +49,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		iq.setAttribute("type", aType);
 	}
 	
-	var setFrom = function(from)
+	this.setFrom = function(from)
 	{
 		// sets the "from" jid
 		
@@ -70,7 +70,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 	}
 	
 	
-	var setTo = function(to)
+	this.setTo = function(to)
 	{
 		// sets the "to" jid
 		
