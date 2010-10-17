@@ -77,6 +77,11 @@ zxmppClass.prototype.util = function (zxmpp)
 		}
 	}
 	
+	// by Ivan Vucica
+	this.serializedXML = function(xml)
+	{
+		return (new XMLSerializer()).serializeToString(xml);
+	}
 	
 	// by Ivan Vucica
 	this.easier_attribs = function(xml)
