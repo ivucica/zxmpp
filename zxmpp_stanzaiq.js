@@ -28,7 +28,59 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 	{
 		// sets the type: get, set, result
 		// requires this.iq to be valid
+		
+		if(!iq)
+		{
+			console.error("zxmpp::stanzaIq::setType(): iq not set");
+			return;
+		}
+		switch(aType)
+		{
+			case "set":
+			case "get":
+			case "result":
+			break;
+			
+			default:
+			console.error("zxmpp::stanzaIq::setType(): invalid type " + aType);
+			return;
+		}
+		
+		iq.setAttribute("type", aType);
 	}
 	
+	var setFrom = function(from)
+	{
+		// sets the "from" jid
+		
+		if(!iq)
+		{
+			console.error("zxmpp::stanzaIq::setFrom(): iq not set");
+			return;
+		}
+		
+		if(from && from != zxmpp.stream.fullJid)
+		{
+			console.warn("zxmpp::stanzaIq::setFrom(): setting from to non-own jid");
+			iq.setAttribute("from", from);
+			return;
+		}
+		
+		iq.setAttribute("from", zxmpp.stream.fullJid);
+	}
+	
+	
+	var setTo = function(to)
+	{
+		// sets the "to" jid
+		
+		if(!iq)
+		{
+			console.error("zxmpp::stanzaIq::setTo(): iq not set");
+			return;
+		}
+		
+		iq.setAttribute("to", zxmpp.stream.fullJid);
+	}
 }
 
