@@ -32,6 +32,14 @@ zxmppClass.prototype.stream = function (zxmpp)
 	/* in case all poll connections are currently talkin',
 	   add the packet to queue */
 	this.pollPacketQueue = [];
+	
+	/* supported stream:features */
+	this.features = {};
+	
+	/* state tracking variables */
+	this.hasSentAuth = false;
+	this.authSuccess = undefined;
+	this.hasSentRestart = false;
 
 	/* state funcs */
 	this.uniqueId = function(idType)
@@ -135,6 +143,12 @@ zxmppClass.prototype.stream = function (zxmpp)
 		
 		// in case of poll message and no available connection,
 		// queues the message
+		
+		/*
+		console.log("============ TRANSMIT =================");
+		console.log(msg);
+		console.log("=======================================");		
+		*/
 		
 		if(!send_style) send_style = "poll";
 		
@@ -247,7 +261,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 			//       this will allow multistep non-PLAIN
 			//       auth such as SCRAM-SHA-1
 			
-			if(this.zxmpp.saslMechanisms["PLAIN"])
+			if(this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"]["mechanisms"]["PLAIN"])
 			{
 				this.sendPlainAuth("poll");
 			}
@@ -255,6 +269,17 @@ zxmppClass.prototype.stream = function (zxmpp)
 			{
 				console.error("zxmpp::stream::handleConnection(): plain authentication mechanism unsupported. giving up");
 			}
+		}
+		else if(this.authSuccess && !this.hasSentRestart) // success is not false and not undefined
+		{
+			this.sendXmppRestart();
+		}
+		else if(this.hasSentRestart && !this.hasSentBind)
+		{
+			this.sendBindRequest();
+		}
+		else if(this.hasSentBind && this.zxmpp.fullJid)
+		{
 		}
 	}
 	
@@ -268,6 +293,8 @@ zxmppClass.prototype.stream = function (zxmpp)
 	
 	this.sendPlainAuth = function(send_style)
 	{
+		// FIXME move packet fillout to zxmpp_packet.js
+		
 		// send authorization
 		var packet = new this.zxmpp.packet(this.zxmpp);
 		
@@ -288,6 +315,40 @@ zxmppClass.prototype.stream = function (zxmpp)
 		packet.send();
 	}
 
+	this.sendXmppRestart = function(send_style)
+	{
+		// FIXME move packet fillout to zxmpp_packet.js
+		
+		// send xmpp:restart request
+		var packet = new this.zxmpp.packet(this.zxmpp);
+		packet.xml_body.setAttribute("xmpp:restart", "true"); 
+
+		this.hasSentRestart=true;
+		packet.send();
+	}
+	
+	this.sendBindRequest = function(send_style)
+	{
+		// FIXME move packet fillout to zxmpp_packet.js
+		
+		// send binding request
+		// form: <iq type="set"><bind><resource>name</resource></bind></iq>
+		if(!(this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-bind"]))
+		{
+			console.error("zxmpp::stream::sendBindRequest(): Server does not support binding. Aborting");
+			return;
+		}
+		var packet = new this.zxmpp.packet(this.zxmpp);
+		var iq = new this.zxmpp.stanzaIq(this.zxmpp);
+		iq.appendIqToPacket(packet, "bind", "set", this.zxmpp.cfg["server"]);
+		iq.appendBindToPacket(packet, "Z-XMPP");
+		
+		this.hasSentBind=true;
+		packet.send();
+		
+		console.log("sent bind req");
+	}
+	
 	// some more initialization
 	this.genKeys();
 
