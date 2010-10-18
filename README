@@ -1,0 +1,9 @@
+This is an implementation of an XMPP client in Javascript. It uses BOSH concept 
+of HTTP binding as defined by XEP-0124 and XEP-0206.
+
+Goal is to have a backend library for doing XMPP, and a separate GUI that will
+allow attaching an overlay over existing webpage, as well as almost transparent
+reconnection upon unloading the page and reloading it.
+
+(c) 2010 Ivan Vucica
+
