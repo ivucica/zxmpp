@@ -41,6 +41,9 @@ zxmppClass.prototype.caps = function(zxmpp)
 			return; 
 		}
 		
+		// FIXME this is incorrect.
+		// we also need to attach "node" attribute to the <query>.
+		// e.g. <query xmlns="http://jabber.org/protocol/disco#info" node="http://code.google.com/p/exodus#QgayPKawpkPSDYmwT/WM94uAlu0="/>
 		this.zxmpp.stream.sendIqQuery("http://jabber.org/protocol/disco#info", "get", this.ownerJid);
 		
 		

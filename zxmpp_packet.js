@@ -57,10 +57,10 @@ zxmppClass.prototype.packet = function (zxmpp)
 		// remember we wait for a result or error <iq> stanza
 		if(this.iqStanza)
 		{
-			console.log("iq type: " + this.iqStanza.type);
+			//console.log("iq type: " + this.iqStanza.type);
 			if(this.iqStanza.type == "set" || this.iqStanza.type == "get")
 			{
-				console.log("remembering " + this.iqStanza.id);
+				//console.log("remembering " + this.iqStanza.id);
 				this.zxmpp.stream.iqsAwaitingReply[this.iqStanza.id] = this.iqStanza;
 			}
 		}
