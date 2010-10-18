@@ -36,6 +36,10 @@ zxmppClass.prototype.stream = function (zxmpp)
 	/* supported stream:features */
 	this.features = {};
 	
+	/* rememeber outgoing set and get iqs for which we
+	   did not receive a result or error reply */
+	this.iqsAwaitingReply = {};
+	
 	/* state tracking variables */
 	this.hasSentAuth = false;
 	this.authSuccess = undefined;
@@ -293,10 +297,11 @@ zxmppClass.prototype.stream = function (zxmpp)
 		{
 			// send initial presence
 			this.sendCurrentPresence();
+			
 			// also request roster
 			// TODO check if server supports roster!
 			// we need to add caps parsing for that first, though
-			this.sendIqQuery("jabber:iq:roster");
+			this.sendIqQuery("jabber:iq:roster", "get", this.zxmpp.bareJid);
 			
 			this.hasSentInitialPresence = true;
 		}
@@ -363,6 +368,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		}
 		var packet = new this.zxmpp.packet(this.zxmpp);
 		var iq = new this.zxmpp.stanzaIq(this.zxmpp);
+		
 		iq.appendIqToPacket(packet, "bind", "set", this.zxmpp.cfg["server"]);
 		iq.appendBindToPacket(packet, "Z-XMPP");
 		
@@ -410,13 +416,13 @@ zxmppClass.prototype.stream = function (zxmpp)
 	}
 	
 	
-	this.sendIqQuery = function(namespace, send_style)
+	this.sendIqQuery = function(namespace, type, destination, send_style)
 	{
 		// FIXME move packet fillout to zxmpp_packet.js
 		
 		var packet = new this.zxmpp.packet(this.zxmpp);
 		var iq = new this.zxmpp.stanzaIq(this.zxmpp);
-		iq.appendIqToPacket(packet, "query", "set", this.zxmpp.cfg["server"]);
+		iq.appendIqToPacket(packet, "query", type, destination);
 
 		iq.appendQueryToPacket(packet, namespace);
 		
