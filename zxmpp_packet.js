@@ -81,11 +81,14 @@ zxmppClass.prototype.packet = function (zxmpp)
 		
 		// root element, xml.firstChild, is <body>
 		this.xml_body = xml.firstChild;
+		var attrs = this.zxmpp.util.easierAttrs(this.xml_body);
+
+		// store the sid we received
+		this.zxmpp.stream.sid = attrs["sid"];
 		
 		// we need to extract namespace specs from body
 		// just extract those with colon, since by default we
 		// presume xmlns to be http://jabber.org/protocol/httpbind
-		var attrs = this.zxmpp.util.easierAttrs(this.xml_body);
 		for(var attr in attrs)
 		{
 			var colonsplit = attr.split(":");
@@ -105,11 +108,10 @@ zxmppClass.prototype.packet = function (zxmpp)
 			
 			var nsurl = false;
 			var stanza = false;
+			this.zxmpp.util.easierAttrs(child);
 			if(child.nodeName.split(":").length>1)
 			{
 				var ns = child.nodeName.split(":")[0];
-				this.zxmpp.util.easierAttrs(child);
-			
 				stanza = child.nodeName.split(":")[1];
 				
 				if(child.attr["xmlns:" + ns])
@@ -124,7 +126,10 @@ zxmppClass.prototype.packet = function (zxmpp)
 			else
 			{
 				stanza = child.nodeName;
-				nsurl = this.defaultNamespace;
+				if(!child.attr["xmlns"])
+					nsurl = this.defaultNamespace;
+				else
+					nsurl = child.attr["xmlns"];
 			}
 			
 			if(!nsurl)

@@ -21,7 +21,7 @@ function go()
 	};
 	
 	var zxmpp = new zxmppClass();
-	zxmpp.main(document.getElementById("zxmpp_root"), cfg);
+	zxmpp.main(document.getElementById("zxmpp_root"), cfg, "perica", "123");
 	//var pack = new zxmpp.packet(zxmpp);
 }
 

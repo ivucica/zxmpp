@@ -17,7 +17,8 @@ function zxmppClass()
 	this.util = new this.util(this);
 	this.stream = new this.stream(this);
 	
-	
+	// supported auth mechanisms
+	this.saslMechanisms = {};
 
 }
 
@@ -28,10 +29,25 @@ zxmppClass.prototype.init = function(uiOwner, configDict)
 	 ****************************/
 	this.uiOwner = uiOwner; // html element that will serve as ZXMPP UI's root
 	this.cfg = configDict; // configuration
+	
 }
 
-zxmppClass.prototype.main = function(uiOwner, configDict)
+zxmppClass.prototype.setUsername = function(username)
+{
+	this.username = username;
+	this.bareJid = username + "@" + this.cfg["server"];
+}
+zxmppClass.prototype.setPassword = function(password)
+{
+	this.password = password;
+}
+
+zxmppClass.prototype.main = function(uiOwner, configDict, username, password)
 {	
 	this.init(uiOwner, configDict);
+	
+	this.setUsername(username);
+	this.setPassword(password);
+	
 	this.stream.establish();	
 }

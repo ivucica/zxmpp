@@ -65,14 +65,14 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			return;
 		}
 		
-		if(from && from != zxmpp.stream.fullJid)
+		if(from && from != zxmpp.fullJid)
 		{
 			console.warn("zxmpp::stanzaIq::setFrom(): setting from to non-own jid");
 			iq.setAttribute("from", from);
 			return;
 		}
 		
-		iq.setAttribute("from", zxmpp.stream.fullJid);
+		iq.setAttribute("from", zxmpp.fullJid);
 	}
 	
 	
@@ -86,7 +86,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			return;
 		}
 		
-		iq.setAttribute("to", zxmpp.stream.fullJid);
+		iq.setAttribute("to", zxmpp.fullJid);
 	}
 }
 

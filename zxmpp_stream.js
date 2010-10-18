@@ -239,11 +239,52 @@ zxmppClass.prototype.stream = function (zxmpp)
 	{
 		var packet = new this.zxmpp.packet(this.zxmpp);
 		packet.parseXML(conn.responseXML);
+		
+		if(!this.hasSentAuth)
+		{
+			// FIXME design an auth class,
+			//       and then call this.auth.doStep();
+			//       this will allow multistep non-PLAIN
+			//       auth such as SCRAM-SHA-1
+			
+			if(this.zxmpp.saslMechanisms["PLAIN"])
+			{
+				this.sendPlainAuth("poll");
+			}
+			else
+			{
+				console.error("zxmpp::stream::handleConnection(): plain authentication mechanism unsupported. giving up");
+			}
+		}
 	}
 	
 	this.sendIdle = function(send_style)
 	{
+		// sends empty packet
+		// for example, on "hold" connections
 		var packet = new this.zxmpp.packet(this.zxmpp);
+		packet.send();
+	}
+	
+	this.sendPlainAuth = function(send_style)
+	{
+		// send authorization
+		var packet = new this.zxmpp.packet(this.zxmpp);
+		
+		var authnode = packet.xml.createElementNS("urn:ietf:params:xml:ns:xmpp-sasl", "auth");
+		authnode.setAttribute("mechanism", "PLAIN");
+		packet.xml_body.appendChild(authnode);
+
+		// create child text node
+		var authnode_text = packet.xml.createTextNode(
+			this.zxmpp.util.encode64(
+				this.zxmpp.bareJid + "\0" + 
+				this.zxmpp.username + "\0" + 
+				this.zxmpp.password
+			));
+		authnode.appendChild(authnode_text);
+
+		this.hasSentAuth=true;
 		packet.send();
 	}
 
