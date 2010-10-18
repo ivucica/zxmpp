@@ -34,7 +34,8 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 		if(this.type == "unavailable")
 		{
 			presence.show = "unavailable";
-			// TODO should actually REMOVE the presence
+			this.zxmpp.removePresence(this.from);
+			return; // FIXME we should keep on parsing; showing the status upon logout might be fun
 		}
 
 		this.presenceNode = presence;

@@ -26,4 +26,6 @@ zxmppClass.prototype.presence = function (zxmpp)
 	this.status = "";
 	
 	this.priority = 0;
+	
+	this.caps = new this.zxmpp.caps(this.zxmpp);
 }

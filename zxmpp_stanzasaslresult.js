@@ -19,6 +19,30 @@ zxmppClass.prototype.stanzaSaslResult = function(zxmpp)
 		else if(xml.nodeName == "failure")
 		{
 			this.zxmpp.stream.authSuccess = false;
+			
+			this.zxmpp.stream.terminate();
+			
+			if(this.zxmpp.onConnectionTerminate)
+			{
+				var code = "saslfailure";
+				if(xml.firstChild)
+				{
+					code+="/"+xml.firstChild.nodeName;
+				}
+				
+				var humanreadable = "A SASL authentication failure has occured.";
+				if(xml.firstChild)
+				{
+					switch(xml.firstChild.nodeName)
+					{
+						case "not-authorized":
+						humanreadable = "Provided authentication details do not give you access.";
+						break;
+					}
+				}
+				this.zxmpp.onConnectionTerminate(code, humanreadable);
+			}
+			
 		}
 		else
 		{
