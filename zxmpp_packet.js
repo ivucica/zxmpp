@@ -22,7 +22,7 @@ zxmppClass.prototype.packet = function (zxmpp)
 	// parsed stanzas
 	this.iq = false;
 	this.message = false;
-	this.presence;
+	this.presence = false;
 	
 	// defined namespaces
 	// used only when parsing
@@ -30,19 +30,6 @@ zxmppClass.prototype.packet = function (zxmpp)
 	this.defaultNamespace = "http://jabber.org/protocol/httpbind";
 	
 	/* functions */
-	this.addIq = function(idtype, type, to)
-	{
-		// generate an iq in this packet
-		
-		var iq = this.xml.createElementNS("jabber:client", "iq");
-		iq.setAttribute("id", this.zxmpp.stream.uniqueID(idtype));
-		iq.setAttribute("type", type);
-		if(to) 
-			iq.setAttribute("to", to);
-				
-		return iq;
-	}
-	
 	
 	this.send = function()
 	{	
@@ -84,7 +71,8 @@ zxmppClass.prototype.packet = function (zxmpp)
 		var attrs = this.zxmpp.util.easierAttrs(this.xml_body);
 
 		// store the sid we received
-		this.zxmpp.stream.sid = attrs["sid"];
+		if(attrs["sid"])
+			this.zxmpp.stream.sid = attrs["sid"];
 		
 		// we need to extract namespace specs from body
 		// just extract those with colon, since by default we
@@ -152,6 +140,24 @@ zxmppClass.prototype.packet = function (zxmpp)
 					break;
 				}
 				break;
+				
+				case "urn:ietf:params:xml:ns:xmpp-sasl":
+				switch(stanza)
+				{
+					case "success":
+					stanzaInstance = new this.zxmpp.stanzaSaslResult(this.zxmpp);
+					break;
+					case "failure":
+					stanzaInstance = new this.zxmpp.stanzaSaslResult(this.zxmpp);
+					break;
+				}
+				case "jabber:client":
+				switch(stanza)
+				{
+					case "iq":
+					stanzaInstance = new this.zxmpp.stanzaIq(this.zxmpp);
+					break;
+				}
 			
 			}
 			

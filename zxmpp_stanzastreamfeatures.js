@@ -18,11 +18,31 @@ zxmppClass.prototype.stanzaStreamFeatures = function(zxmpp)
 			if(child && child.nodeName)
 			{
 				this.zxmpp.util.easierAttrs(child);
+				
+				var feature = false;
 				if(child.nodeName == "mechanisms" && child.attr["xmlns"]=="urn:ietf:params:xml:ns:xmpp-sasl")
 				{
-					this.parseMechanisms(child);
+					feature = this.parseMechanisms(child);
+					feature.xmlNS = child.attr["xmlns"];
+				}
+				else if(child.nodeName == "bind" && child.attr["xmlns"]=="urn:ietf:params:xml:ns:xmpp-bind")
+				{
+					feature = new Object();
+					feature.xmlNS = child.attr["xmlns"];
+				}
+				else
+				{
+					console.warn("zxmpp::stanzaStreamFeatures::parseXML(): Unparsed " + child.nodeName + " in namespace " + child.attr["xmlns"]  + ": " + this.zxmpp.util.serializedXML(child));
 				}
 				
+				
+				if(feature)
+				{
+					feature.nodeName = child.nodeName;
+					if(!this.zxmpp.stream.features[child.attr["xmlns"]])
+						this.zxmpp.stream.features[child.attr["xmlns"]] = new Array();
+					this.zxmpp.stream.features[child.attr["xmlns"]][child.nodeName] = feature;
+				}
 			}
 		}
 	}
@@ -30,14 +50,16 @@ zxmppClass.prototype.stanzaStreamFeatures = function(zxmpp)
 	
 	this.parseMechanisms = function(xml)
 	{
+		var saslMechanisms = [];
 		for(var i in xml.childNodes)
 		{
 			var child = xml.childNodes[i];
 			if(child.nodeName=="mechanism")
 			{
-				this.zxmpp.saslMechanisms[child.firstChild.nodeValue.toUpperCase()] = true;
+				saslMechanisms[child.firstChild.nodeValue.toUpperCase()] = true;
 			}
 		}
+		return saslMechanisms;
 	}
 	
 }
