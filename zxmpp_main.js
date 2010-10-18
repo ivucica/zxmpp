@@ -2,7 +2,7 @@
  * Z-XMPP
  * A Javascript XMPP client.
  *
- * DOCUMENTATION ON BOSH: http://xmpp.org/extensions/xep-0124.html 
+ * (c) 2010 Ivan Vucica
  */
  
 function zxmppClass() 

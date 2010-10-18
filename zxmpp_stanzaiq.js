@@ -2,7 +2,7 @@
  * Z-XMPP
  * A Javascript XMPP client.
  *
- * DOCUMENTATION ON BOSH: http://xmpp.org/extensions/xep-0124.html 
+ * (c) 2010 Ivan Vucica
  */
  
 zxmppClass.prototype.stanzaIq = function(zxmpp)
@@ -11,6 +11,12 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 	
 	this.iq = false;
 	this.query = false;
+
+	this.parseXML = function(xml)
+	{
+		// TODO
+		console.warn("zxmpp::stanzaIq::parseXML(): unimplemented");
+	}
 
 	this.appendQueryToPacket = function(packet, namespace)
 	{

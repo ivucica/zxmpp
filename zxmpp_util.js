@@ -2,7 +2,7 @@
  * Z-XMPP
  * A Javascript XMPP client.
  *
- * DOCUMENTATION ON BOSH: http://xmpp.org/extensions/xep-0124.html 
+ * (c) 2010 Ivan Vucica
  */
 
 zxmppClass.prototype.util = function (zxmpp)
@@ -84,13 +84,14 @@ zxmppClass.prototype.util = function (zxmpp)
 	}
 	
 	// by Ivan Vucica
-	this.easier_attribs = function(xml)
+	this.easierAttrs = function(xml)
 	{
-		xml.attr = new Array();
+		xml.attr = {};
 		for(var i in xml.attributes)
 		{
 			xml.attr[xml.attributes[i].nodeName] = xml.attributes[i].nodeValue;
 		}
+		return xml.attr;
 	}
 	
 	

@@ -2,7 +2,7 @@
  * Z-XMPP
  * A Javascript XMPP client.
  *
- * DOCUMENTATION ON BOSH: http://xmpp.org/extensions/xep-0124.html 
+ * (c) 2010 Ivan Vucica
  */
 
 zxmppClass.prototype.stream = function (zxmpp)
@@ -56,7 +56,6 @@ zxmppClass.prototype.stream = function (zxmpp)
 		
 		body.setAttribute('ver','1.6');
 		body.setAttribute('wait','60');
-		body.setAttribute('xmlns:xmpp','urn:xmpp:xbosh');
 		body.setAttribute('xmpp:version','1.0');
 		body.setAttribute('hold','1');
 		body.setAttribute('secure','false');
@@ -137,7 +136,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		// in case of poll message and no available connection,
 		// queues the message
 		
-		if(!send_style) send_style = "hold";
+		if(!send_style) send_style = "poll";
 		
 		var conn = this.findFreeConnection(send_style);
 		
@@ -175,8 +174,14 @@ zxmppClass.prototype.stream = function (zxmpp)
 
 	this.tryEmptyingPollQueue = function()
 	{
-		// stub
-		console.log("...tryEmptyingPollQueue");
+		while(this.pollPacketQueue.length && this.findFreeConnection("poll"))
+		{
+			// grab a packet that waits longest
+			var packet = this.pollPacketQueue.shift();
+			
+			this.transmitPacket(packet, "poll");
+		}
+
 	}
 	
 	this.genKeys = function()
@@ -219,13 +224,13 @@ zxmppClass.prototype.stream = function (zxmpp)
 		{
 			conn.connzxmpp.stream.connectionsHold[conn.connindex] = new XMLHttpRequest();
 			conn.connzxmpp.stream.handleConnection(conn);
-			// zxmpp_do_dummy();
+			conn.connzxmpp.streamchildr.sendIdle("hold");
 		}
 		else
 		{
 			conn.connzxmpp.stream.connectionsPoll[conn.connindex] = new XMLHttpRequest();
 			conn.connzxmpp.stream.handleConnection(conn);
-			this.tryEmptyingPollQueue();
+			conn.connzxmpp.stream.tryEmptyingPollQueue();
 		}
 		
 	}
@@ -236,6 +241,11 @@ zxmppClass.prototype.stream = function (zxmpp)
 		packet.parseXML(conn.responseXML);
 	}
 	
+	this.sendIdle = function(send_style)
+	{
+		var packet = new this.zxmpp.packet(this.zxmpp);
+		packet.send();
+	}
 
 	// some more initialization
 	this.genKeys();

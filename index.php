@@ -6,6 +6,8 @@
 <script src="zxmpp_util.js"></script>
 <script src="zxmpp_stream.js"></script>
 <script src="zxmpp_packet.js"></script>
+
+<script src="zxmpp_stanzastreamfeatures.js"></script>
 </head>
 <body>
 <div id="zxmpp_root">Loading zxmpp</div>
