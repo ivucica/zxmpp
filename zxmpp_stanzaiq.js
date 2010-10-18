@@ -10,8 +10,10 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 	this.zxmpp = zxmpp;
 	
 	this.iq = false;
+	
 	this.query = false;
 	this.bind = false;
+	this.session = false;
 
 	this.to = false;
 	this.from = false;
@@ -145,6 +147,19 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		
 		var resource_value = packet.xml.createTextNode(resource);
 		resource_node.appendChild(resource_value);
+	}
+
+	this.appendSessionToPacket = function(packet, resource)
+	{
+		// For a given packet initialized with an <iq>,
+		// append a <session/>, 
+		// initializing this.session
+		
+		// Also, attach that <iq> to this class, 
+		// initializing this.iq
+		var iq = this.iq = packet.iq;
+		var session = this.session = packet.xml.createElementNS("urn:ietf:params:xml:ns:xmpp-session", "session");
+		iq.appendChild(session);
 	}
 
 

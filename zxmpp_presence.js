@@ -16,10 +16,12 @@ zxmppClass.prototype.presence = function (zxmpp)
 	
 	this.show = "unavailable";
 	// possible states:
+	// * available (wire: no <show/> defined)
 	// * chat
 	// * away
 	// * xa
 	// * dnd
+	// * unavailable (wire: type="unavailable")
 	
 	this.status = "";
 	
