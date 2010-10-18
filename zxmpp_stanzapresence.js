@@ -131,6 +131,9 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 			presenceNode.appendChild(priorityNode);
 		}
 		
+		
+		packet.presenceXML = presenceNode;
+		packet.presenceStanza = this;
 	}
 	
 	this.addCaps = function()

@@ -20,9 +20,9 @@ zxmppClass.prototype.packet = function (zxmpp)
 	this.xml_body.setAttribute('xmlns:xmpp','urn:xmpp:xbosh');
 
 	// parsed stanzas
-	this.iq = false;
-	this.message = false;
-	this.presence = false;
+	this.iqStanza = false; this.iqXML = false;
+	this.messageStanza = false; this.messageXML = false;
+	this.presenceStanza = false; this.presenceXML = false;
 	
 	// defined namespaces
 	// used only when parsing
@@ -53,6 +53,17 @@ zxmppClass.prototype.packet = function (zxmpp)
 		if(keys.newKey)
 			body.setAttribute('newkey', keys.newkey);
 		
+		// if we have a set or get <iq> stanza, then
+		// remember we wait for a result or error <iq> stanza
+		if(this.iqStanza)
+		{
+			console.log("iq type: " + this.iqStanza.type);
+			if(this.iqStanza.type == "set" || this.iqStanza.type == "get")
+			{
+				console.log("remembering " + this.iqStanza.id);
+				this.zxmpp.stream.iqsAwaitingReply[this.iqStanza.id] = this.iqStanza;
+			}
+		}
 		
 		// serialize xml, for output on wire
 		var outxml = this.zxmpp.util.serializedXML(this.xml);

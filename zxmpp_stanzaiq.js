@@ -4,12 +4,12 @@
  *
  * (c) 2010 Ivan Vucica
  */
- 
+
 zxmppClass.prototype.stanzaIq = function(zxmpp)
 {
 	this.zxmpp = zxmpp;
 	
-	this.iq = false;
+	this.iqXML = false;
 	
 	this.query = false;
 	this.bind = false;
@@ -40,6 +40,23 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			{
 				case "bind":
 				this.parseBindXML(child);
+				break;
+				
+				case "query":
+				this.parseQueryXML(child);
+				break;
+				
+				case "error":
+				console.error("zxmpp::stanzaIq::parseXML(): error node received: " + this.zxmpp.util.serializedXML(child));
+				if(this.zxmpp.stream.iqsAwaitingReply[this.id])
+				{
+					var orig = this.zxmpp.stream.iqsAwaitingReply[this.id];
+					console.error("zxmpp::stanzaIq::parseXML(): original stanza: " + this.zxmpp.util.serializedXML(orig.iqXML));
+				}
+				else
+				{
+					console.error("zxmpp::stanzaIq::parseXML(): original stanza with id " + this.id + " not found");
+				}
 				break;
 				
 				default:
@@ -81,6 +98,56 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		}
 	}
 	
+	this.parseQueryXML = function(xml)
+	{
+		switch(this.type)
+		{
+			case "result":
+			
+			switch(xml.attr["xmlns"])
+			{
+				case "jabber:iq:roster":
+				this.parseQueryRosterXML(xml);
+				break;
+				
+				default:
+				console.warn("zxmpp::stanzaIq::parseQueryXML(): Unknown namespace " + xml.attr["xmlns"]);
+
+			}
+			
+			break;
+		}
+	}
+	
+	this.parseQueryRosterXML = function(xml)
+	{
+		for(var i in xml.childNodes)
+		{
+			var child = xml.childNodes[i];
+			if(!child.nodeName) continue;
+			
+			this.zxmpp.util.easierAttrs(child);
+			
+			switch(child.nodeName)
+			{
+				case "item":
+				// FIXME should actually have a class "rosteritem"
+				// which would parse this and serve as representation
+				// in the roster
+				// but oh well...
+				
+				var jid = child.attr["jid"];
+				console.log("Roster: " + jid);				
+				break;
+				
+				default:
+				console.warn("zxmpp::stanzaIq::parseQueryRosterXML(): Unknown namespace " + xml.attr["xmlns"]);
+
+			}
+		}
+	}
+	
+	
 	this.iqFail = function()
 	{
 		console.error("zxmpp::stanzaIq::iqFail(): a failure parsing IQ stanza has occured");
@@ -115,8 +182,9 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			
 		packet.xml_body.appendChild(iq);
 		
-		packet.iq = iq;
-		this.iq = iq;
+		packet.iqXML = iq;
+		this.iqXML = iq;
+		packet.iqStanza = this;
 	}
 
 	this.appendQueryToPacket = function(packet, namespace)
@@ -125,10 +193,13 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		// append a <query>, initializing this.query
 		
 		// Also, attach that <iq> to this class, 
-		// initializing this.iq
-		var iq = this.iq = packet.iq;
+		// initializing this.iqXML
+		var iq = this.iqXML = packet.iqXML;
 		var query = this.query = packet.xml.createElementNS(namespace, "query");
-		iq.appendChild(query);	
+		iq.appendChild(query);
+		
+		packet.iqStanza = this;
+		
 	}
 	this.appendBindToPacket = function(packet, resource)
 	{
@@ -137,8 +208,8 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		// initializing this.bind
 		
 		// Also, attach that <iq> to this class, 
-		// initializing this.iq
-		var iq = this.iq = packet.iq;
+		// initializing this.iqXML
+		var iq = this.iqXML = packet.iqXML;
 		var bind = this.bind = packet.xml.createElementNS("urn:ietf:params:xml:ns:xmpp-bind", "bind");
 		iq.appendChild(bind);
 		
@@ -147,6 +218,8 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		
 		var resource_value = packet.xml.createTextNode(resource);
 		resource_node.appendChild(resource_value);
+		
+		packet.iqStanza = this;
 	}
 
 	this.appendSessionToPacket = function(packet, resource)
@@ -156,8 +229,8 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		// initializing this.session
 		
 		// Also, attach that <iq> to this class, 
-		// initializing this.iq
-		var iq = this.iq = packet.iq;
+		// initializing this.iqXML
+		var iq = this.iqXML = packet.iqXML;
 		var session = this.session = packet.xml.createElementNS("urn:ietf:params:xml:ns:xmpp-session", "session");
 		iq.appendChild(session);
 	}
@@ -166,9 +239,9 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 	this.setType = function(aType)
 	{
 		// sets the type: get, set, result
-		// requires this.iq to be valid
+		// requires this.iqXML to be valid
 		
-		if(!iq)
+		if(!this.iqXML)
 		{
 			console.error("zxmpp::stanzaIq::setType(): iq not set");
 			return;
@@ -185,14 +258,15 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			return;
 		}
 		
-		iq.setAttribute("type", aType);
+		this.type = aType;
+		this.iqXML.setAttribute("type", aType);
 	}
 	
 	this.setFrom = function(from)
 	{
 		// sets the "from" jid
 		
-		if(!iq)
+		if(!this.iqXML)
 		{
 			console.error("zxmpp::stanzaIq::setFrom(): iq not set");
 			return;
@@ -201,11 +275,13 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		if(from && from != zxmpp.fullJid)
 		{
 			console.warn("zxmpp::stanzaIq::setFrom(): setting from to non-own jid");
-			iq.setAttribute("from", from);
+			this.iqXML.setAttribute("from", from);
+			this.from = from;
 			return;
 		}
+		this.from = zxmpp.fullJid;
 		
-		iq.setAttribute("from", zxmpp.fullJid);
+		this.iqXML.setAttribute("from", zxmpp.fullJid);
 	}
 	
 	
@@ -213,13 +289,14 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 	{
 		// sets the "to" jid
 		
-		if(!iq)
+		if(!this.iqXML)
 		{
 			console.error("zxmpp::stanzaIq::setTo(): iq not set");
 			return;
 		}
+		this.to = to;
 		
-		iq.setAttribute("to", zxmpp.fullJid);
+		this.iqXML.setAttribute("to", zxmpp.fullJid);
 	}
 }
 
