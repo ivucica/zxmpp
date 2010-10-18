@@ -38,6 +38,10 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				
 			switch(child.nodeName)
 			{
+				case "#text":
+				// ignore
+				break;
+				
 				case "bind":
 				this.parseBindXML(child);
 				break;
