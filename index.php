@@ -9,6 +9,7 @@
 <script src="zxmpp_presence.js"></script>
 
 <script src="zxmpp_stanzaiq.js"></script>
+<script src="zxmpp_stanzapresence.js"></script>
 <script src="zxmpp_stanzastreamfeatures.js"></script>
 <script src="zxmpp_stanzasaslresult.js"></script>
 </head>
@@ -16,6 +17,7 @@
 <div id="zxmpp_root">Loading zxmpp</div>
 <button onclick="go();">go</button>
 <button onclick="dumppresences();">dump presences</button>
+<button onclick="dumpstreamfeatures();">dump stream features</button>
 <script defer="defer">
 var zxmpp;
 function go()
@@ -33,6 +35,10 @@ function go()
 function dumppresences()
 {
 	zxmpp._debugDumpPresences();
+}
+function dumpstreamfeatures()
+{
+	zxmpp._debugDumpStreamFeatures();
 }
 
 go();

@@ -40,6 +40,9 @@ zxmppClass.prototype.stream = function (zxmpp)
 	this.hasSentAuth = false;
 	this.authSuccess = undefined;
 	this.hasSentRestart = false;
+	this.hasSentBind = false;
+	this.hasSentSessionRequest = false;
+	this.hasSentInitialPresence = false;
 
 	/* state funcs */
 	this.uniqueId = function(idType)
@@ -63,7 +66,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		var body = packet.xml_body;
 		
 		body.setAttribute('ver','1.6');
-		body.setAttribute('wait','60');
+		body.setAttribute('wait','120');
 		body.setAttribute('xmpp:version','1.0');
 		body.setAttribute('hold','1');
 		body.setAttribute('secure','false');
@@ -144,13 +147,16 @@ zxmppClass.prototype.stream = function (zxmpp)
 		// in case of poll message and no available connection,
 		// queues the message
 		
+		
+		
+		if(!send_style) send_style = "poll";
+		
+		
 		/*
-		console.log("============ TRANSMIT =================");
+		console.log("============ TRANSMIT (" + send_style + ") ============");
 		console.log(msg);
 		console.log("=======================================");		
 		*/
-		
-		if(!send_style) send_style = "poll";
 		
 		var conn = this.findFreeConnection(send_style);
 		
@@ -169,7 +175,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		else if (send_style == "poll")
 		{
 			// there was no available poll connection slot
-			this.pollPacketQueue.push(xml);
+			this.pollPacketQueue.push(msg);
 			console.log("zxmpp::Stream::transmitPacket(): Sending on poll connection while poll queue exists. To keep ordering, added outgoing msg to packet queue and tried dispatching poll queue");
 			this.tryEmptyingPollQueue();
 		}
@@ -237,8 +243,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		if(conn.conntype == "hold")
 		{
 			conn.connzxmpp.stream.connectionsHold[conn.connindex] = new XMLHttpRequest();
-			conn.connzxmpp.stream.handleConnection(conn);
-			conn.connzxmpp.streamchildr.sendIdle("hold");
+			conn.connzxmpp.stream.handleConnection(conn);	
 		}
 		else
 		{
@@ -261,7 +266,8 @@ zxmppClass.prototype.stream = function (zxmpp)
 			//       this will allow multistep non-PLAIN
 			//       auth such as SCRAM-SHA-1
 			
-			if(this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"]["mechanisms"]["PLAIN"])
+			if(this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"] && 
+			this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"]["mechanisms"]["PLAIN"])
 			{
 				this.sendPlainAuth("poll");
 			}
@@ -269,6 +275,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 			{
 				console.error("zxmpp::stream::handleConnection(): plain authentication mechanism unsupported. giving up");
 			}
+			
 		}
 		else if(this.authSuccess && !this.hasSentRestart) // success is not false and not undefined
 		{
@@ -278,8 +285,24 @@ zxmppClass.prototype.stream = function (zxmpp)
 		{
 			this.sendBindRequest();
 		}
-		else if(this.hasSentBind && this.zxmpp.fullJid)
+		else if(this.hasSentBind && !this.hasSentSessionRequest)
 		{
+			this.sendSessionRequest();
+		}
+		else if(this.hasSentSessionRequest && this.zxmpp.fullJid && !this.hasSentInitialPresence)
+		{
+			// send initial presence
+			this.sendCurrentPresence();
+			// also request roster
+			// TODO check if server supports roster!
+			// we need to add caps parsing for that first, though
+			this.sendIqQuery("jabber:iq:roster");
+			
+			this.hasSentInitialPresence = true;
+		}
+		else if(this.hasSentInitialPresence && this.findFreeConnection("hold")) // if we haven't held yet, and we have a free holding slot...
+		{
+			this.sendIdle("hold");
 		}
 	}
 	
@@ -288,7 +311,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		// sends empty packet
 		// for example, on "hold" connections
 		var packet = new this.zxmpp.packet(this.zxmpp);
-		packet.send();
+		packet.send(send_style);
 	}
 	
 	this.sendPlainAuth = function(send_style)
@@ -312,7 +335,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		authnode.appendChild(authnode_text);
 
 		this.hasSentAuth=true;
-		packet.send();
+		packet.send(send_style);
 	}
 
 	this.sendXmppRestart = function(send_style)
@@ -324,7 +347,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		packet.xml_body.setAttribute("xmpp:restart", "true"); 
 
 		this.hasSentRestart=true;
-		packet.send();
+		packet.send(send_style);
 	}
 	
 	this.sendBindRequest = function(send_style)
@@ -344,9 +367,60 @@ zxmppClass.prototype.stream = function (zxmpp)
 		iq.appendBindToPacket(packet, "Z-XMPP");
 		
 		this.hasSentBind=true;
-		packet.send();
+		packet.send(send_style);
 		
-		console.log("sent bind req");
+	}
+	
+	this.sendSessionRequest = function(send_style)
+	{
+		// FIXME move packet fillout to zxmpp_packet.js
+		
+		// send session request
+		// form: <iq type="set"><session/></iq>
+		if(!(this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-session"]))
+		{
+			console.error("zxmpp::stream::sendSessionRequest(): Server does not support session. Aborting");
+			return;
+		}
+
+		var packet = new this.zxmpp.packet(this.zxmpp);
+		var iq = new this.zxmpp.stanzaIq(this.zxmpp);
+		iq.appendIqToPacket(packet, "session", "set", this.zxmpp.cfg["server"]);
+		iq.appendSessionToPacket(packet);
+		
+		this.hasSentSessionRequest=true;
+		packet.send(send_style);
+
+	}
+	
+	this.sendCurrentPresence = function(send_style)
+	{
+		// FIXME move packet fillout to zxmpp_packet.js
+		
+		// TODO server must support presence capability!
+		// check if it does.
+		// but, we dont have caps parsing yet
+		var packet = new this.zxmpp.packet(this.zxmpp);
+		var presence = new this.zxmpp.stanzaPresence(this.zxmpp);
+		presence.appendToPacket(packet, this.zxmpp.fullJid, false, "available", "Using Z-XMPP", 1);
+		
+		this.hasSentInitialPresence = true;
+		packet.send(send_style);
+		
+	}
+	
+	
+	this.sendIqQuery = function(namespace, send_style)
+	{
+		// FIXME move packet fillout to zxmpp_packet.js
+		
+		var packet = new this.zxmpp.packet(this.zxmpp);
+		var iq = new this.zxmpp.stanzaIq(this.zxmpp);
+		iq.appendIqToPacket(packet, "query", "set", this.zxmpp.cfg["server"]);
+
+		iq.appendQueryToPacket(packet, namespace);
+		
+		packet.send(send_style);
 	}
 	
 	// some more initialization

@@ -31,7 +31,7 @@ zxmppClass.prototype.packet = function (zxmpp)
 	
 	/* functions */
 	
-	this.send = function()
+	this.send = function(send_style)
 	{	
 		var body = this.xml_body;
 		
@@ -58,7 +58,7 @@ zxmppClass.prototype.packet = function (zxmpp)
 		var outxml = this.zxmpp.util.serializedXML(this.xml);
 		
 		// output to wire
-		this.zxmpp.stream.transmitPacket(outxml, "poll");
+		this.zxmpp.stream.transmitPacket(outxml, send_style);
 	}
 	
 	
@@ -157,6 +157,10 @@ zxmppClass.prototype.packet = function (zxmpp)
 					case "iq":
 					stanzaInstance = new this.zxmpp.stanzaIq(this.zxmpp);
 					break;
+					case "presence":
+					stanzaInstance = new this.zxmpp.stanzaPresence(this.zxmpp);
+					break;
+					
 				}
 			
 			}

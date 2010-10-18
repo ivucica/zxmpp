@@ -30,6 +30,11 @@ zxmppClass.prototype.stanzaStreamFeatures = function(zxmpp)
 					feature = new Object();
 					feature.xmlNS = child.attr["xmlns"];
 				}
+				else if(child.nodeName == "session" && child.attr["xmlns"]=="urn:ietf:params:xml:ns:xmpp-session")
+				{
+					feature = new Object();
+					feature.xmlNS = child.attr["xmlns"];
+				}
 				else
 				{
 					console.warn("zxmpp::stanzaStreamFeatures::parseXML(): Unparsed " + child.nodeName + " in namespace " + child.attr["xmlns"]  + ": " + this.zxmpp.util.serializedXML(child));

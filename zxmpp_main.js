@@ -96,3 +96,20 @@ zxmppClass.prototype._debugDumpPresences = function()
 	} 
 	console.log(" ");
 }
+
+zxmppClass.prototype._debugDumpStreamFeatures = function()
+{
+	console.log(" ");
+	console.log("======= STREAM:FEATURES ======== ");
+	for(var xmlns in this.stream.features)
+	{
+		console.log(xmlns);
+		var nodes = this.stream.features[xmlns];
+		for(var node in nodes)
+		{
+			console.log(" " + node);
+		}
+	} 
+	console.log(" ");
+}
+
