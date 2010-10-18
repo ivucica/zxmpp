@@ -28,7 +28,7 @@ function go()
 		"server": window.location.hostname
 	};
 	zxmpp = new zxmppClass();
-	
+	zxmpp.onConnectionTerminate=handler_connectionterminate;
 	zxmpp.main(document.getElementById("zxmpp_root"), cfg, "perica", "123");
 	//var pack = new zxmpp.packet(zxmpp);
 }
@@ -40,6 +40,39 @@ function dumppresences()
 function dumpstreamfeatures()
 {
 	zxmpp._debugDumpStreamFeatures();
+}
+
+function handler_connectionterminate(code,humanreadable)
+{
+	codesplit=code.split("/");
+	switch(codesplit[0])
+	{
+		case "terminate":
+		switch(codesplit[1])
+		{
+			default:
+			alert("Server-side termination with code \'" + code + "\'\n\n" + humanreadable);
+			break;
+		}
+		break;
+		
+		case "saslfailure":
+		switch(codesplit[1])
+		{
+			case "not-authorized":
+			alert("Wrong username or password!\n\n" + humanreadable);
+			break;
+			
+			default:
+			alert("Login error with code \'" + code + "\'\n\n" + humanreadable);
+
+		}
+		break;
+		
+		default:
+		alert("Termination with code \'" + code + "\'\n\n" + humanreadable);
+		break;
+	}
 }
 
 go();

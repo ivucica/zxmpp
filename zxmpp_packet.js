@@ -31,8 +31,8 @@ zxmppClass.prototype.packet = function (zxmpp)
 	
 	/* functions */
 	
-	this.send = function(send_style)
-	{	
+	this.finalized = function()
+	{
 		var body = this.xml_body;
 		
 		// assign a sequential request id
@@ -65,21 +65,62 @@ zxmppClass.prototype.packet = function (zxmpp)
 			}
 		}
 		
-		// serialize xml, for output on wire
-		var outxml = this.zxmpp.util.serializedXML(this.xml);
+		return this.zxmpp.util.serializedXML(this.xml);
 		
-		// output to wire
-		this.zxmpp.stream.transmitPacket(outxml, send_style);
+	}
+	
+	this.send = function(send_style)
+	{	
+		
+		// queue for wire
+		this.zxmpp.stream.transmitPacket(this, send_style);
 	}
 	
 	
 	this.parseXML = function(xml)
 	{
+		if(!xml || !xml.firstChild)
+		{
+			return false;
+		}
+		
+		
 		this.xml = xml;
 		
 		// root element, xml.firstChild, is <body>
 		this.xml_body = xml.firstChild;
 		var attrs = this.zxmpp.util.easierAttrs(this.xml_body);
+
+		// check if this is special-type id
+		if(attrs["type"])
+		{
+			switch(attrs["type"])
+			{
+				case "terminate":
+				this.zxmpp.stream.terminate();
+				if(this.zxmpp.onConnectionTerminate)
+				{
+					// let's generate an error-identifying code + human readable error
+					
+					var code = "terminate";
+					if(attrs["condition"])
+						code+="/"+attrs["condition"];
+						
+					var humanreadable = "Terminate requested by server with unset condition.";
+					switch(attrs["condition"])
+					{
+						case "host-unknown":
+						humanreadable = "Server does not handle the specified hostname.";
+						break;
+					}
+					this.zxmpp.onConnectionTerminate(code, humanreadable);
+					
+					
+				}
+				return false;
+				break;
+			}
+		}
 
 		// store the sid we received
 		if(attrs["sid"])
@@ -134,7 +175,7 @@ zxmppClass.prototype.packet = function (zxmpp)
 			if(!nsurl)
 			{
 				console.warn("zxmpp::packet::parseXML(): Stanza " + child.nodeName + " in unknown namespace. Stanza dropped");
-				return;
+				continue;
 			}
 			
 			// now we have enough data about stanza to start parsing it
@@ -187,5 +228,6 @@ zxmppClass.prototype.packet = function (zxmpp)
 			
 			
 		}
+		return true;
 	}
 }

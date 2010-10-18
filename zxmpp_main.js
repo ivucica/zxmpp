@@ -71,6 +71,7 @@ zxmppClass.prototype.getPresence = function(fullJid)
 	presence.fullJid = fullJid;
 	presence.bareJid = bareJid;
 	presence.resource = resource;
+	presence.caps.ownerJid = fullJid;
 	
 	this.presences[bareJid][resource] = presence;
 	
@@ -78,7 +79,13 @@ zxmppClass.prototype.getPresence = function(fullJid)
 }
 zxmppClass.prototype.removePresence = function(fullJid)
 {
-	// TODO
+	var jid = fullJid.split("/");
+	var bareJid = jid[0];
+	var resource = jid[1];
+
+	delete this.presences[bareJid][resource];
+	if(this.presences[bareJid].length==0) // FIXME this doesnt seem to work
+		delete this.presences[bareJid];
 }
 
 zxmppClass.prototype._debugDumpPresences = function()

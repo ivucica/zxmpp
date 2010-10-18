@@ -72,7 +72,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		body.setAttribute('ver','1.6');
 		body.setAttribute('wait','120');
 		body.setAttribute('xmpp:version','1.0');
-		body.setAttribute('hold','1');
+		body.setAttribute('hold','3');
 		body.setAttribute('secure','false');
 		body.setAttribute('to',this.zxmpp.cfg['server']);
 		body.setAttribute('route',this.zxmpp.cfg['server'] + ':5222');
@@ -143,9 +143,9 @@ zxmppClass.prototype.stream = function (zxmpp)
 
 	}
 	
-	this.transmitPacket = function(msg,send_style)
+	this.transmitPacket = function(packet,send_style)
 	{
-		// send "msg" (string) using "send_style"-type
+		// send "packet" (zxmpp.packet) using "send_style"-type
 		// connection (either "hold" or "poll", default hold)
 		
 		// in case of poll message and no available connection,
@@ -158,13 +158,14 @@ zxmppClass.prototype.stream = function (zxmpp)
 		
 		/*
 		console.log("============ TRANSMIT (" + send_style + ") ============");
-		console.log(msg);
+		console.log("(not finalized packet)");
+		console.log(this.zxmpp.util.serializedXML(packet.xml));
 		console.log("=======================================");		
 		*/
 		
 		var conn = this.findFreeConnection(send_style);
 		
-		
+		if(conn) console.log("Sending " + send_style + " with pollqueue " + this.pollPacketQueue.length);
 		if(conn && (send_style=="hold" || (send_style == "poll" && this.pollPacketQueue.length == 0)))
 		{
 			// there is an available hold or poll connection slot
@@ -173,14 +174,14 @@ zxmppClass.prototype.stream = function (zxmpp)
  			conn.setRequestHeader("Content-type","text/xml; charset=utf-8");
 			conn.setRequestHeader("X-ZXMPPType",send_style);
 			conn.onreadystatechange = this.zxmpp.stream.handleConnectionStateChange;
-			conn.send(msg);
+			conn.send(packet.finalized());
 
 		}
 		else if (send_style == "poll")
 		{
 			// there was no available poll connection slot
-			this.pollPacketQueue.push(msg);
-			console.log("zxmpp::Stream::transmitPacket(): Sending on poll connection while poll queue exists. To keep ordering, added outgoing msg to packet queue and tried dispatching poll queue");
+			this.pollPacketQueue.push(packet);
+			//console.log("zxmpp::Stream::transmitPacket(): Sending on poll connection while poll queue exists. To keep ordering, added outgoing msg to packet queue and tried dispatching poll queue");
 			this.tryEmptyingPollQueue();
 		}
 		else if (send_style == "hold")
@@ -261,7 +262,10 @@ zxmppClass.prototype.stream = function (zxmpp)
 	this.handleConnection = function(conn)
 	{
 		var packet = new this.zxmpp.packet(this.zxmpp);
-		packet.parseXML(conn.responseXML);
+		if(!packet.parseXML(conn.responseXML)) // packet not intended for further processing
+		{
+			return;
+		}
 		
 		if(!this.hasSentAuth)
 		{
@@ -301,7 +305,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 			// also request roster
 			// TODO check if server supports roster!
 			// we need to add caps parsing for that first, though
-			this.sendIqQuery("jabber:iq:roster", "get", this.zxmpp.bareJid);
+			this.sendIqQuery("jabber:iq:roster", "get");//, this.zxmpp.bareJid);
 			
 			this.hasSentInitialPresence = true;
 		}
@@ -416,7 +420,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 	}
 	
 	
-	this.sendIqQuery = function(namespace, type, destination, send_style)
+	this.sendIqQuery = function(namespace, type, destination, send_style, extra_query_attribs)
 	{
 		// FIXME move packet fillout to zxmpp_packet.js
 		
@@ -426,12 +430,45 @@ zxmppClass.prototype.stream = function (zxmpp)
 
 		iq.appendQueryToPacket(packet, namespace);
 		
+		if(extra_query_attribs)
+		{
+			for(var attrib in extra_query_attribs)
+			{
+				var val = extra_query_attribs[attrib];
+				
+				iq.query.setAttribute(attrib, val);
+			}
+		}
 		packet.send(send_style);
 		
 		// in case caller wants to add something
 		// more to the "remembered" reference to 
 		// this zxmpp::stanzaIq, return it.
 		return iq; 
+	}
+	
+	this.terminate = function()
+	{
+		console.log("Finishing stream termination");
+		for(var conn in this.connectionsHold)
+		{
+			conn.onreadystatechange = false;
+			if(conn.abort)
+				conn.abort();
+		}
+		for(var conn in this.connectionsPoll)
+		{
+			conn.onreadystatechange = false;
+			if(conn.abort)
+				conn.abort();
+		}
+		
+		// reset pools
+		this.connectionsHold = [new XMLHttpRequest()];
+		this.connectionsPoll = [new XMLHttpRequest()]; //, new XMLHttpRequest];
+		
+		// clean queue
+		this.packetQueue = [];
 	}
 	
 	// some more initialization

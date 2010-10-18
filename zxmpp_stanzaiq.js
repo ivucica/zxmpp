@@ -55,17 +55,27 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				if(this.zxmpp.stream.iqsAwaitingReply[this.id])
 				{
 					var orig = this.zxmpp.stream.iqsAwaitingReply[this.id];
-					console.error("zxmpp::stanzaIq::parseXML(): original stanza: " + this.zxmpp.util.serializedXML(orig.iqXML));
+					console.error("zxmpp::stanzaIq::parseXML(): original stanza: " + this.zxmpp.util.serializedXML(orig.iqXML));					
 				}
 				else
 				{
 					console.error("zxmpp::stanzaIq::parseXML(): original stanza with id " + this.id + " not found");
 				}
+				
 				break;
 				
 				default:
 				console.warn("zxmpp::stanzaIq::parseXML(): Unknown child " + child.nodeName);
 			}
+		}
+		
+		switch(this.type)
+		{
+			case "result":
+			case "error":
+			delete this.zxmpp.stream.iqsAwaitingReply[this.id];
+			break;
+			default:
 		}
 	}
 	
@@ -113,11 +123,16 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				case "jabber:iq:roster":
 				this.parseQueryRosterXML(xml);
 				break;
+
+				case "http://jabber.org/protocol/disco#info":
+				this.parseQueryDiscoInfoXML(xml);
+				break;
 				
 				default:
 				console.warn("zxmpp::stanzaIq::parseQueryXML(): Unknown namespace " + xml.attr["xmlns"]);
 
 			}
+			
 			
 			break;
 		}
@@ -151,6 +166,12 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		}
 	}
 	
+	this.parseQueryDiscoInfoXML = function(xml)
+	{
+		console.log("disco info: " + this.zxmpp.util.serializedXML(xml));
+		
+	}
+	
 	
 	this.iqFail = function()
 	{
@@ -167,7 +188,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			case "get":
 			case "set":
 			// FIXME implement failure response to server
-			console.warn("zxmpp::stanzaIq::iqFail(): responding to " + this.type + "-type iq failure is unimplemented");
+			console.warn("zxmpp::stanzaIq::iqFail(): responding to " + this.type + "-type iq failure ");
 			
 			break;
 		}
