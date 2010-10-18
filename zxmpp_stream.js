@@ -427,6 +427,11 @@ zxmppClass.prototype.stream = function (zxmpp)
 		iq.appendQueryToPacket(packet, namespace);
 		
 		packet.send(send_style);
+		
+		// in case caller wants to add something
+		// more to the "remembered" reference to 
+		// this zxmpp::stanzaIq, return it.
+		return iq; 
 	}
 	
 	// some more initialization

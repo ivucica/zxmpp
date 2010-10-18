@@ -7,6 +7,7 @@
 <script src="zxmpp_stream.js"></script>
 <script src="zxmpp_packet.js"></script>
 <script src="zxmpp_presence.js"></script>
+<script src="zxmpp_caps.js"></script>
 
 <script src="zxmpp_stanzaiq.js"></script>
 <script src="zxmpp_stanzapresence.js"></script>

@@ -61,6 +61,12 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 				this.priority = child.firstChild.nodeValue;
 				break;
 				
+				case "c":
+				this.caps = presence.caps = new this.zxmpp.caps(this.zxmpp);
+				this.caps.ownerJid = this.from;
+				this.caps.parseXML(child);
+				break;
+				
 				case "#text":
 				// ignore!
 				break;
