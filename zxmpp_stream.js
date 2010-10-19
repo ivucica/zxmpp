@@ -174,7 +174,8 @@ zxmppClass.prototype.stream = function (zxmpp)
  			conn.setRequestHeader("Content-type","text/xml; charset=utf-8");
 			conn.setRequestHeader("X-ZXMPPType",send_style);
 			conn.onreadystatechange = this.zxmpp.stream.handleConnectionStateChange;
-			conn.send(packet.finalized());
+			conn.connoutgoing = packet.finalized();
+			conn.send(conn.connoutgoing);
 
 		}
 		else if (send_style == "poll")
@@ -224,6 +225,8 @@ zxmppClass.prototype.stream = function (zxmpp)
 
 	}
 
+	this.retriesUpon404 = 5; // how many times can we retry sending packet?
+
 	this.handleConnectionStateChange = function()
 	{
 		
@@ -242,6 +245,51 @@ zxmppClass.prototype.stream = function (zxmpp)
 		if(conn.readyState != 4) 
 		{
 			return;
+		}
+
+		// the connection failed?
+		if(conn.status != 200)
+		{
+			switch(conn.status)
+			{
+				case "404":
+				// TODO check if BOSH really specifies 404 upon out of order packet, or is this ejabberd specific behavior?		
+				if(conn.connzxmpp.stream.retriesUpon404<0)
+				{
+					console.error("zxmppClass::Stream::handleConnectionStateChange(): Too many 404s, giving up and terminating");
+					conn.connzxmpp.stream.terminate();
+	
+					var code = "terminate/http-" + conn.status;
+					var humanreadable = "Attempts to handle 404 by reposting failed. The service does not exist or there were too many out of order packets";
+					conn.connzxmpp.onConnectionTerminate(code, humanreadable);
+					return;
+				}
+				
+				conn.connzxmpp.stream.retriesUpon404--;
+				console.warn("zxmppClass::Stream::handeConnectionStateChange(): http 404 - out of order request? retrying");
+				
+				conn.send(conn.connoutgoing);
+				return;
+				
+				case 503:
+				console.error("zxmppClass::Stream::handleConnectionStateChange(): service not running or overloaded: http " + conn.status + ", terminating connection");
+				conn.connzxmpp.stream.terminate();
+
+				var code = "terminate/http-" + conn.status;
+				var humanreadable = "Service not running or overloaded.";
+				conn.connzxmpp.onConnectionTerminate(code, humanreadable);
+				return;
+				
+				default:
+				console.error("zxmppClass::Stream::handleConnectionStateChange(): invalid http status " + conn.status + ", terminating connection");
+				conn.connzxmpp.stream.terminate();
+
+				var code = "terminate/http-" + conn.status;
+				var humanreadable = "Unexpected HTTP status " + conn.status + ".";
+				conn.connzxmpp.onConnectionTerminate(code, humanreadable);
+				return;
+				
+			}
 		}
 
 		// clean connection slot, handle connection, try pushing stuff
