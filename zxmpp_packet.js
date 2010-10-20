@@ -53,17 +53,6 @@ zxmppClass.prototype.packet = function (zxmpp)
 		if(keys.newKey)
 			body.setAttribute('newkey', keys.newkey);
 		
-		// if we have a set or get <iq> stanza, then
-		// remember we wait for a result or error <iq> stanza
-		if(this.iqStanza)
-		{
-			//console.log("iq type: " + this.iqStanza.type);
-			if(this.iqStanza.type == "set" || this.iqStanza.type == "get")
-			{
-				//console.log("remembering " + this.iqStanza.id);
-				this.zxmpp.stream.iqsAwaitingReply[this.iqStanza.id] = this.iqStanza;
-			}
-		}
 		
 		return this.zxmpp.util.serializedXML(this.xml);
 		

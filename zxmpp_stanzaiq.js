@@ -205,16 +205,20 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		var node = xml.attr["node"];
 		
 		
-		var askingIq = (this.zxmpp.stream.iqsAwaitingReply[this.id]);
-		if(!askingIq)
-		{
-			this.iqFail();
-			return; // FIXME make sure that, after failing, we give up on processing <iq> completely
-		}
-		
 		switch(this.type)
 		{
 			case "result":
+			
+			
+			var askingIq = (this.zxmpp.stream.iqsAwaitingReply[this.id]);
+			if(!askingIq)
+			{
+				console.error("No asking iq for id " + this.id);
+				this.iqFail();
+				return; // FIXME make sure that, after failing, we give up on processing <iq> completely
+			}
+			
+			
 			for(var i in xml.childNodes)
 			{
 				var child = xml.childNodes[i];
@@ -324,6 +328,15 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		packet.iqXML = iq;
 		this.iqXML = iq;
 		packet.iqStanza = this;
+			
+		// remember we wait for a result or error <iq> stanza
+		if(this.type == "set" || this.type == "get")
+		{
+			//console.log("remembering " + this.iqStanza.id);
+			this.zxmpp.stream.iqsAwaitingReply[this.id] = this;
+		}
+		
+
 	}
 
 	this.appendQueryToPacket = function(packet, namespace)
