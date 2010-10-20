@@ -21,7 +21,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 
 	/* pre-baked request objects */
 	this.connectionsHold.push(new XMLHttpRequest());
-	this.connectionsPoll.push(new XMLHttpRequest(), new XMLHttpRequest());
+	this.connectionsPoll.push(new XMLHttpRequest());//, new XMLHttpRequest());
 
 	/* set of unique ids so far */
 	this.uniqueIds = {};
@@ -129,21 +129,22 @@ zxmppClass.prototype.stream = function (zxmpp)
 			var conn = connection_pool[i];
 			if(conn.readyState == 0)
 			{
-				//console.log("free slot found at " + i);
+				//console.log("free slot found at: " + i);
 				availableConn = conn;
 				availableConn.connindex = i;
 				availableConn.conntype = send_style;
 				availableConn.connzxmpp = this.zxmpp;
+				return availableConn;
 				break;
 			}
-			//console.log("searching over " + i);
+			//console.log("searching passed: " + i);
 		}
 		//console.log("...but did not find empty slot");
-		return availableConn;
-
+		return false;
+		
 	}
 	
-	this.transmitPacket = function(packet,send_style)
+	this.transmitPacket = function(packet,send_style,sending_from_queue)
 	{
 		// send "packet" (zxmpp.packet) using "send_style"-type
 		// connection (either "hold" or "poll", default hold)
@@ -163,10 +164,57 @@ zxmppClass.prototype.stream = function (zxmpp)
 		console.log("=======================================");		
 		*/
 		
+		
+		var conn = this.findFreeConnection(send_style);
+		
+
+/*	
+		if(send_style=="poll")
+		{
+			if(conn && (this.pollPacketQueue.length == 0 || sending_from_queue))
+			{
+				conn.open("POST", this.zxmpp.cfg["bind-url"]);
+ 				conn.setRequestHeader("Content-type","text/xml; charset=utf-8");
+				conn.setRequestHeader("X-ZXMPPType",send_style);
+				conn.onreadystatechange = this.zxmpp.stream.handleConnectionStateChange;
+				if(!conn.connoutgoing)
+					conn.connoutgoing = packet.finalized();
+				conn.send(conn.connoutgoing);
+			}
+			else
+			{
+				this.pollPacketQueue.push(packet);
+				this.tryEmptyingPollQueue();
+			}
+		}
+		else
+		{
+			if(conn)
+			{
+				conn.open("POST", this.zxmpp.cfg["bind-url"]);
+ 				conn.setRequestHeader("Content-type","text/xml; charset=utf-8");
+				conn.setRequestHeader("X-ZXMPPType",send_style);
+				conn.onreadystatechange = this.zxmpp.stream.handleConnectionStateChange;
+				if(!conn.connoutgoing)
+					conn.connoutgoing = packet.finalized();
+				conn.send(conn.connoutgoing);
+			}
+			else
+			{
+				
+			}
+		}
+*/		
+		
+//		return;
+
+
 		var conn = this.findFreeConnection(send_style);
 		
 		if(conn) console.log("Sending " + send_style + " with pollqueue " + this.pollPacketQueue.length);
-		if(conn && (send_style=="hold" || (send_style == "poll" && this.pollPacketQueue.length == 0)))
+
+		
+		if(conn && (send_style=="hold" || (send_style == "poll" && (this.pollPacketQueue.length == 0 ||sending_from_queue) )))
 		{
 			// there is an available hold or poll connection slot
 
@@ -178,6 +226,9 @@ zxmppClass.prototype.stream = function (zxmpp)
 				conn.connoutgoing = packet.finalized();
 			conn.send(conn.connoutgoing);
 
+/*
+			if(this.hasSentInitialPresence && this.pollPacketQueue.length == 0 && send_style == "poll" && this.findFreeConnection("hold"))
+				this.sendIdle("hold");*/
 			//console.log("WRITING " + conn.connoutgoing);
 
 		}
@@ -189,6 +240,11 @@ zxmppClass.prototype.stream = function (zxmpp)
 
 			this.pollPacketQueue.push(packet);
 			this.tryEmptyingPollQueue();
+			
+			if(this.pollPacketQueue.length == 0 && send_style == "poll" && this.findFreeConnection("hold"))
+				this.sendIdle("hold");
+
+			
 		}
 		else if (send_style == "hold")
 		{
@@ -205,12 +261,12 @@ zxmppClass.prototype.stream = function (zxmpp)
 
 	this.tryEmptyingPollQueue = function()
 	{
-		while(this.pollPacketQueue.length>0 && this.findFreeConnection("poll"))
+		while(this.pollPacketQueue.length && this.findFreeConnection("poll"))
 		{
 			// grab a packet that waits longest
 			var packet = this.pollPacketQueue.shift();
 			
-			this.transmitPacket(packet, "poll");
+			this.transmitPacket(packet, "poll", true);
 		}
 
 	}
@@ -389,7 +445,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 			
 			this.hasSentInitialPresence = true;
 		}
-		else if(this.hasSentInitialPresence && this.findFreeConnection("hold")) // if we haven't held yet, and we have a free holding slot...
+		else if(this.hasSentInitialPresence && this.findFreeConnection("hold") && this.pollPacketQueue.length) // if we haven't held yet, and we have a free holding slot, and nothing is waiting to poll...
 		{
 			this.sendIdle("hold");
 		}
