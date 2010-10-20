@@ -17,6 +17,7 @@ zxmppClass.prototype.caps = function(zxmpp)
 	this.hash = false;
 	
 	this.features = {};
+	this.featuresExt = {};
 	this.ownerJid = false;
 	this.ownerNode = false;
 	
@@ -158,8 +159,9 @@ zxmppClass.prototype.caps = function(zxmpp)
 		
 		var packet = new this.zxmpp.packet(this.zxmpp);
 		var needsSending = false;
-		for(var ext in exts)
+		for(var extId in exts)
 		{
+			var ext = exts[extId];
 			if(extdest[ext])
 			{
 				var feature = extdest[ext];
