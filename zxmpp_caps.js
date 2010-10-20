@@ -111,6 +111,7 @@ zxmppClass.prototype.caps = function(zxmpp)
 			return; 
 		}
 		
+		console.log("Asking " + this.ownerJid + " about caps");
 		this.zxmpp.stream.sendIqQuery("http://jabber.org/protocol/disco#info", "get", this.ownerJid, false, {"node": this.node + "#" + this.ver});
 		
 		

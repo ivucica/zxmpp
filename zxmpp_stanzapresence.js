@@ -39,7 +39,7 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 		}
 
 		this.presenceNode = presence;
-		
+		//console.log("Got presence from " + this.from);
 		for(var i in xml.childNodes)
 		{
 			var child = xml.childNodes[i];
@@ -48,31 +48,40 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 			switch(child.nodeName)
 			{
 				case "show":
-				presence.show = child.firstChild.nodeValue;
+				if(this.from != this.zxmpp.fullJid)
+					presence.show = child.firstChild.nodeValue;
 				this.show = child.firstChild.nodeValue;
 				break;
 			
 				case "status":
-				presence.status = child.firstChild.nodeValue;
+				if(this.from != this.zxmpp.fullJid)
+					presence.status = child.firstChild.nodeValue;
 				this.status = child.firstChild.nodeValue;
 				break;
 				
 				case "priority":
-				presence.priority = child.firstChild.nodeValue;
+				if(this.from != this.zxmpp.fullJid)
+					presence.priority = child.firstChild.nodeValue;
 				this.priority = child.firstChild.nodeValue;
 				break;
 				
 				case "c": // TODO check namespace? 
-				this.caps = presence.caps = new this.zxmpp.caps(this.zxmpp);
-				this.caps.ownerJid = this.from;
-				this.caps.parseXML(child);
+				if(this.from != this.zxmpp.fullJid)
+				{
+					this.caps = presence.caps = new this.zxmpp.caps(this.zxmpp);
+					this.caps.ownerJid = this.from;
+					this.caps.parseXML(child);
+				}
+				else
+				{
+					this.caps = presence.caps;
+				}
 				break;
 				
 				case "#text":
 				// ignore!
 				break;
 				
-				// TODO handle "c"
 				default:
 				console.log("zxmpp::stanzapresence::parseXML(): Unhandled child node " + child.nodeName);	
 			}
