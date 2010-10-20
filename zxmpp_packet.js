@@ -62,7 +62,16 @@ zxmppClass.prototype.packet = function (zxmpp)
 	{	
 		
 		// queue for wire
-		this.zxmpp.stream.transmitPacket(this, send_style);
+		// FIXME ignores send_style!
+		if(send_style=="hold")
+		{
+			this.zxmpp.stream.transmitPacket(this, send_style);
+		}
+		else
+		{
+			this.zxmpp.stream.pollPacketQueue.push(this);
+			this.zxmpp.stream.tryEmptyingPollQueue();
+		}
 	}
 	
 	

@@ -211,7 +211,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 
 		var conn = this.findFreeConnection(send_style);
 		
-		if(conn) console.log("Sending " + send_style + " with pollqueue " + this.pollPacketQueue.length);
+		if(conn) console.log("Sending " + send_style + " with pollqueue " + this.pollPacketQueue.length + ": " + this.zxmpp.util.serializedXML(packet.xml));
 
 		
 		if(conn && (send_style=="hold" || (send_style == "poll" && (this.pollPacketQueue.length == 0 ||sending_from_queue) )))
@@ -232,6 +232,9 @@ zxmppClass.prototype.stream = function (zxmpp)
 			//console.log("WRITING " + conn.connoutgoing);
 
 		}
+		
+		
+		/*
 		else if (send_style == "poll")
 		{
 			// there was no available poll connection slot
@@ -254,7 +257,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		{
 			console.error("zxmpp::Stream::transmitPacket(): Unhandled case while handling send_style " + send_style);
 		}
-	
+		*/
 		
 
 	}
@@ -445,7 +448,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 			
 			this.hasSentInitialPresence = true;
 		}
-		else if(this.hasSentInitialPresence && this.findFreeConnection("hold") && this.pollPacketQueue.length) // if we haven't held yet, and we have a free holding slot, and nothing is waiting to poll...
+		else if(this.hasSentInitialPresence && this.findFreeConnection("hold") && this.findFreeConnection("poll") && !this.pollPacketQueue.length) // if we haven't held yet, and we have a free holding slot, and nothing is waiting to poll...
 		{
 			this.sendIdle("hold");
 		}
