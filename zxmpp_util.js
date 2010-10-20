@@ -390,7 +390,7 @@ zxmppClass.prototype.util = function (zxmpp)
         var clone = {};
         for(var i in obj) {
             if(typeof(obj[i])=="object")
-                clone[i] = cloneObject(obj[i]);
+                clone[i] = this.cloneObject(obj[i]);
             else
                 clone[i] = obj[i];
         }
