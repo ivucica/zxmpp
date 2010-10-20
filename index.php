@@ -2,6 +2,9 @@
 <html>
 <head>
 <title>Z-XMPP</title>
+
+<script src="deepCopy.js"></script>
+
 <script src="zxmpp_main.js"></script>
 <script src="zxmpp_util.js"></script>
 <script src="zxmpp_stream.js"></script>
