@@ -385,16 +385,9 @@ zxmppClass.prototype.util = function (zxmpp)
 	/**********************
 	 * clone object func  *
 	 *********************/
-	 // http://stackoverflow.com/questions/122102/what-is-the-most-efficient-way-to-clone-a-javascript-object/1891377#1891377
+	 // http://oranlooney.com/deep-copy-javascript/
 	this.cloneObject = function(obj) {
-        var clone = {};
-        for(var i in obj) {
-            if(typeof(obj[i])=="object")
-                clone[i] = this.cloneObject(obj[i]);
-            else
-                clone[i] = obj[i];
-        }
-        return clone;
+        return owl.copy(obj);
     }
 
 	
