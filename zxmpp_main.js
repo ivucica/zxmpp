@@ -31,7 +31,10 @@ zxmppClass.prototype.init = function(uiOwner, configDict)
 	/****************
 	 * client state *
 	 ****************/
-	this.presences= {};
+	this.presences = {};
+	this.capsNodes = {};
+	this.roster = {};
+	this.rosterGroups = {};
 	
 }
 
@@ -98,7 +101,19 @@ zxmppClass.prototype._debugDumpPresences = function()
 		var resources = this.presences[bareJid];
 		for(var resource in resources)
 		{
-			console.log(" " + resource);
+			var presence = resources[resource];
+			var info = "";
+			info += presence.caps.nodeType + " " + presence.caps.nodeCategory + " " + presence.caps.nodeName;
+			info += " (";
+			for(var feature in presence.caps.features)
+			{
+				info += feature + ", ";
+			}
+			info += "that's it)"
+			
+			
+			
+			console.log(" " + resource + " - " + info);
 		}
 	} 
 	console.log(" ");

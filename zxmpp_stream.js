@@ -72,7 +72,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		body.setAttribute('ver','1.6');
 		body.setAttribute('wait','120');
 		body.setAttribute('xmpp:version','1.0');
-		body.setAttribute('hold','3');
+		body.setAttribute('hold','15');
 		body.setAttribute('secure','false');
 		body.setAttribute('to',this.zxmpp.cfg['server']);
 		body.setAttribute('route',this.zxmpp.cfg['server'] + ':5222');
@@ -174,15 +174,20 @@ zxmppClass.prototype.stream = function (zxmpp)
  			conn.setRequestHeader("Content-type","text/xml; charset=utf-8");
 			conn.setRequestHeader("X-ZXMPPType",send_style);
 			conn.onreadystatechange = this.zxmpp.stream.handleConnectionStateChange;
-			conn.connoutgoing = packet.finalized();
+			if(!conn.connoutgoing)
+				conn.connoutgoing = packet.finalized();
 			conn.send(conn.connoutgoing);
+
+			//console.log("WRITING " + conn.connoutgoing);
 
 		}
 		else if (send_style == "poll")
 		{
 			// there was no available poll connection slot
+			// or, there was something in the queue
+			console.log("zxmpp::Stream::transmitPacket(): Sending on poll connection while poll connections are taken, or poll queue exists: " + this.pollPacketQueue.length + ". To keep ordering, added outgoing msg to packet queue and tried dispatching poll queue");
+
 			this.pollPacketQueue.push(packet);
-			//console.log("zxmpp::Stream::transmitPacket(): Sending on poll connection while poll queue exists. To keep ordering, added outgoing msg to packet queue and tried dispatching poll queue");
 			this.tryEmptyingPollQueue();
 		}
 		else if (send_style == "hold")
@@ -200,7 +205,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 
 	this.tryEmptyingPollQueue = function()
 	{
-		while(this.pollPacketQueue.length && this.findFreeConnection("poll"))
+		while(this.pollPacketQueue.length>0 && this.findFreeConnection("poll"))
 		{
 			// grab a packet that waits longest
 			var packet = this.pollPacketQueue.shift();
@@ -246,29 +251,56 @@ zxmppClass.prototype.stream = function (zxmpp)
 		{
 			return;
 		}
-
+		
 		// the connection failed?
 		if(conn.status != 200)
 		{
 			switch(conn.status)
 			{
-				case "404":
+				case 0:
+				// retry as with 404!
+				// although this is probably due to page closing,
+				// it could be also due to different disconnect
+				// (such as computer going to standby, or unreliable
+				// connection)
+				
+				console.log("Disconnect (HTTP status 0) - retrying");
+				
+				
+				case 404:
 				// TODO check if BOSH really specifies 404 upon out of order packet, or is this ejabberd specific behavior?		
 				if(conn.connzxmpp.stream.retriesUpon404<0)
 				{
-					console.error("zxmppClass::Stream::handleConnectionStateChange(): Too many 404s, giving up and terminating");
+					console.error("zxmppClass::Stream::handleConnectionStateChange(): Too many " + conn.status + " failures, giving up and terminating");
 					conn.connzxmpp.stream.terminate();
 	
 					var code = "terminate/http-" + conn.status;
-					var humanreadable = "Attempts to handle 404 by reposting failed. The service does not exist or there were too many out of order packets";
+					var humanreadable = "Attempts to handle " + conn.status + " by reposting failed. The service does not exist or there were too many out of order packets";
 					conn.connzxmpp.onConnectionTerminate(code, humanreadable);
 					return;
 				}
 				
 				conn.connzxmpp.stream.retriesUpon404--;
-				console.warn("zxmppClass::Stream::handeConnectionStateChange(): http 404 - out of order request? retrying");
+				console.warn("zxmppClass::Stream::handeConnectionStateChange(): http " + conn.status + " - out of order request? http abort? retrying");
 				
-				conn.send(conn.connoutgoing);
+//				conn.send(conn.connoutgoing);
+
+				conn2 = new XMLHttpRequest();
+				conn2.open("POST", conn.connzxmpp.cfg["bind-url"]);
+	 			conn2.setRequestHeader("Content-type","text/xml; charset=utf-8");
+				conn2.setRequestHeader("X-ZXMPPType",conn.conntype);
+				conn2.onreadystatechange = conn.connzxmpp.stream.handleConnectionStateChange;
+				conn2.connoutgoing = conn.connoutgoing;
+				conn2.connindex = conn.connindex;
+				conn2.connzxmpp = conn.connzxmpp;
+				conn2.conntype = conn.conntype;
+				conn2.send(conn2.connoutgoing);
+				
+				if(conn2.conntype=="hold")
+					conn.connzxmpp.stream.connectionsHold[conn2.connindex] = conn2;
+				else
+					conn.connzxmpp.stream.connectionsPoll[conn2.connindex] = conn2;
+
 				return;
 				
 				case 503:
@@ -285,7 +317,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 				conn.connzxmpp.stream.terminate();
 
 				var code = "terminate/http-" + conn.status;
-				var humanreadable = "Unexpected HTTP status " + conn.status + ".";
+				var humanreadable = "Unexpected HTTP status '" + conn.status + "'.";
 				conn.connzxmpp.onConnectionTerminate(code, humanreadable);
 				return;
 				

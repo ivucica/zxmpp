@@ -109,11 +109,17 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			}
 			
 			break;
+			
+			default:
+			console.warn("zxmpp::stanzaIq::parseBindXML(): cannot handle iq's of type " + this.type);
+			this.iqFail();
 		}
 	}
 	
 	this.parseQueryXML = function(xml)
 	{
+		this.zxmpp.util.easierAttrs(xml);
+
 		switch(this.type)
 		{
 			case "result":
@@ -129,12 +135,28 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				break;
 				
 				default:
-				console.warn("zxmpp::stanzaIq::parseQueryXML(): Unknown namespace " + xml.attr["xmlns"]);
-
+				console.warn("zxmpp::stanzaIq::parseQueryXML(): Unknown namespace " + xml.attr["xmlns"] + " (iqtype=result)");
+				this.iqFail();
 			}
 			
 			
 			break;
+			
+			case "set":
+			
+			switch(xml.attrib["xmlns"])
+			{
+				// behavior is the same.
+				case "jabber:iq:roster":
+				this.parseQueryRosterXML(xml);
+				this.iqResultEmpty();
+				break;
+
+				default:
+				console.warn("zxmpp::stanzaIq::parseQueryXML(): Unknown namespace " + xml.attr["xmlns"] + " (iqtype=set)");
+				this.iqFail();
+
+			}
 		}
 	}
 	
@@ -156,20 +178,75 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				// but oh well...
 				
 				var jid = child.attr["jid"];
-				console.log("Roster: " + jid);				
+				var name = child.attr["name"]; // roster nickname, optional!
+				var ask = child.attr["ask"]; // if ask="subscribe", we sent the request... but it's optional.
+				var subscription = child.attr["subscription"]; // state of subscription.
+				
+				this.zxmpp.roster[jid] = {};
+				console.log("Roster: " + jid);
+				console.log(" " + this.zxmpp.util.serializedXML(child));
+				
 				break;
 				
 				default:
 				console.warn("zxmpp::stanzaIq::parseQueryRosterXML(): Unknown namespace " + xml.attr["xmlns"]);
-
+				this.iqFail();
 			}
 		}
 	}
 	
 	this.parseQueryDiscoInfoXML = function(xml)
 	{
-		console.log("disco info: " + this.zxmpp.util.serializedXML(xml));
+		//console.log("disco info: " + this.zxmpp.util.serializedXML(xml));
 		
+		var presence = this.zxmpp.getPresence(this.from);
+		var caps = presence.caps;
+		
+		switch(this.type)
+		{
+			case "result":
+			for(var i in xml.childNodes)
+			{
+				var child = xml.childNodes[i];
+				if(!child.nodeName) continue;
+				
+				this.zxmpp.util.easierAttrs(child);
+				switch(child.nodeName)
+				{
+					case "identity":
+					var ccategory = child.attr["category"]; // client
+					var ctype = child.attr["type"]; // pc
+					var cname = child.attr["name"]; // e.g. Psi
+					
+					caps.nodeCategory = ccategory;
+					caps.nodeName = cname;
+					caps.nodeType = ctype;
+					
+					break;
+					
+					case "feature":
+					caps.features[child.attr["var"]] = true;
+					
+					break;
+				}
+			}
+			
+			caps.finishProcessing(); // add to cache db or whatever
+			
+			break;
+			
+			default:
+			console.warn("zxmpp::stanzaIq::parseQueryDiscoInfoXML(): unimplemented response to iq's of type " + this.type);
+			this.iqFail();
+		}
+	}
+	
+	this.iqResultEmpty = function()
+	{
+		var packet = new this.zxmpp.packet(this.zxmpp);
+		var iq = new this.zxmpp.stanzaIq(this.zxmpp);
+		iq.appendIqToPacket(packet, "emptyiqresult", "result", this.from);
+		packet.send("poll");
 	}
 	
 	
@@ -187,12 +264,18 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			default:
 			case "get":
 			case "set":
-			// FIXME implement failure response to server
 			console.warn("zxmpp::stanzaIq::iqFail(): responding to " + this.type + "-type iq failure ");
 			
+			// FIXME perhaps we MUST include failure reason?
+			// because currently we dont.
+
+			var packet = new this.zxmpp.packet(this.zxmpp);
+			var iq = new this.zxmpp.stanzaIq(this.zxmpp);
+			iq.appendIqToPacket(packet, "emptyiqfailure", "error", this.from);
+			packet.send("poll");
+
 			break;
-		}
-		
+		}	
 	}
 	
 	this.appendIqToPacket = function(packet, idtype, type, to)
