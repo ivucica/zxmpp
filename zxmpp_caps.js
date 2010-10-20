@@ -24,6 +24,9 @@ zxmppClass.prototype.caps = function(zxmpp)
 	this.nodeType = false;
 	this.nodeName = false;
 	
+	// FIXME hash="sha-1"; perhaps dont use it in database key?
+	
+	
 	this.parseXML = function (xml) // parse "c"
 	{
 		
@@ -40,20 +43,31 @@ zxmppClass.prototype.caps = function(zxmpp)
 		
 		this.ownerNode = this.node + "#" + this.ver;
 		
+		
+		
 		// if we already know caps, skip
 		if(this.hash)
 		{
 			// XEP-0115-4
 			// we can use node database
 			
+			// let's first discover each ext we don't know about
+			if(!this.zxmpp.capsNodesExt[this.ownerNode + "#" + this.hash])
+				this.zxmpp.capsNodesExt[this.ownerNode + "#" + this.hash] = {};
+			var extdest = this.zxmpp.capsNodesExt[this.ownerNode + "#" + this.hash];
+			
+			this.unpackExt(extdest);
+			
+			
+			
 			if(this.zxmpp.capsNodes[this.ownerNode + "#" + this.hash])
 			{
 				// replace this instance in its owner zxmpp::presence with
 				// the cached zxmpp::caps based on the hash
 				
-				// TODO must copy, not reference, and then replace ownerJid!
-				this.zxmpp.getPresence(this.ownerJid).caps = this.zxmpp.capsNodes[this.ownerNode + "#" + this.hash];
-				
+				this.zxmpp.getPresence(this.ownerJid).caps = this.zxmpp.util.cloneObject(this.zxmpp.capsNodes[this.ownerNode + "#" + this.hash]);
+				this.zxmpp.getPresence(this.ownerJid).caps.ownerJid = this.ownerJid;
+					
 				return;
 			}
 		}
@@ -63,7 +77,15 @@ zxmppClass.prototype.caps = function(zxmpp)
 			// using database is impossible,
 			// since we cannot verify caps
 			
-			// TODO implement "ext" parsing
+
+			// let's first discover each ext we don't know about
+			if(!this.zxmpp.capsNodesExt[this.ownerNode])
+				this.zxmpp.capsNodesExt[this.ownerNode] = {};
+			var extdest = this.zxmpp.capsNodesExt[this.ownerNode];
+			
+			this.unpackExt(extdest);
+			
+
 			
 			// TODO decide if we will trust clients that dont serve us hash
 			// for now we will trust 
@@ -72,8 +94,8 @@ zxmppClass.prototype.caps = function(zxmpp)
 				// replace this instance in its owner zxmpp::presence with
 				// the cached zxmpp::caps, based on just the node+ver
 				
-				// TODO must copy, not reference, and then replace ownerJid!
-				this.zxmpp.getPresence(this.ownerJid).caps = this.zxmpp.capsNodes[this.ownerNode];
+				this.zxmpp.getPresence(this.ownerJid).caps = this.zxmpp.util.cloneObject(this.zxmpp.capsNodes[this.ownerNode]);
+				this.zxmpp.getPresence(this.ownerJid).caps.ownerJid = this.ownerJid;
 				
 				return;
 			}
@@ -91,7 +113,6 @@ zxmppClass.prototype.caps = function(zxmpp)
 		this.zxmpp.stream.sendIqQuery("http://jabber.org/protocol/disco#info", "get", this.ownerJid, false, {"node": this.node + "#" + this.ver});
 		
 		
-		
 	}
 
 	this.finishProcessing = function()
@@ -103,15 +124,62 @@ zxmppClass.prototype.caps = function(zxmpp)
 		{
 			// TODO add hash spoofing verification!
 			
-			this.zxmpp.capsNodes[this.ownerNode + "#" + this.hash] = this;
+			this.zxmpp.capsNodes[this.ownerNode + "#" + this.hash] = this.zxmpp.util.cloneObject(this);
 		}
 		else
 		{
 			// TODO decide if we should trust the client without a hash!
 			// let's still cache based on ver, and trust
 			
-			this.zxmpp.capsNodes[this.ownerNode] = this;
+			this.zxmpp.capsNodes[this.ownerNode] = this.zxmpp.util.cloneObject(this);
 		}
+	}
+
+
+	this.appendToXML = function(packet, xml)
+	{
+		// FIXME currently we add constant values.
+		// we should actually add values stored in this caps instance!
+		// idea: function "this.useThisClientDefaults" which'll set defaults
+		
+		
+		var cnode = packet.xml.createElementNS("http://jabber.org/protocol/caps", "c");
+		cnode.setAttribute("node", "http://ivan.vucica.net/zxmpp/"); // FIXME move client identifier to global var
+		cnode.setAttribute("ver", "1.0"); // TODO implement proper, hashed "ver"-ification string
+		cnode.setAttribute("ext", ""); // TODO Send some capabilities! Avoid 'ext'
+		// TODO calculate hash, use the hash under "ver", and set "hash" to "sha-1"
+		xml.appendChild(cnode);
+	}
+
+
+	this.unpackExt = function(extdest)
+	{
+		var exts = this.ext.split(" ");
+		
+		var packet = new this.zxmpp.packet(this.zxmpp);
+		var needsSending = false;
+		for(var ext in exts)
+		{
+			if(extdest[ext])
+			{
+				var feature = extdest[ext];
+				this.featuresExt[feature] = true;
+				continue; // no need to request, we fetched from cache
+			}
+			
+			var iq = new this.zxmpp.stanzaIq(this.zxmpp);
+			iq.appendIqToPacket(packet, "query", "get", this.ownerJid);
+			iq.appendQueryToPacket(packet, "http://jabber.org/protocol/disco#info");
+
+			iq.query.setAttribute("node", this.node + "#" + ext);
+			iq.inquiringExt = ext;
+			iq.extDest = extdest;
+				
+			needsSending = true;
+		}
+		
+		if(needsSending)
+			packet.send("poll");
 	}
 
 };

@@ -138,19 +138,16 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 			presenceNode.appendChild(priorityNode);
 		}
 		
+		// finally, add our caps!
+		var presence = this.zxmpp.getPresence(this.from);
+		var caps = presence.caps;
+		//TODO: caps.usethisclientdefaults()
+		caps.appendToXML(packet, presenceNode);
 		
 		packet.presenceXML = presenceNode;
 		packet.presenceStanza = this;
 	}
 	
-	this.addCaps = function()
-	{
-		var cnode = packet.createElementNS("http://jabber.org/protocol/caps", "c");
-		cnode.setAttribute("node", "http://ivan.vucica.net/zxmpp/"); // FIXME move client identifier to global var
-		cnode.setAttribute("ver", "1.0"); // TODO implement proper, hashed "ver"
-		cnode.setAttribute("ext", ""); // TODO Send some capabilities! Avoid 'ext'
-		
-	}
 	
 	
 }

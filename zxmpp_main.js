@@ -33,6 +33,7 @@ zxmppClass.prototype.init = function(uiOwner, configDict)
 	 ****************/
 	this.presences = {};
 	this.capsNodes = {};
+	this.capsNodesExt = {};
 	this.roster = {};
 	this.rosterGroups = {};
 	

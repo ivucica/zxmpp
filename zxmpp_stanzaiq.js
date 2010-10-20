@@ -202,6 +202,16 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		var presence = this.zxmpp.getPresence(this.from);
 		var caps = presence.caps;
 		
+		var node = xml.attr["node"];
+		
+		
+		var askingIq = (this.zxmpp.stream.iqsAwaitingReply[this.id]);
+		if(!askingIq)
+		{
+			this.iqFail();
+			return; // FIXME make sure that, after failing, we give up on processing <iq> completely
+		}
+		
 		switch(this.type)
 		{
 			case "result":
@@ -225,7 +235,28 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 					break;
 					
 					case "feature":
-					caps.features[child.attr["var"]] = true;
+					if(!askingIq.inquiringExt)
+					{
+						// generic feature list asking
+						caps.features[child.attr["var"]] = true;
+					} 
+					else
+					{
+						// we're asking for description of an ext
+						// remember in db, and add to "extended" feature list
+						
+						caps.featuresExt[child.attr["var"]] = true;
+						
+						if(!askingIq.extDest)
+						{
+							console.warn("zxmpp::stanzaIq::parseQueryDiscoInfoXML(): unspecified extDest, cannot store ext info");
+							continue;
+						}
+						// remember in db:
+						askingIq.extDest[askingIq.inquiringExt] = child.attr["var"];
+						
+					}
+					
 					
 					break;
 				}
