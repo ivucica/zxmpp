@@ -10,6 +10,8 @@ zxmppClass.prototype.stanzaStreamFeatures = function(zxmpp)
 {
 	this.zxmpp = zxmpp;
 	
+	this.caps = false;
+	
 	this.parseXML = function (xml)
 	{
 		for(var i in xml.childNodes)
@@ -34,6 +36,14 @@ zxmppClass.prototype.stanzaStreamFeatures = function(zxmpp)
 				{
 					feature = new Object();
 					feature.xmlNS = child.attr["xmlns"];
+				}
+				else if(child.nodeName == "c" && child.attr["xmlns"]=="http://jabber.org/protocol/caps")
+				{
+					/*	var presence = this.zxmpp.getPresence(this.zxmpp.cfg["server"]);
+						this.caps = presence.caps = new this.zxmpp.caps(this.zxmpp);
+						this.caps.ownerJid = this.zxmpp.cfg["server"];
+						this.caps.parseXML(child);*/
+					// FIXME must not ask for these details until connection has been established
 				}
 				else
 				{
