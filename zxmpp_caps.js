@@ -156,6 +156,7 @@ zxmppClass.prototype.caps = function(zxmpp)
 
 	this.unpackExt = function(extdest)
 	{
+		if(!this.ext) return;
 		var exts = this.ext.split(" ");
 		
 		var packet = new this.zxmpp.packet(this.zxmpp);
