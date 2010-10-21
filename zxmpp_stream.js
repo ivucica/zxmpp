@@ -549,6 +549,9 @@ zxmppClass.prototype.stream = function (zxmpp)
 		// TODO server must support presence capability!
 		// check if it does.
 		// but, we dont have caps parsing yet
+		
+		// TODO send actual presence, not hardcoded stuff
+		
 		var packet = new this.zxmpp.packet(this.zxmpp);
 		var presence = new this.zxmpp.stanzaPresence(this.zxmpp);
 		presence.appendToPacket(packet, this.zxmpp.fullJid, false, "available", "Using Z-XMPP", 1);
@@ -584,6 +587,23 @@ zxmppClass.prototype.stream = function (zxmpp)
 		// more to the "remembered" reference to 
 		// this zxmpp::stanzaIq, return it.
 		return iq; 
+	}
+	
+	this.logoff = function()
+	{
+		// first send logoff "presence"
+		
+		var packet = new this.zxmpp.packet(this.zxmpp);
+		var presence = new this.zxmpp.stanzaPresence(this.zxmpp);
+		presence.appendToPacket(packet, this.zxmpp.fullJid, false, "unavailable", "Logging off Z-XMPP", 1);
+		
+		packet.xml_body.setAttribute("type","terminate");
+		packet.send("poll");
+		
+		// then ...
+		// TODO do nicer cleanup
+		zxmppClass._STREAM=this;
+		setTimeout(1, "zxmppClass._STREAM.terminate();");
 	}
 	
 	this.terminate = function()

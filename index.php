@@ -22,6 +22,8 @@
 <button onclick="go();">go</button>
 <button onclick="dumppresences();">dump presences</button>
 <button onclick="dumpstreamfeatures();">dump stream features</button>
+<button onclick="logoff();">logoff</button>
+
 <script defer="defer">
 var zxmpp;
 function go()
@@ -43,6 +45,10 @@ function dumppresences()
 function dumpstreamfeatures()
 {
 	zxmpp._debugDumpStreamFeatures();
+}
+function logoff()
+{
+	zxmpp.stream.logoff();
 }
 
 function handler_connectionterminate(code,humanreadable)
