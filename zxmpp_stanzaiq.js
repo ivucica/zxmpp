@@ -29,6 +29,8 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		this.type = xml.attr["type"];
 		this.id = xml.attr["id"];
 		
+		this.iqXML = xml;
+		
 		for(var i in xml.childNodes)
 		{
 			var child = xml.childNodes[i];
@@ -64,8 +66,19 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				
 				break;
 				
+				
+				case "session":
+				// should trigger session start, but bind does that already
+				// plus, it's mentioned in various sources that this can be
+				// safely ignored and treated as a noop.
+				
+				// so let's just include it here so we don't send iqFail to
+				// server and so that we don't log this as a warning.
+				break;
+				
 				default:
 				console.warn("zxmpp::stanzaIq::parseXML(): Unknown child " + child.nodeName);
+				this.iqFail();
 			}
 		}
 		
@@ -157,6 +170,13 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				this.iqFail();
 
 			}
+			
+			break;
+			
+			
+			default:
+			console.warn("zxmpp::stanzaIq::parseQueryXML(): unhandled iq type " + this.type);
+			this.iqFail();
 		}
 	}
 	
@@ -280,14 +300,14 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 	{
 		var packet = new this.zxmpp.packet(this.zxmpp);
 		var iq = new this.zxmpp.stanzaIq(this.zxmpp);
-		iq.appendIqToPacket(packet, "emptyiqresult", "result", this.from);
+		iq.appendIqToPacket(packet, false, "result", this.from, this.id);
 		packet.send("poll");
 	}
 	
 	
 	this.iqFail = function()
 	{
-		console.error("zxmpp::stanzaIq::iqFail(): a failure parsing IQ stanza has occured");
+		console.error("zxmpp::stanzaIq::iqFail(): a failure parsing IQ stanza has occured: " + this.zxmpp.util.serializedXML(this.iqXML));
 			
 		switch(this.type)
 		{
@@ -306,19 +326,26 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 
 			var packet = new this.zxmpp.packet(this.zxmpp);
 			var iq = new this.zxmpp.stanzaIq(this.zxmpp);
-			iq.appendIqToPacket(packet, "emptyiqfailure", "error", this.from);
+			iq.appendIqToPacket(packet, false, "error", this.from, this.id);
+			iq.appendErrorToPacket(packet, "cancel", {"not-allowed":"urn:ietf:params:xml:ns:xmpp-stanzas"});
+			
 			packet.send("poll");
 
 			break;
 		}	
 	}
 	
-	this.appendIqToPacket = function(packet, idtype, type, to)
+	this.appendIqToPacket = function(packet, idtype, type, to, forced_id)
 	{
 		// generate an iq in this packet
 		
 		var iq = packet.xml.createElementNS("jabber:client", "iq");
-		iq.setAttribute("id", this.id=this.zxmpp.stream.uniqueId(idtype));
+		
+		if(!forced_id)
+			iq.setAttribute("id", this.id=this.zxmpp.stream.uniqueId(idtype));
+		else
+			iq.setAttribute("id", this.id=forced_id);
+			
 		iq.setAttribute("type", this.type=type);
 		if(to) 
 			iq.setAttribute("to", this.to=to);
@@ -350,8 +377,31 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		var query = this.query = packet.xml.createElementNS(namespace, "query");
 		iq.appendChild(query);
 		
-		packet.iqStanza = this;
+		packet.iqStanza = this;	
+	}
+	
+	this.appendErrorToPacket = function(packet, type, details)
+	{
+		// For a given packet initialized with an <iq>,
+		// append a <error>, initializing this.error
 		
+		// Also, attach that <iq> to this class, 
+		// initializing this.iqXML
+		var iq = this.iqXML = packet.iqXML;
+		var error = this.error = packet.xml.createElement("error");
+		iq.appendChild(error);
+		error.setAttribute("type", type);
+		
+		if(details)
+		{
+			for(var nodename in details)
+			{
+				var ns = details[nodename];
+				packet.xml.createElementNS(ns, nodename);
+			}
+		}
+			
+		packet.iqStanza = this;	
 	}
 	this.appendBindToPacket = function(packet, resource)
 	{
