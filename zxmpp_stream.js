@@ -316,15 +316,16 @@ zxmppClass.prototype.stream = function (zxmpp)
 		{
 			switch(conn.status)
 			{
-				case 0:
-				// retry as with 404!
+				case 0:	
 				// although this is probably due to page closing,
 				// it could be also due to different disconnect
 				// (such as computer going to standby, or unreliable
 				// connection)
+				case 502:
+				// probably proxy timeout!
+				console.log("Disconnect (HTTP status " + conn.status + ") - retrying");
 				
-				console.log("Disconnect (HTTP status 0) - retrying");
-				
+				// retry as with 404!
 				
 				case 404:
 				// TODO check if BOSH really specifies 404 upon out of order packet, or is this ejabberd specific behavior?		
