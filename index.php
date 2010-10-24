@@ -29,8 +29,8 @@ var zxmpp;
 function go()
 {
 	var cfg = {
-		"bind-url": "http-bind/",
-		"server": window.location.hostname
+		"bind-url": "z-http-bind/",
+		"server": "zatemas.zrs.hr"//window.location.hostname
 	};
 	zxmpp = new zxmppClass();
 	zxmpp.onConnectionTerminate=handler_connectionterminate;
