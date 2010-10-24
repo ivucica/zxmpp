@@ -21,6 +21,7 @@ function zxmppClass()
 	this.onConnectionTerminate = [];
 	this.onPresenceUpdate = [];
 	this.onRosterUpdate = [];
+	this.onMessage = [];
 }
 
 zxmppClass.prototype.init = function(uiOwner, configDict)
@@ -203,6 +204,19 @@ zxmppClass.prototype.notifyRosterUpdate = function(rosteritem)
 			rosterUpdateHandler.func(rosterUpdateHandler.context, this, rosteritem);
 		else
 			rosterUpdateHandler(this, rosteritem);
+	}
+}
+
+zxmppClass.prototype.notifyMessage = function(messageStanza)
+{
+	
+	for(var rosterUpdateHandlerId in this.onMessage)
+	{
+		var messageHandler = this.onMessage[rosterUpdateHandlerId];
+		if(messageHandler.func)
+			messageHandler.func(messageHandler.context, this, messageStanza);
+		else
+			messageHandler(this, messageStanza);
 	}
 }
 

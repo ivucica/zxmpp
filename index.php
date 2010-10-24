@@ -22,7 +22,7 @@
 <script src="zxmpp_stanzapresence.js"></script>
 <script src="zxmpp_stanzastreamfeatures.js"></script>
 <script src="zxmpp_stanzasaslresult.js"></script>
-
+<script src="zxmpp_stanzamessage.js"></script>
 </head>
 <body>
 <div id="zxmpp_root">Loading zxmpp</div>
@@ -50,6 +50,7 @@ function go()
 	zxmpp.onConnectionTerminate.push(handler_connectionterminate);
 	zxmpp.onPresenceUpdate.push(handler_presenceupdate);
 	zxmpp.onRosterUpdate.push(handler_rosterupdate);
+	zxmpp.onMessage.push(handler_message);
 	zxmpp.main(document.getElementById("zxmpp_root"), cfg, "perica", "123");
 	//var pack = new zxmpp.packet(zxmpp);
 
@@ -142,6 +143,10 @@ function handler_rosterupdate(sender, item)
 		zxmppui.rosterAdded(item.bareJid, presence ? presence.show : "unavailable", presence ? presence.status : "");
 		
 	}
+}
+function handler_message(sender, messagestanza)
+{
+	console.log("> " + messagestanza.from + ": " + messagestanza.body);
 }
 go();
 </script>
