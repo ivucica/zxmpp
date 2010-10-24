@@ -42,6 +42,9 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 		}
 
 		this.presenceNode = presence;
+		this.show = presence.show = "avail";
+		this.status = presence.status = "";
+
 		//console.log("Got presence from " + this.from);
 		for(var i in xml.childNodes)
 		{
