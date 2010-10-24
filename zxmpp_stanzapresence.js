@@ -35,7 +35,10 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 		{
 			presence.show = "unavailable";
 			this.zxmpp.removePresence(this.from);
-			return; // FIXME we should keep on parsing; showing the status upon logout might be fun
+			
+			this.zxmpp.notifyPresenceUpdate(presence);
+			
+			return; // FIXME we should not return and should continue parsing; showing the <status> upon logout might be fun
 		}
 
 		this.presenceNode = presence;
@@ -97,6 +100,9 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 			}
 			
 		}
+		
+		this.zxmpp.notifyPresenceUpdate(presence);
+
 	}
 	
 	

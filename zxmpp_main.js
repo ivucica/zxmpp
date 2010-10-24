@@ -16,6 +16,10 @@ function zxmppClass()
 	 
 	this.util = new this.util(this);
 	this.stream = new this.stream(this);
+	
+	// Event handlers
+	this.onConnectionTerminate = [];
+	this.onPresenceUpdate = [];
 }
 
 zxmppClass.prototype.init = function(uiOwner, configDict)
@@ -133,5 +137,31 @@ zxmppClass.prototype._debugDumpStreamFeatures = function()
 		}
 	} 
 	console.log(" ");
+}
+
+zxmppClass.prototype.notifyConnectionTerminate = function(code,humanreadable)
+{
+	for(var terminateHandlerId in this.onConnectionTerminate)
+	{
+		var terminateHandler = this.onConnectionTerminate[terminateHandlerId];
+		console.log("notifyConnectionTerminate: " + terminateHandler);
+		if(terminateHandler.func)
+			terminateHandler.func(terminateHandler.context,code,humanreadable);
+		else
+			terminateHandler(code,humanreadable);
+	}
+}
+
+zxmppClass.prototype.notifyPresenceUpdate = function(presence)
+{
+	for(var presenceHandlerId in this.onPresenceUpdate)
+	{
+		var presenceHandler = this.onConnectionTerminate[presenceHandlerId];
+		console.log("notifyPresenceUpdate: " + presenceUpdate);
+		if(presenceHandler.func)
+			presenceHandler.func(presenceHandler.context, presence);
+		else
+			presenceHandler(presence);
+	}
 }
 
