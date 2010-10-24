@@ -16,7 +16,6 @@ function zxmppClass()
 	 
 	this.util = new this.util(this);
 	this.stream = new this.stream(this);
-	
 }
 
 zxmppClass.prototype.init = function(uiOwner, configDict)

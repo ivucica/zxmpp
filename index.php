@@ -3,10 +3,14 @@
 <head>
 <title>Z-XMPP</title>
 
+<link href="application.css" rel="stylesheet" type="text/css">
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
 <script src="deepCopy.js"></script>
 
 <script src="zxmpp_main.js"></script>
 <script src="zxmpp_util.js"></script>
+<script src="zxmpp_ui.js"></script>
 <script src="zxmpp_stream.js"></script>
 <script src="zxmpp_packet.js"></script>
 <script src="zxmpp_presence.js"></script>
@@ -16,6 +20,7 @@
 <script src="zxmpp_stanzapresence.js"></script>
 <script src="zxmpp_stanzastreamfeatures.js"></script>
 <script src="zxmpp_stanzasaslresult.js"></script>
+
 </head>
 <body>
 <div id="zxmpp_root">Loading zxmpp</div>
@@ -30,11 +35,12 @@ function go()
 {
 	var cfg = {
 		"bind-url": "z-http-bind/",
-		"server": "zatemas.zrs.hr"//window.location.hostname
+		"server": 'zatemas.zrs.hr'//window.location.hostname
 	};
 	zxmpp = new zxmppClass();
 	zxmpp.onConnectionTerminate=handler_connectionterminate;
 	zxmpp.main(document.getElementById("zxmpp_root"), cfg, "perica", "123");
+	$('body').append((new zxmpp.ui).toString());
 	//var pack = new zxmpp.packet(zxmpp);
 }
 
