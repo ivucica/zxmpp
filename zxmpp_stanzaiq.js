@@ -137,6 +137,8 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		{
 			case "result":
 			
+			if(!xml.attrib)
+				xml.attrib = {"xmlns":"UNSET"}; // dummy so we throw error
 			switch(xml.attr["xmlns"])
 			{
 				case "jabber:iq:roster":
@@ -156,7 +158,9 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			break;
 			
 			case "set":
-			
+			if(!xml.attrib)
+				xml.attrib = {"xmlns":"UNSET"}; // dummy so we throw error
+
 			switch(xml.attrib["xmlns"])
 			{
 				// behavior is the same.
