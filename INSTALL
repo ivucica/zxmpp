@@ -1,0 +1,8 @@
+= apache modules, .htaccess
+
+Your apache installation needs to have mod_rewrite and mod_proxy enabled,
+at least for the directory where you put zxmpp. We're shipping an example
+.htaccess which redirects to a local XMPP server, with BOSH service being
+run on port 5280 in subdirectory http-bind/ (as on ejabberd).
+
+
