@@ -110,6 +110,12 @@ function handler_rosterupdate(item)
 	{
 		console.log("     " + item.groups[i]);
 	}
+	
+	var presence = zxmpp.getTopPresenceForBareJid(item.bareJid);
+	if(presence)
+	{
+		console.log("Presence icon: " + presence.show);
+	}
 }
 go();
 </script>
