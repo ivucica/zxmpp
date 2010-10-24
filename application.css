@@ -1,0 +1,8 @@
+.zxmpp_bar {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	height: 20px;
+	border: 1px solid red;
+}
