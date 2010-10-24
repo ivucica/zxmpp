@@ -144,7 +144,6 @@ zxmppClass.prototype.notifyConnectionTerminate = function(code,humanreadable)
 	for(var terminateHandlerId in this.onConnectionTerminate)
 	{
 		var terminateHandler = this.onConnectionTerminate[terminateHandlerId];
-		console.log("notifyConnectionTerminate: " + terminateHandler);
 		if(terminateHandler.func)
 			terminateHandler.func(terminateHandler.context,code,humanreadable);
 		else
@@ -157,7 +156,6 @@ zxmppClass.prototype.notifyPresenceUpdate = function(presence)
 	for(var presenceHandlerId in this.onPresenceUpdate)
 	{
 		var presenceHandler = this.onConnectionTerminate[presenceHandlerId];
-		console.log("notifyPresenceUpdate: " + presenceUpdate);
 		if(presenceHandler.func)
 			presenceHandler.func(presenceHandler.context, presence);
 		else
