@@ -5,7 +5,14 @@
 	right: 0px;
 	height: 20px;
 	z-index: 9999;
-	border: 1px solid red;
+
+	background: #ccc;
+	border-left: 1px solid #eee;
+	border-top: 1px solid #eee;
+	border-right: 1px solid #333;
+	border-bottom: 1px solid #333;
+	font-size: 8pt;
+	font-family: Arial;
 }
 
 .zxmpp_window {
@@ -16,10 +23,58 @@
 }
 
 .zxmpp_title {
-	border-left: 1px solid green;
-	border-right: 1px solid green;
+	height: 18px;
+	border-left: 1px solid #eee;
+	border-top: 1px solid #eee;
+	border-right: 1px solid #333;
+	border-bottom: 1px solid #333;
+	background: #ccc;
+	cursor: default;
+}
+.zxmpp_title div
+{
+	padding: 2px;
 }
 
 .zxmpp_content {
-	border: 1px solid blue;
+	border-left: 1px solid #eee;
+	border-top: 1px solid #eee;
+	border-right: 1px solid #333;
+	border-bottom: 1px solid #333;
+	background: #ccc;
+	width: 200px;
+	font-size: 8pt;
+	font-family: Arial;
+}
+
+.zxmpp_user {
+	border: 1px solid #ccc;
+	background: #ccc;
+	cursor: default;
+}
+.zxmpp_user:hover {
+	background: #eee;
+	border-left: 1px solid #eee;
+	border-top: 1px solid #eee;
+	border-right: 1px solid #333;
+	border-bottom: 1px solid #333;
+}
+
+.zxmpp_statusavail {
+	color: green;
+}
+.zxmpp_statuschat {
+	color: #1f1;
+}
+.zxmpp_statusaway {
+	color: #f97;
+}
+.zxmpp_statusxa {
+	color: red;
+}
+.zxmpp_statusunavailable {
+	color: #777;
+}
+.zxmpp_statusundefined {
+	color: yellow; /* make sure it stands out; this is a bug */
 }

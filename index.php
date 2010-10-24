@@ -5,7 +5,8 @@
 
 <link href="application.css" rel="stylesheet" type="text/css">
 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+<!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>-->
+<script src="jquery.min.js"></script>
 <script src="deepCopy.js"></script>
 
 <script src="zxmpp_main.js"></script>
@@ -34,17 +35,28 @@
 var zxmpp;
 function go()
 {
-	var cfg = {
+	var zatecfg = {
 		"bind-url": "z-http-bind/",
-		"server": 'zatemas.zrs.hr'//window.location.hostname
+		"server": 'zatemas.zrs.hr'
 	};
+	var relativecfg = {
+		"bind-url": "http-bind/",
+		"server": window.location.hostname
+	};
+
+	var cfg = relativecfg;
+
 	zxmpp = new zxmppClass();
 	zxmpp.onConnectionTerminate.push(handler_connectionterminate);
 	zxmpp.onPresenceUpdate.push(handler_presenceupdate);
 	zxmpp.onRosterUpdate.push(handler_rosterupdate);
 	zxmpp.main(document.getElementById("zxmpp_root"), cfg, "perica", "123");
-	ui = (new zxmpp.ui).inject('body');//.onPresenceUpdate(['perica', 'matija']);
 	//var pack = new zxmpp.packet(zxmpp);
+
+
+
+	window.zxmppui = (new zxmpp.ui);//.inject('body');//.onPresenceUpdate(['perica', 'matija']);
+	window.zxmppui.inject('body');
 }
 
 function dumppresences()
@@ -99,6 +111,14 @@ function handler_presenceupdate(sender, presence)
 	console.log(" -> " + presence.fullJid);
 	console.log("   Icon: " + presence.show);
 	console.log("   Status: " + presence.status);
+
+
+	var toppresence = sender.getTopPresenceForBareJid(presence.bareJid);
+	if(toppresence)
+	{
+		console.log("Updating " + toppresence.bareJid);
+		zxmppui.presenceUpdate(toppresence.bareJid, toppresence.show, toppresence.bareJid, toppresence.status);
+	}
 }
 function handler_rosterupdate(sender, item)
 {
@@ -111,10 +131,16 @@ function handler_rosterupdate(sender, item)
 		console.log("     " + item.groups[i]);
 	}
 	
-	var presence = zxmpp.getTopPresenceForBareJid(item.bareJid);
+	var presence = sender.getTopPresenceForBareJid(item.bareJid);
 	if(presence)
 	{
 		console.log("Presence icon: " + presence.show);
+	}
+
+	if(item.subscription != "removed")
+	{
+		zxmppui.rosterAdded(item.bareJid, presence ? presence.show : "unavailable", presence ? presence.status : "");
+		
 	}
 }
 go();
