@@ -448,7 +448,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 			
 			this.hasSentInitialPresence = true;
 		}
-		else if(this.hasSentInitialPresence && this.findFreeConnection("hold") && this.findFreeConnection("poll") && !this.pollPacketQueue.length) // if we haven't held yet, and we have a free holding slot, and nothing is waiting to poll...
+		else if(this.hasSentInitialPresence && this.findFreeConnection("hold") && !this.pollPacketQueue.length) // if we haven't held yet, and we have a free holding slot, and nothing is waiting to poll...
 		{
 			this.sendIdle("hold");
 		}
