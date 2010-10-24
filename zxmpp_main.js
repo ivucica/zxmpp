@@ -176,9 +176,9 @@ zxmppClass.prototype.notifyConnectionTerminate = function(code,humanreadable)
 	{
 		var terminateHandler = this.onConnectionTerminate[terminateHandlerId];
 		if(terminateHandler.func)
-			terminateHandler.func(terminateHandler.context,code,humanreadable);
+			terminateHandler.func(terminateHandler.context, this, code, humanreadable);
 		else
-			terminateHandler(code,humanreadable);
+			terminateHandler(this,code,humanreadable);
 	}
 }
 
@@ -188,9 +188,9 @@ zxmppClass.prototype.notifyPresenceUpdate = function(presence)
 	{
 		var presenceHandler = this.onPresenceUpdate[presenceHandlerId];
 		if(presenceHandler.func)
-			presenceHandler.func(presenceHandler.context, presence);
+			presenceHandler.func(presenceHandler.context, this, presence);
 		else
-			presenceHandler(presence);
+			presenceHandler(this, presence);
 	}
 }
 zxmppClass.prototype.notifyRosterUpdate = function(rosteritem)
@@ -200,9 +200,9 @@ zxmppClass.prototype.notifyRosterUpdate = function(rosteritem)
 	{
 		var rosterUpdateHandler = this.onRosterUpdate[rosterUpdateHandlerId];
 		if(rosterUpdateHandler.func)
-			rosterUpdateHandler.func(rosterUpdateHandler.context, rosteritem);
+			rosterUpdateHandler.func(rosterUpdateHandler.context, this, rosteritem);
 		else
-			rosterUpdateHandler(rosteritem);
+			rosterUpdateHandler(this, rosteritem);
 	}
 }
 
