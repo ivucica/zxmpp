@@ -513,7 +513,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		var iq = new this.zxmpp.stanzaIq(this.zxmpp);
 		
 		iq.appendIqToPacket(packet, "bind", "set", this.zxmpp.cfg["server"]);
-		iq.appendBindToPacket(packet, "Z-XMPP");
+		iq.appendBindToPacket(packet, "Z-XMPP" + (Math.random() % 1000));
 		
 		this.hasSentBind=true;
 		packet.send(send_style);
