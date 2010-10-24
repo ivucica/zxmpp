@@ -22,7 +22,6 @@ zxmppClass.prototype.stanzaSaslResult = function(zxmpp)
 			
 			this.zxmpp.stream.terminate();
 			
-			if(this.zxmpp.onConnectionTerminate)
 			{
 				var code = "saslfailure";
 				if(xml.firstChild)
@@ -40,7 +39,7 @@ zxmppClass.prototype.stanzaSaslResult = function(zxmpp)
 						break;
 					}
 				}
-				this.zxmpp.onConnectionTerminate(code, humanreadable);
+				this.zxmpp.notifyConnectionTerminate(code, humanreadable);
 			}
 			
 		}

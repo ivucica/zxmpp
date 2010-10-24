@@ -96,7 +96,6 @@ zxmppClass.prototype.packet = function (zxmpp)
 			{
 				case "terminate":
 				this.zxmpp.stream.terminate();
-				if(this.zxmpp.onConnectionTerminate)
 				{
 					// let's generate an error-identifying code + human readable error
 					
@@ -111,7 +110,7 @@ zxmppClass.prototype.packet = function (zxmpp)
 						humanreadable = "Server does not handle the specified hostname.";
 						break;
 					}
-					this.zxmpp.onConnectionTerminate(code, humanreadable);
+					this.zxmpp.notifyConnectionTerminate(code, humanreadable);
 					
 					
 				}

@@ -38,7 +38,7 @@ function go()
 		"server": 'zatemas.zrs.hr'//window.location.hostname
 	};
 	zxmpp = new zxmppClass();
-	zxmpp.onConnectionTerminate=handler_connectionterminate;
+	zxmpp.onConnectionTerminate.push(handler_connectionterminate);
 	zxmpp.main(document.getElementById("zxmpp_root"), cfg, "perica", "123");
 	$('body').append((new zxmpp.ui).toString());
 	//var pack = new zxmpp.packet(zxmpp);
