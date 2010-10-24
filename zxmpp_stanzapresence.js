@@ -30,7 +30,7 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 		this.type = xml.attr["type"];
 
 		var presence = this.zxmpp.getPresence(this.from);
-		presence.show = "available";
+		presence.show = "avail";
 		if(this.type == "unavailable")
 		{
 			presence.show = "unavailable";
@@ -48,21 +48,31 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 			switch(child.nodeName)
 			{
 				case "show":
+				if(child.firstChild)
+					this.show = child.firstChild.nodeValue;
+				else
+					this.show = "avail";
 				if(this.from != this.zxmpp.fullJid)
-					presence.show = child.firstChild.nodeValue;
-				this.show = child.firstChild.nodeValue;
+					presence.show = this.show;
 				break;
 			
 				case "status":
+				if(child.firstChild)
+					this.status = child.firstChild.nodeValue;
+				else
+					this.status = "";	
 				if(this.from != this.zxmpp.fullJid)
-					presence.status = child.firstChild.nodeValue;
-				this.status = child.firstChild.nodeValue;
+					presence.status = this.status;
+					
 				break;
 				
 				case "priority":
+				if(child.firstChild)
+					this.priority = child.firstChild.nodeValue;
+				else
+					this.priority = 1;
 				if(this.from != this.zxmpp.fullJid)
-					presence.priority = child.firstChild.nodeValue;
-				this.priority = child.firstChild.nodeValue;
+					presence.priority = this.priority;
 				break;
 				
 				case "c": // TODO check namespace? 
@@ -102,7 +112,7 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 		{
 			this.type = "unavailable";
 		}
-		else if(type == "available")
+		else if(type == "avail")
 		{
 			// both show and type are empty!
 		}

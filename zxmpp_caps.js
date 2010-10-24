@@ -147,7 +147,7 @@ zxmppClass.prototype.caps = function(zxmpp)
 		
 		var cnode = packet.xml.createElementNS("http://jabber.org/protocol/caps", "c");
 		cnode.setAttribute("node", "http://ivan.vucica.net/zxmpp/"); // FIXME move client identifier to global var
-		cnode.setAttribute("ver", "1.0."); // TODO implement proper, hashed "ver"-ification string
+		cnode.setAttribute("ver", "1.0"); // TODO implement proper, hashed "ver"-ification string
 		cnode.setAttribute("ext", ""); // TODO Send some capabilities! Avoid 'ext'
 		// TODO calculate hash, use the hash under "ver", and set "hash" to "sha-1"
 		xml.appendChild(cnode);
