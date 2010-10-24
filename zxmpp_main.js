@@ -84,6 +84,37 @@ zxmppClass.prototype.getPresence = function(fullJid)
 	
 	return presence;
 }
+zxmppClass.prototype.getPresencesForBareJid = function(bareJid)
+{
+	return this.presences[bareJid];
+}
+zxmppClass.prototype.getTopPresenceForBareJid = function(bareJid)
+{
+	var topPresence = false;
+	var presences = this.presences[bareJid];
+	
+	if(!presences)
+		return false;
+
+	for(var resource in presences)
+	{
+		var presence = presences[resource];
+		if(!topPresence)
+		{
+			topPresence = presence;
+			continue;
+		}
+		
+		if(presence.priority > topPresence.priority)
+		{
+			topPresence = presence;
+		}
+	}
+
+	return topPresence;
+}
+
+
 zxmppClass.prototype.removePresence = function(fullJid)
 {
 	var jid = fullJid.split("/");
