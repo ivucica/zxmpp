@@ -40,7 +40,7 @@ function go()
 	zxmpp = new zxmppClass();
 	zxmpp.onConnectionTerminate.push(handler_connectionterminate);
 	zxmpp.main(document.getElementById("zxmpp_root"), cfg, "perica", "123");
-	$('body').append((new zxmpp.ui).toString());
+	ui = (new zxmpp.ui).inject('body');//.onPresenceUpdate(['perica', 'matija']);
 	//var pack = new zxmpp.packet(zxmpp);
 }
 

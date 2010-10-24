@@ -1,8 +1,25 @@
 .zxmpp_bar {
-	position: absolute;
+	position: fixed;
 	bottom: 0px;
 	left: 0px;
 	right: 0px;
 	height: 20px;
+	z-index: 9999;
 	border: 1px solid red;
+}
+
+.zxmpp_window {
+	float: right;
+	position: absolute;
+	bottom: 0px;
+	right: 0px;
+}
+
+.zxmpp_title {
+	border-left: 1px solid green;
+	border-right: 1px solid green;
+}
+
+.zxmpp_content {
+	border: 1px solid blue;
 }
