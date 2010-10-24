@@ -61,7 +61,7 @@ function logoff()
 	zxmpp.stream.logoff();
 }
 
-function handler_connectionterminate(code,humanreadable)
+function handler_connectionterminate(sender, code, humanreadable)
 {
 	codesplit=code.split("/");
 	switch(codesplit[0])
@@ -93,14 +93,14 @@ function handler_connectionterminate(code,humanreadable)
 		break;
 	}
 }
-function handler_presenceupdate(presence)
+function handler_presenceupdate(sender, presence)
 {
 	console.log("INDEX.PHP: Presence update: ");
 	console.log(" -> " + presence.fullJid);
 	console.log("   Icon: " + presence.show);
 	console.log("   Status: " + presence.status);
 }
-function handler_rosterupdate(item)
+function handler_rosterupdate(sender, item)
 {
 	console.log("INDEX.PHP: Roster update: ");
 	console.log(" -> " + item.bareJid);
