@@ -9,12 +9,8 @@ zxmppClass.prototype.ui = function() {
 	this.bar = undefined,
 	this.userlist = undefined,
 
-	this.toString = function() {
-		return $('<div class="zxmpp_bar"></div>');
-	}
-
 	this.inject = function(where) {
-		this.bar = $(this.toString()).appendTo(where);
+		this.bar = $('<div class="zxmpp_bar"></div>').appendTo(where);
 		this.bar.delegate('.zxmpp_title', 'click', this.changeWindowStatus);
 		this.userlist = this.openWindow('Online');
 		this.openWindow('bok');
