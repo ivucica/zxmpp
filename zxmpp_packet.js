@@ -209,6 +209,9 @@ zxmppClass.prototype.packet = function (zxmpp)
 					case "presence":
 					stanzaInstance = new this.zxmpp.stanzaPresence(this.zxmpp);
 					break;
+					case "message":
+					stanzaInstance = new this.zxmpp.stanzaMessage(this.zxmpp);
+					break;
 					
 				}
 			
