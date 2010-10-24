@@ -20,6 +20,7 @@ function zxmppClass()
 	// Event handlers
 	this.onConnectionTerminate = [];
 	this.onPresenceUpdate = [];
+	this.onRosterUpdate = [];
 }
 
 zxmppClass.prototype.init = function(uiOwner, configDict)
@@ -38,7 +39,6 @@ zxmppClass.prototype.init = function(uiOwner, configDict)
 	this.capsNodes = {};
 	this.capsNodesExt = {};
 	this.roster = {};
-	this.rosterGroups = {};
 	
 }
 
@@ -155,11 +155,23 @@ zxmppClass.prototype.notifyPresenceUpdate = function(presence)
 {
 	for(var presenceHandlerId in this.onPresenceUpdate)
 	{
-		var presenceHandler = this.onConnectionTerminate[presenceHandlerId];
+		var presenceHandler = this.onPresenceUpdate[presenceHandlerId];
 		if(presenceHandler.func)
 			presenceHandler.func(presenceHandler.context, presence);
 		else
 			presenceHandler(presence);
+	}
+}
+zxmppClass.prototype.notifyRosterUpdate = function(rosteritem)
+{
+	
+	for(var rosterUpdateHandlerId in this.onRosterUpdate)
+	{
+		var rosterUpdateHandler = this.onRosterUpdate[rosterUpdateHandlerId];
+		if(rosterUpdateHandler.func)
+			rosterUpdateHandler.func(rosterUpdateHandler.context, rosteritem);
+		else
+			rosterUpdateHandler(rosteritem);
 	}
 }
 

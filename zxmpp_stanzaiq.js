@@ -196,22 +196,13 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			switch(child.nodeName)
 			{
 				case "item":
-				// FIXME should actually have a class "rosteritem"
-				// which would parse this and serve as representation
-				// in the roster
-				// but oh well...
-				
-				var jid = child.attr["jid"];
-				var name = child.attr["name"]; // roster nickname, optional!
-				var ask = child.attr["ask"]; // if ask="subscribe", we sent the request... but it's optional.
-				var subscription = child.attr["subscription"]; // state of subscription.
-				
-				this.zxmpp.roster[jid] = {};
-				console.log("Roster: " + jid);
-				console.log(" " + this.zxmpp.util.serializedXML(child));
-				
+				var rosteritem = new this.zxmpp.itemRoster(this.zxmpp);
+				rosteritem.parseXML(child);
+				this.zxmpp.roster[rosteritem.bareJid] = rosteritem;
+				this.zxmpp.notifyRosterUpdate(rosteritem);
+
 				break;
-				
+
 				default:
 				console.warn("zxmpp::stanzaIq::parseQueryRosterXML(): Unknown namespace " + xml.attr["xmlns"]);
 				this.iqFail();

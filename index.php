@@ -15,6 +15,7 @@
 <script src="zxmpp_packet.js"></script>
 <script src="zxmpp_presence.js"></script>
 <script src="zxmpp_caps.js"></script>
+<script src="zxmpp_itemroster.js"></script>
 
 <script src="zxmpp_stanzaiq.js"></script>
 <script src="zxmpp_stanzapresence.js"></script>
@@ -39,6 +40,8 @@ function go()
 	};
 	zxmpp = new zxmppClass();
 	zxmpp.onConnectionTerminate.push(handler_connectionterminate);
+	zxmpp.onPresenceUpdate.push(handler_presenceupdate);
+	zxmpp.onRosterUpdate.push(handler_rosterupdate);
 	zxmpp.main(document.getElementById("zxmpp_root"), cfg, "perica", "123");
 	ui = (new zxmpp.ui).inject('body');//.onPresenceUpdate(['perica', 'matija']);
 	//var pack = new zxmpp.packet(zxmpp);
@@ -52,6 +55,7 @@ function dumpstreamfeatures()
 {
 	zxmpp._debugDumpStreamFeatures();
 }
+
 function logoff()
 {
 	zxmpp.stream.logoff();
@@ -89,7 +93,24 @@ function handler_connectionterminate(code,humanreadable)
 		break;
 	}
 }
-
+function handler_presenceupdate(presence)
+{
+	console.log("INDEX.PHP: Presence update: ");
+	console.log(" -> " + presence.fullJid);
+	console.log("   Icon: " + presence.show);
+	console.log("   Status: " + presence.status);
+}
+function handler_rosterupdate(item)
+{
+	console.log("INDEX.PHP: Roster update: ");
+	console.log(" -> " + item.bareJid);
+	console.log("   Subscription: " + item.subscription); 
+	console.log("   Groups:");
+	for(var i in item.groups)
+	{
+		console.log("     " + item.groups[i]);
+	}
+}
 go();
 </script>
 </body>
