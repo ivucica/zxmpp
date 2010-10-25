@@ -47,6 +47,11 @@
 	font-family: Arial;
 }
 
+.zxmpp_content_msg {
+	max-height: 150px;
+	overflow: auto;
+}
+
 .zxmpp_user {
 	border: 1px solid #ccc;
 	background: #ccc;

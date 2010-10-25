@@ -58,6 +58,7 @@ function go()
 
 	window.zxmppui = (new zxmpp.ui);//.inject('body');//.onPresenceUpdate(['perica', 'matija']);
 	window.zxmppui.inject('body');
+	window.zxmppui.backend = zxmpp;
 }
 
 function dumppresences()
@@ -147,6 +148,8 @@ function handler_rosterupdate(sender, item)
 function handler_message(sender, messagestanza)
 {
 	console.log("> " + messagestanza.from + ": " + messagestanza.body);
+	if(messagestanza.body)
+		zxmppui.messageReceived(messagestanza.from, messagestanza.body);
 }
 go();
 </script>

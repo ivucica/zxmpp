@@ -589,7 +589,20 @@ zxmppClass.prototype.stream = function (zxmpp)
 		// this zxmpp::stanzaIq, return it.
 		return iq; 
 	}
-	
+
+
+	this.sendMessage = function(send_style, from, to, type, body)
+	{
+		// FIXME move packet fillout to zxmpp_packet.js
+		
+		var packet = new this.zxmpp.packet(this.zxmpp);
+		var message = new this.zxmpp.stanzaMessage(this.zxmpp);
+		message.appendToPacket(packet, from, to, type, body);
+		
+		packet.send(send_style);
+		
+	}
+
 	this.logoff = function()
 	{
 		// first send logoff "presence"
