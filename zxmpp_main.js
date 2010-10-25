@@ -220,3 +220,8 @@ zxmppClass.prototype.notifyMessage = function(messageStanza)
 	}
 }
 
+
+zxmppClass.prototype.sendMessage = function(to, body)
+{
+	this.stream.sendMessage("poll", this.fullJid, to, "chat", body);
+}

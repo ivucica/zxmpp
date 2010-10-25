@@ -58,6 +58,7 @@ zxmppClass.prototype.stanzaMessage = function(zxmpp)
 		this.from = from;
 		this.to = to;
 		this.body = body;
+		this.type = type;
 		
 		var messageNode = this.messageNode = packet.xml.createElement("message");
 		if(this.from) messageNode.setAttribute("from", this.from);
@@ -67,9 +68,11 @@ zxmppClass.prototype.stanzaMessage = function(zxmpp)
 			messageNode.setAttribute("type", this.type);
 		}
 		packet.xml_body.appendChild(messageNode);
-		
+	
+		console.log("body: " + this.body);	
 		if(this.body)
 		{
+			console.log("appending " + this.body);
 			var bodyNode = packet.xml.createElement("body");
 			var bodyText = packet.xml.createTextNode(this.body);
 			bodyNode.appendChild(bodyText);
