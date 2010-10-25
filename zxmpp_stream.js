@@ -226,9 +226,9 @@ zxmppClass.prototype.stream = function (zxmpp)
 				conn.connoutgoing = packet.finalized();
 			conn.send(conn.connoutgoing);
 
-/*
+
 			if(this.hasSentInitialPresence && this.pollPacketQueue.length == 0 && send_style == "poll" && this.findFreeConnection("hold"))
-				this.sendIdle("hold");*/
+				this.sendIdle("hold");
 			//console.log("WRITING " + conn.connoutgoing);
 
 		}
