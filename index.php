@@ -24,7 +24,7 @@
 <script src="zxmpp_stanzasaslresult.js"></script>
 <script src="zxmpp_stanzamessage.js"></script>
 </head>
-<body>
+<body onunload="zxmpp.logoff();">
 <div id="zxmpp_root">Loading zxmpp</div>
 <input id="usr" value="perica"><input type="password" id="pwd" value="123">
 

@@ -349,7 +349,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 			conn.connzxmpp.stream.connectionsPoll[conn2.connindex] = conn2;
 	}
 
-	this.retriesUpon404 = 5; // how many times can we retry sending packet?
+	this.retriesUpon404 = 10; // how many times can we retry sending packet?
 
 	this.handleConnectionStateChange = function()
 	{
@@ -405,7 +405,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 				
 //				conn.send(conn.connoutgoing);
 
-				setTimeout(conn.connzxmpp.stream.retryConn, 1000, conn);
+				setTimeout(conn.connzxmpp.stream.retryConn, 600+Math.random()*100, conn);
 				return;
 				
 				case 503:
@@ -432,7 +432,8 @@ zxmppClass.prototype.stream = function (zxmpp)
 		}
 
 		// success? reset 404 count
-		this.retriesUpon404 = 5;
+		this.retriesUpon404 = 10;
+		console.log("Retries are reset");
 
 		// clean connection slot, handle connection, try pushing stuff
 		if(conn.conntype == "hold")
