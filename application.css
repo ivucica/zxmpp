@@ -79,6 +79,7 @@
 }
 .zxmpp_statusunavailable {
 	color: #777;
+	display: none;
 }
 .zxmpp_statusundefined {
 	color: yellow; /* make sure it stands out; this is a bug */
