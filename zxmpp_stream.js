@@ -74,8 +74,8 @@ zxmppClass.prototype.stream = function (zxmpp)
 		body.setAttribute('xmpp:version','1.0');
 		body.setAttribute('hold','15');
 		body.setAttribute('secure','false');
-		body.setAttribute('to',this.zxmpp.cfg['server']);
-		body.setAttribute('route',this.zxmpp.cfg['server'] + ':5222');
+		body.setAttribute('to',this.zxmpp.cfg['domain']);
+		body.setAttribute('route',this.zxmpp.cfg['route']);
 
 		packet.send();
 	}
@@ -371,7 +371,9 @@ zxmppClass.prototype.stream = function (zxmpp)
 				var humanreadable = "Service not running or overloaded.";
 				conn.connzxmpp.notifyConnectionTerminate(code, humanreadable);
 				return;
-				
+			
+				case 500:
+				window.open("data:text/html," + conn.responseText, "Name");
 				default:
 				console.error("zxmppClass::Stream::handleConnectionStateChange(): invalid http status " + conn.status + ", terminating connection");
 				conn.connzxmpp.stream.terminate();
@@ -513,7 +515,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		var packet = new this.zxmpp.packet(this.zxmpp);
 		var iq = new this.zxmpp.stanzaIq(this.zxmpp);
 		
-		iq.appendIqToPacket(packet, "bind", "set", this.zxmpp.cfg["server"]);
+		iq.appendIqToPacket(packet, "bind", "set", this.zxmpp.cfg["domain"]);
 		iq.appendBindToPacket(packet, "Z-XMPP" + Math.random() * 1000);
 		
 		this.hasSentBind=true;
@@ -535,7 +537,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 
 		var packet = new this.zxmpp.packet(this.zxmpp);
 		var iq = new this.zxmpp.stanzaIq(this.zxmpp);
-		iq.appendIqToPacket(packet, "session", "set", this.zxmpp.cfg["server"]);
+		iq.appendIqToPacket(packet, "session", "set", this.zxmpp.cfg["domain"]);
 		iq.appendSessionToPacket(packet);
 		
 		this.hasSentSessionRequest=true;
