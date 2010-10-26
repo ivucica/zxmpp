@@ -49,9 +49,10 @@ zxmppClass.prototype.packet = function (zxmpp)
 		// assign cryptographic key(s) from 
 		// part 15 of XEP-0124
 		var keys = this.zxmpp.stream.assignKey();
-		body.setAttribute('key', keys.key);
+		if(keys.key)
+			body.setAttribute('key', keys.key);
 		if(keys.newKey)
-			body.setAttribute('newkey', keys.newkey);
+			body.setAttribute('newkey', keys.newKey);
 		
 		
 		return this.zxmpp.util.serializedXML(this.xml);
