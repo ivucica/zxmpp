@@ -141,9 +141,9 @@ function handler_rosterupdate(sender, item)
 	{
 		console.log("     " + item.groups[i]);
 	}
-	
+	*/
 	var presence = sender.getTopPresenceForBareJid(item.bareJid);
-	if(presence)
+/*	if(presence)
 	{
 		console.log("Presence icon: " + presence.show);
 	}
