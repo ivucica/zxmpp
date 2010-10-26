@@ -71,11 +71,14 @@
 .zxmpp_statuschat {
 	color: #1f1;
 }
+.zxmpp_statusdnd {
+	color: red;
+}
 .zxmpp_statusaway {
 	color: #f97;
 }
 .zxmpp_statusxa {
-	color: red;
+	color: #fa8;
 }
 .zxmpp_statusunavailable {
 	color: #777;
