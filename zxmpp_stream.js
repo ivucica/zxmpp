@@ -646,7 +646,5 @@ zxmppClass.prototype.stream = function (zxmpp)
 		this.packetQueue = [];
 	}
 	
-	// some more initialization
-	this.genKeys();
 
 }
