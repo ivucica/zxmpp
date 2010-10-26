@@ -26,6 +26,8 @@
 </head>
 <body>
 <div id="zxmpp_root">Loading zxmpp</div>
+<input id="usr" value="perica"><input type="password" id="pwd" value="123">
+
 <button onclick="go();">go</button>
 <button onclick="dumppresences();">dump presences</button>
 <button onclick="dumpstreamfeatures();">dump stream features</button>
@@ -36,22 +38,28 @@ var zxmpp;
 function go()
 {
 	var zatecfg = {
-		"bind-url": "z-http-bind/",
-		"server": 'zatemas.zrs.hr'
+		"bind-url": "punjab-bind", //"z-http-bind/",
+		"route": "xmpp:zatemas.zrs.hr:5222",
+		"domain": "zatemas.zrs.hr"
 	};
 	var relativecfg = {
 		"bind-url": "http-bind/",
-		"server": window.location.hostname
+		"route": "xmpp:" + window.location.hostname + ":5222",
+		"domain": window.location.hostname
 	};
-
-	var cfg = relativecfg;
+	var gtalkcfg = {
+		"bind-url": "punjab-bind/",
+		"route": "xmpp:talk.google.com:5222",
+		"domain": "gmail.com"
+	}
+	var cfg = gtalkcfg;
 
 	zxmpp = new zxmppClass();
 	zxmpp.onConnectionTerminate.push(handler_connectionterminate);
 	zxmpp.onPresenceUpdate.push(handler_presenceupdate);
 	zxmpp.onRosterUpdate.push(handler_rosterupdate);
 	zxmpp.onMessage.push(handler_message);
-	zxmpp.main(document.getElementById("zxmpp_root"), cfg, "perica", "123");
+	zxmpp.main(document.getElementById("zxmpp_root"), cfg, document.getElementById("usr").value, document.getElementById("pwd").value);
 	//var pack = new zxmpp.packet(zxmpp);
 
 
@@ -151,7 +159,7 @@ function handler_message(sender, messagestanza)
 	if(messagestanza.body)
 		zxmppui.messageReceived(messagestanza.from, messagestanza.body);
 }
-go();
+//go();
 </script>
 </body>
 </html>

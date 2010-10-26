@@ -46,7 +46,7 @@ zxmppClass.prototype.init = function(uiOwner, configDict)
 zxmppClass.prototype.setUsername = function(username)
 {
 	this.username = username;
-	this.bareJid = username + "@" + this.cfg["server"];
+	this.bareJid = username + "@" + this.cfg["domain"]; 
 	this.presences[this.bareJid] = {};
 }
 zxmppClass.prototype.setPassword = function(password)
