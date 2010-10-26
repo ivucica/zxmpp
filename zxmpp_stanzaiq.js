@@ -302,7 +302,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 	
 	this.iqFail = function()
 	{
-		console.error("zxmpp::stanzaIq::iqFail(): a failure parsing IQ stanza has occured: " + this.zxmpp.util.serializedXML(this.iqXML));
+		console.warn("zxmpp::stanzaIq::iqFail(): a failure parsing IQ stanza has occured: " + this.zxmpp.util.serializedXML(this.iqXML));
 			
 		switch(this.type)
 		{
