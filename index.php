@@ -117,25 +117,26 @@ function handler_connectionterminate(sender, code, humanreadable)
 }
 function handler_presenceupdate(sender, presence)
 {
-	console.log("INDEX.PHP: Presence update: ");
+/*	console.log("INDEX.PHP: Presence update: ");
 	console.log(" -> " + presence.fullJid);
 	console.log("   Icon: " + presence.show);
 	console.log("   Status: " + presence.status);
-
+*/
 
 	var toppresence = sender.getTopPresenceForBareJid(presence.bareJid);
 	if(toppresence)
 	{
-		console.log("Updating " + toppresence.bareJid);
+		//console.log("Updating " + toppresence.bareJid);
 		zxmppui.presenceUpdate(toppresence.bareJid, toppresence.show, toppresence.bareJid, toppresence.status);
 	}
 }
 function handler_rosterupdate(sender, item)
 {
-	console.log("INDEX.PHP: Roster update: ");
+/*	console.log("INDEX.PHP: Roster update: ");
 	console.log(" -> " + item.bareJid);
 	console.log("   Subscription: " + item.subscription); 
 	console.log("   Groups:");
+
 	for(var i in item.groups)
 	{
 		console.log("     " + item.groups[i]);
@@ -146,11 +147,15 @@ function handler_rosterupdate(sender, item)
 	{
 		console.log("Presence icon: " + presence.show);
 	}
-
+*/
 	if(item.subscription != "removed")
 	{
 		zxmppui.rosterAdded(item.bareJid, presence ? presence.show : "unavailable", presence ? presence.status : "");
 		
+	}
+	else
+	{
+		zxmpp.rosterRemoved(item.bareJid);
 	}
 }
 function handler_message(sender, messagestanza)
