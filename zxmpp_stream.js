@@ -16,7 +16,6 @@ zxmppClass.prototype.stream = function (zxmpp)
 	/* connections and packet queue */
 	this.connectionsHold = new Array(); // these are "holding" connections, those that wait for response idly
 	this.connectionsPoll = new Array(); // these are "polling" connections, those that are used to send stuff to server
-	this.packetQueue = new Array(); // this queue holds packets that we tried to send while we had no free poll slot
 
 
 	/* pre-baked request objects */
@@ -317,6 +316,39 @@ zxmppClass.prototype.stream = function (zxmpp)
 
 	}
 
+
+	this.retryConn = function(conn)
+	{
+		// retry sending after timeout
+		// also, only if poll queue is completely free.
+		// otherwise, delay more
+		console.log("this.retryConn");	
+		/*if(conn.connzxmpp.stream.pollPacketQueue.length)
+		{
+			console.log("zxmpp retryConn delaying more");
+			conn.connzxmpp.stream.tryEmptyingPollQueue();
+			setTimeout(conn.connzxmpp.stream.retryConn, 1000, conn);
+			return;
+		}
+		console.log("Yay");
+*/
+		conn2 = new XMLHttpRequest();
+		conn2.open("POST", conn.connzxmpp.cfg["bind-url"]);
+		conn2.setRequestHeader("Content-type","text/xml; charset=utf-8");
+		conn2.setRequestHeader("X-ZXMPPType",conn.conntype);
+		conn2.onreadystatechange = conn.connzxmpp.stream.handleConnectionStateChange;
+		conn2.connoutgoing = conn.connoutgoing;
+		conn2.connindex = conn.connindex;
+		conn2.connzxmpp = conn.connzxmpp;
+		conn2.conntype = conn.conntype;
+		conn2.send(conn2.connoutgoing);
+		
+		if(conn2.conntype=="hold")
+			conn.connzxmpp.stream.connectionsHold[conn2.connindex] = conn2;
+		else
+			conn.connzxmpp.stream.connectionsPoll[conn2.connindex] = conn2;
+	}
+
 	this.retriesUpon404 = 5; // how many times can we retry sending packet?
 
 	this.handleConnectionStateChange = function()
@@ -373,22 +405,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 				
 //				conn.send(conn.connoutgoing);
 
-				conn2 = new XMLHttpRequest();
-				conn2.open("POST", conn.connzxmpp.cfg["bind-url"]);
-	 			conn2.setRequestHeader("Content-type","text/xml; charset=utf-8");
-				conn2.setRequestHeader("X-ZXMPPType",conn.conntype);
-				conn2.onreadystatechange = conn.connzxmpp.stream.handleConnectionStateChange;
-				conn2.connoutgoing = conn.connoutgoing;
-				conn2.connindex = conn.connindex;
-				conn2.connzxmpp = conn.connzxmpp;
-				conn2.conntype = conn.conntype;
-				conn2.send(conn2.connoutgoing);
-				
-				if(conn2.conntype=="hold")
-					conn.connzxmpp.stream.connectionsHold[conn2.connindex] = conn2;
-				else
-					conn.connzxmpp.stream.connectionsPoll[conn2.connindex] = conn2;
-
+				setTimeout(conn.connzxmpp.stream.retryConn, 1000, conn);
 				return;
 				
 				case 503:
@@ -413,6 +430,9 @@ zxmppClass.prototype.stream = function (zxmpp)
 				
 			}
 		}
+
+		// success? reset 404 count
+		this.retriesUpon404 = 5;
 
 		// clean connection slot, handle connection, try pushing stuff
 		if(conn.conntype == "hold")
@@ -678,7 +698,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		this.connectionsPoll = [new XMLHttpRequest()]; //, new XMLHttpRequest];
 		
 		// clean queue
-		this.packetQueue = [];
+		this.pollPacketQueue = [];
 	}
 	
 
