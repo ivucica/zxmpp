@@ -242,7 +242,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		
 		if(conn) console.log("Sending " + send_style + " with pollqueue " + this.pollPacketQueue.length + ": " + this.zxmpp.util.serializedXML(packet.xml));
 
-		var ridTooFarApart = this.sentUnrespondedRIDs.length && this.assignRID(true)-this.sentUnrespondedRIDs[0]>2;
+		var ridTooFarApart = this.sentUnrespondedRIDs.length && this.assignRID(true)-this.sentUnrespondedRIDs[0]>1;
 		if(ridTooFarApart)
 		{
 			console.log("Would send for RID " + this.assignRID(true) + "; but last received is too far apart: " + (this.sentUnrespondedRIDs[0] ? this.sentUnrespondedRIDs[0] : "nil"));
@@ -257,6 +257,8 @@ zxmppClass.prototype.stream = function (zxmpp)
 			conn.open("POST", this.zxmpp.cfg["bind-url"]);
  			conn.setRequestHeader("Content-type","text/xml; charset=utf-8");
 			conn.setRequestHeader("X-ZXMPPType",send_style);
+			conn.setRequestHeader("X-ZXMPPOldestRid", this.sentUnrespondedRIDs[0]);
+			conn.setRequestHeader("X-ZXMPPMyRid", this.assignRID(true));
 			conn.onreadystatechange = this.zxmpp.stream.handleConnectionStateChange;
 			conn.connrid = this.assignRID(true);
 			if(!conn.connoutgoing)
