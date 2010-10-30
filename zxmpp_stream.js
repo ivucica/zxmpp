@@ -384,7 +384,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		}
 
 		// success? reset 404 count
-		this.retriesUpon404 = 10;
+		conn.connzxmpp.stream.retriesUpon404 = 10;
 		console.log("Retries are reset");
 
 		// clean connection slot, handle connection, try pushing stuff
@@ -532,7 +532,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		var iq = new this.zxmpp.stanzaIq(this.zxmpp);
 		
 		iq.appendIqToPacket(packet, "bind", "set", this.zxmpp.cfg["domain"]);
-		iq.appendBindToPacket(packet, "Z-XMPP" + Math.random() * 1000);
+		iq.appendBindToPacket(packet, "Z-XMPP" + Math.floor(Math.random() * 1000));
 		
 		this.hasSentBind=true;
 		packet.send(send_style);
