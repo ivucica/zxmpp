@@ -73,8 +73,10 @@ zxmppClass.prototype.ui = function() {
 	this.showMessage = function(jid, txt) {
 		// FIXME dont use document.getElementById
 
-		var safejid = jid.split("/")[0].replace(/[^a-zA-Z 0-9]+/g,'');
-		this.messageWindow(safejid);
+		var barejid = jid.split("/")[0];
+		var safejid = barejid.replace(/[^a-zA-Z 0-9]+/g,'');
+		
+		this.messageWindow(barejid);
 		//$('#zxmpp_window_msg_' + safejid + ' > input').remove();
 		console.log("zxmpp_window_msg_" + safejid);
 		var msgcontainer = document.getElementById("zxmpp_window_msg_" + safejid).firstChild.firstChild
@@ -112,7 +114,7 @@ zxmppClass.prototype.ui = function() {
 		//	return msgwindow;
 			return;
 		}
-		console.log("Opening that window");
+		console.log("Opening that window: " + jid + " (" + safejid + ")");
 		var msgwindowjq = zxmppui.openWindow(jid, "msg_" + safejid); 
 
 		msgwindowjq.children('.zxmpp_content').append('<div class="zxmpp_content_msg"/>');
