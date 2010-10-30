@@ -46,6 +46,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 	this.hasSentBind = false;
 	this.hasSentSessionRequest = false;
 	this.hasSentInitialPresence = false;
+	this.sentUnrespondedRIDs = [];
 
 	/* state funcs */
 	this.uniqueId = function(idType)
@@ -79,9 +80,12 @@ zxmppClass.prototype.stream = function (zxmpp)
 		packet.send();
 	}
 	
-	this.assignRID = function()
+	this.assignRID = function(just_polling_nextrid)
 	{
-		return (this.requestId++)-1;
+		if(!just_polling_nextrid)
+			return (this.requestId++)-1;
+		else
+			return this.requestId;
 	}
 
 	this.assignKey = function()
@@ -238,17 +242,26 @@ zxmppClass.prototype.stream = function (zxmpp)
 		
 		if(conn) console.log("Sending " + send_style + " with pollqueue " + this.pollPacketQueue.length + ": " + this.zxmpp.util.serializedXML(packet.xml));
 
-		
-		if(conn && (send_style=="hold" || (send_style == "poll" && (this.pollPacketQueue.length == 0 ||sending_from_queue) )))
+		var ridTooFarApart = this.sentUnrespondedRIDs.length && this.assignRID(true)-this.sentUnrespondedRIDs[0]>2;
+		if(ridTooFarApart)
+		{
+			console.log("Would send for RID " + this.assignRID(true) + "; but last received is too far apart: " + (this.sentUnrespondedRIDs[0] ? this.sentUnrespondedRIDs[0] : "nil"));
+		}
+		if(conn && !ridTooFarApart && (send_style=="hold" || (send_style == "poll" && (this.pollPacketQueue.length == 0 ||sending_from_queue) )))
 		{
 			// there is an available hold or poll connection slot
+			// and, our rid is not too different from the last one we received
+
+			console.log("Sending for RID " + this.assignRID(true) + "; last received is " + this.sentUnrespondedRIDs[0] + " -- toofarapart: " + ridTooFarApart + " for " + (this.assignRID(true)-this.sentUnrespondedRIDs[0]));
 
 			conn.open("POST", this.zxmpp.cfg["bind-url"]);
  			conn.setRequestHeader("Content-type","text/xml; charset=utf-8");
 			conn.setRequestHeader("X-ZXMPPType",send_style);
 			conn.onreadystatechange = this.zxmpp.stream.handleConnectionStateChange;
+			conn.connrid = this.assignRID(true);
 			if(!conn.connoutgoing)
 				conn.connoutgoing = packet.finalized();
+			this.sentUnrespondedRIDs.push(conn.connrid);
 			conn.send(conn.connoutgoing);
 
 
@@ -257,7 +270,8 @@ zxmppClass.prototype.stream = function (zxmpp)
 				this.fillPollConnection();
 				//this.sendIdle("hold");
 			//console.log("WRITING " + conn.connoutgoing);
-
+			
+			return true;
 		}
 		
 		
@@ -296,7 +310,11 @@ zxmppClass.prototype.stream = function (zxmpp)
 			// grab a packet that waits longest
 			var packet = this.pollPacketQueue.shift();
 			
-			this.transmitPacket(packet, "poll", true);
+			if(!this.transmitPacket(packet, "poll", true))
+			{
+				this.pollPacketQueue.unshift(packet);
+				return;
+			}
 		}
 
 	}
@@ -341,6 +359,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		conn2.connindex = conn.connindex;
 		conn2.connzxmpp = conn.connzxmpp;
 		conn2.conntype = conn.conntype;
+		conn2.connrid = conn.connrid;
 		conn2.send(conn2.connoutgoing);
 		
 		if(conn2.conntype=="hold")
@@ -447,7 +466,15 @@ zxmppClass.prototype.stream = function (zxmpp)
 			conn.connzxmpp.stream.handleConnection(conn);
 			conn.connzxmpp.stream.tryEmptyingPollQueue();
 		}
-		
+		console.log("That was received rid " + conn.connrid);
+		var idx = conn.connzxmpp.stream.sentUnrespondedRIDs.indexOf(conn.connrid);
+		if(idx!=-1)
+			conn.connzxmpp.stream.sentUnrespondedRIDs.splice(idx,1);
+
+		//if(conn.connrid > conn.connzxmpp.stream.lastReceivedRID)
+		//	conn.connzxmpp.stream.lastReceivedRID = conn.connrid;
+
+		conn.connzxmpp.stream.tryEmptyingPollQueue();
 	}
 	
 	this.handleConnection = function(conn)
