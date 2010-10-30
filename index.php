@@ -52,7 +52,7 @@ function go()
 		"route": "xmpp:talk.google.com:5222",
 		"domain": "gmail.com"
 	}
-	var cfg = relativecfg;
+	var cfg = gtalkcfg;
 
 	zxmpp = new zxmppClass();
 	zxmpp.onConnectionTerminate.push(handler_connectionterminate);
