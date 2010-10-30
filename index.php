@@ -150,7 +150,7 @@ function handler_rosterupdate(sender, item)
 */
 	if(item.subscription != "removed")
 	{
-		zxmppui.rosterAdded(item.bareJid, presence ? presence.show : "unavailable", presence ? presence.status : "");
+		zxmppui.rosterAdded(item.bareJid, presence ? presence.show : "unavailable", item.name ? item.name : item.bareJid, presence ? presence.status : "");
 		
 	}
 	else

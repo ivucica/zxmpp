@@ -47,8 +47,11 @@ zxmppClass.prototype.ui = function() {
 		var safejid = jid.replace(/[^a-zA-Z 0-9]+/g,'');
 		if(!status) 
 			status = "";
-		this.userlist.children('.zxmpp_content').append('<div class="user' + safejid + ' zxmpp_user zxmpp_status' + icon + '">' + jid + '<div class="zxmpp_statustext">' + status + '</div></div>');
-               this.userlist.delegate('.user' + safejid, 'click', this.userClick);
+		this.userlist.children('.zxmpp_content').append('<div id="zxmpp_roster_' + safejid + '" class="user' + safejid + ' zxmpp_user zxmpp_status' + icon + '">' + display + '<div class="zxmpp_statustext">' + status + '</div></div>');
+		document.getElementById("zxmpp_roster_" + safejid).jid = jid; // fixme dont use id; use jquery and class='user'+safejid
+		document.getElementById("zxmpp_roster_" + safejid).display = display; // fixme dont use id; use jquery and class='user'+safejid
+		console.log("==> ROSTERADDED: " + jid + ", icon=" + icon + ", display=" + display + ", status=" + status);
+        	this.userlist.delegate('.user' + safejid, 'click', this.userClick);
 	}
 
 	this.rosterRemoved = function(jid) {
@@ -76,7 +79,7 @@ zxmppClass.prototype.ui = function() {
 		var barejid = jid.split("/")[0];
 		var safejid = barejid.replace(/[^a-zA-Z 0-9]+/g,'');
 		
-		this.messageWindow(barejid);
+		this.messageWindow(barejid); // FIXME get roster item from backend, and get display name
 		//$('#zxmpp_window_msg_' + safejid + ' > input').remove();
 		console.log("zxmpp_window_msg_" + safejid);
 		var msgcontainer = document.getElementById("zxmpp_window_msg_" + safejid).firstChild.firstChild
@@ -95,11 +98,12 @@ zxmppClass.prototype.ui = function() {
 
 	this.userClick = function(event) {
 		
-		var jid = this.textContent; // FIXME since jid is not attached to the object, we are currently using button title
+		var jid = this.jid;
+		var display = this.display;
 		
-		zxmppui.messageWindow(jid);//FIXME dont use zxmppui
+		zxmppui.messageWindow(jid, display);//FIXME dont use zxmppui
 	}
-	this.messageWindow = function(jid) {
+	this.messageWindow = function(jid, display) {
 
 		// FIXME we reference zxmppui because "this" might not be an instance of zxmppui
 
@@ -115,7 +119,7 @@ zxmppClass.prototype.ui = function() {
 			return;
 		}
 		console.log("Opening that window: " + jid + " (" + safejid + ")");
-		var msgwindowjq = zxmppui.openWindow(jid, "msg_" + safejid); 
+		var msgwindowjq = zxmppui.openWindow(display, "msg_" + safejid); 
 
 		msgwindowjq.children('.zxmpp_content').append('<div class="zxmpp_content_msg"/>');
 		msgwindowjq.children('.zxmpp_content').append('<input onkeypress="zxmppui_handlekeydown(event);" id="zxmpp_input_msg_' + safejid + '"/>');
