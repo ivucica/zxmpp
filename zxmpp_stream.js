@@ -194,48 +194,6 @@ zxmppClass.prototype.stream = function (zxmpp)
 		*/
 		
 		
-		var conn = this.findFreeConnection(send_style);
-		
-
-/*	
-		if(send_style=="poll")
-		{
-			if(conn && (this.pollPacketQueue.length == 0 || sending_from_queue))
-			{
-				conn.open("POST", this.zxmpp.cfg["bind-url"]);
- 				conn.setRequestHeader("Content-type","text/xml; charset=utf-8");
-				conn.setRequestHeader("X-ZXMPPType",send_style);
-				conn.onreadystatechange = this.zxmpp.stream.handleConnectionStateChange;
-				if(!conn.connoutgoing)
-					conn.connoutgoing = packet.finalized();
-				conn.send(conn.connoutgoing);
-			}
-			else
-			{
-				this.pollPacketQueue.push(packet);
-				this.tryEmptyingPollQueue();
-			}
-		}
-		else
-		{
-			if(conn)
-			{
-				conn.open("POST", this.zxmpp.cfg["bind-url"]);
- 				conn.setRequestHeader("Content-type","text/xml; charset=utf-8");
-				conn.setRequestHeader("X-ZXMPPType",send_style);
-				conn.onreadystatechange = this.zxmpp.stream.handleConnectionStateChange;
-				if(!conn.connoutgoing)
-					conn.connoutgoing = packet.finalized();
-				conn.send(conn.connoutgoing);
-			}
-			else
-			{
-				
-			}
-		}
-*/		
-		
-//		return;
 
 
 		var conn = this.findFreeConnection(send_style);
@@ -267,40 +225,13 @@ zxmppClass.prototype.stream = function (zxmpp)
 			conn.send(conn.connoutgoing);
 
 
-			//if(this.hasSentInitialPresence && this.pollPacketQueue.length == 0 && send_style == "poll" && this.findFreeConnection("hold"))
 			if(this.hasSentInitialPresence && this.freeConnections()>1)
 				this.fillPollConnection();
-				//this.sendIdle("hold");
-			//console.log("WRITING " + conn.connoutgoing);
 			
 			return true;
 		}
 		
 		
-		/*
-		else if (send_style == "poll")
-		{
-			// there was no available poll connection slot
-			// or, there was something in the queue
-			console.log("zxmpp::Stream::transmitPacket(): Sending on poll connection while poll connections are taken, or poll queue exists: " + this.pollPacketQueue.length + ". To keep ordering, added outgoing msg to packet queue and tried dispatching poll queue");
-
-			this.pollPacketQueue.push(packet);
-			this.tryEmptyingPollQueue();
-			
-			if(this.pollPacketQueue.length == 0 && send_style == "poll" && this.findFreeConnection("hold"))
-				this.sendIdle("hold");
-
-			
-		}
-		else if (send_style == "hold")
-		{
-			console.warn("zxmpp::Stream::transmitPacket(): Tried to send a packet on a hold connection, but hold connection is unavailable. Packet dropped.")
-		}
-		else
-		{
-			console.error("zxmpp::Stream::transmitPacket(): Unhandled case while handling send_style " + send_style);
-		}
-		*/
 		
 
 	}
