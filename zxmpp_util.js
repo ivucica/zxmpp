@@ -390,6 +390,89 @@ zxmppClass.prototype.util = function (zxmpp)
         return owl.copy(obj);
     }
 
+
+
+    this.prettyJson = function(jsonified)
+    {
+    
+	    var nSpaces = function(n)
+	    {
+		var r = "";
+		for(var i=0; i<n; i++)
+		    r += " ";
+		return r;
+	    }
+	    var prettyjson = "";
+	    var depth = 0;
+	    var inString = false;
+	    var escaping = false;
+	    for(var i=0; i<jsonified.length; i++)
+	    {
+		if(!inString && !escaping)
+		{
+		    switch(jsonified[i])
+		    {
+			case "\"":
+			inString = true;
+			prettyjson += "\"";
+			break;
+			case "[":
+			case "{":
+			prettyjson += jsonified[i] + "\n";
+			depth++;
+			prettyjson += nSpaces(depth*3);
+			break;
+			
+			case "]":
+			case "}":
+			if(prettyjson[prettyjson.length-1]==" ")
+			{
+			    prettyjson = prettyjson.substr(0, prettyjson.length-3);
+			    prettyjson += jsonified[i];// + "\n";
+			}
+			else
+			{
+			    prettyjson += "\n";
+			    prettyjson += nSpaces(depth*3 - 3);
+
+			    prettyjson += jsonified[i];
+			}
+			depth--;
+			//prettyjson += nSpaces(depth*3);
+			break;
+			
+			case ",":
+			prettyjson += ",\n";
+			prettyjson += nSpaces(depth*3);
+			break;
+			
+			case ":":
+			prettyjson += " : ";
+			break;
+			
+			default:
+			prettyjson += jsonified[i];
+		    }
+		}
+		else
+		{
+		
+		    prettyjson += jsonified[i];
+		    if(escaping)
+		    {
+		    }
+		    else if(inString && jsonified[i] == "\"")
+		    {
+			inString = false;
+		    }
+		    else if(inString && jsonified[i] == "\\")
+		    {
+			escaping = true;
+		    }
+		}
+	    }
+	    return prettyjson;
+    }
 	
 };
 

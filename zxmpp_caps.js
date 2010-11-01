@@ -10,7 +10,8 @@
 zxmppClass.prototype.caps = function(zxmpp)
 {
 	this.zxmpp = zxmpp;
-	
+	this.classType = "caps";
+
 	this.node = false;
 	this.ver = false;
 	this.ext = false;
