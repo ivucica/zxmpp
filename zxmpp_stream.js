@@ -573,7 +573,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		
 		var packet = new this.zxmpp.packet(this.zxmpp);
 		var presence = new this.zxmpp.stanzaPresence(this.zxmpp);
-		presence.appendToPacket(packet, this.zxmpp.fullJid, false, "available", "Using Z-XMPP", 1);
+		presence.appendToPacket(packet, this.zxmpp.fullJid, false, "avail", "Using Z-XMPP", 1);
 		
 		this.hasSentInitialPresence = true;
 		packet.send(send_style);
