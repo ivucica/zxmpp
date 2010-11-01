@@ -32,7 +32,9 @@
 <button onclick="dumppresences();">dump presences</button>
 <button onclick="dumpstreamfeatures();">dump stream features</button>
 <button onclick="logoff();">logoff</button>
-
+<button onclick="serialize();">serialize</button>
+<button onclick="reserialize();">reserialize</button>
+<textarea cols="80" rows="15" id="serialized_output"></textarea>
 <script defer="defer">
 var zxmpp;
 function go()
@@ -52,7 +54,7 @@ function go()
 		"route": "xmpp:talk.google.com:5222",
 		"domain": "gmail.com"
 	}
-	var cfg = gtalkcfg;
+	var cfg = relativecfg;
 
 	zxmpp = new zxmppClass();
 	zxmpp.onConnectionTerminate.push(handler_connectionterminate);
@@ -81,6 +83,15 @@ function dumpstreamfeatures()
 function logoff()
 {
 	zxmpp.stream.logoff();
+}
+
+function serialize()
+{
+	document.getElementById("serialized_output").value = zxmpp.util.prettyJson(zxmpp.serialized());
+}
+function reserialize()
+{
+	document.getElementById("serialized_output").value = zxmpp.util.prettyJson(JSON.stringify(zxmpp.deserializeInternal(document.getElementById("serialized_output").value)));
 }
 
 function handler_connectionterminate(sender, code, humanreadable)
