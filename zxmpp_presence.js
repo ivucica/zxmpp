@@ -3,6 +3,11 @@
  * A Javascript XMPP client.
  *
  * (c) 2010 Ivan Vucica
+ * License is located in the LICENSE file
+ * in Z-XMPP distribution/repository.
+ * Use not complying to those terms is a
+ * violation of various national and 
+ * international copyright laws.
  */
  
 // a class representing a single full-jid's presence

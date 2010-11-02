@@ -1,0 +1,45 @@
+Z-XMPP License
+==============
+
+First, I'd like to point out that this custom, non-FLOSS license 
+will be replaced by either AGPL or a BSD-styled license. For now,
+I'm opening the repository and the client to get feedback.
+
+Basically what I want is:
+1. That you use Z-XMPP only noncommercially.
+2. That if you publish changes anywhere, you grant me rights to use them
+   in any way I want (a la GPL)
+3. That you don't obfuscate the code
+4. If you publish source code either by using Z-XMPP on a web site,
+   or as a ZIP, or in a repository, that you notify zxmpp@vucica.net
+   about it.
+
+Now for the text written by a nonlawyer in a couple of minutes...
+------
+
+You are hereby granted a license exclusively for the following uses:
+1. Examining the source code for personal, non-commercial purposes.
+2. Installing on a non-commercial web-site.
+3. Extending the source code for personal, non-commercial purposes.
+4. Make copies on a non-commercial basis.
+
+
+You are required to keep the source code readable when installing
+on a web site.
+
+You are required to keep the copyright notices intact. You are
+permitted to add a copyright notice for your modifications.
+
+When distributing the source code as a prepackaged copy of the code,
+you are required to include this LICENSE file.
+
+Whenever you distribute the Z-XMPP code to end users, either via
+installation on a web site or as a prepackaged copy of the code,
+you are granting a license to the original author, Ivan Vučica, 
+to make use of any modifications you may have made to Z-XMPP.
+
+Any distribution, either via installation on a web site or as a
+prepackaged copy of the code, is permitted only upon transmitting 
+an e-mail message to zxmpp@vucica.net noting your intent to do so.
+
+
