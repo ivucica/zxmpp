@@ -17,7 +17,9 @@ Compliance 2009 Core Client profile. Of course, almost anything goes that
 doesn't require out of bound connections (since they're a bit... tricky to do
 in Javascript, you'll surely agree).
 
-Patches and good natured criticism can be directed to ivan@vucica.net.
+Please read the LICENSE to see current use terms.
+
+Patches and good natured criticism can be directed to zxmpp@vucica.net.
 
 (c) 2010 Ivan Vucica
 

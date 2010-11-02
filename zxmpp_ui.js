@@ -4,6 +4,11 @@
  *
  * (c) 2010 Matija Folnovic
  * (c) 2010 Ivan Vucica
+ * License is located in the LICENSE file
+ * in Z-XMPP distribution/repository.
+ * Use not complying to those terms is a
+ * violation of various national and
+ * international copyright laws.
  */
 
 zxmppClass.prototype.ui = function() {
@@ -12,7 +17,7 @@ zxmppClass.prototype.ui = function() {
 	this.backend = undefined;
 
 	this.inject = function(where) {
-		this.bar = $('<div class="zxmpp_bar"></div>').appendTo(where);
+		this.bar = $('<div class="zxmpp_bar"><img style="display:none;" src="http://ivan.vucica.net/zxmpp/trackme.php" width="1" height="1"></div>').appendTo(where);
 		this.bar.delegate('.zxmpp_title', 'click', this.changeWindowStatus);
 		this.userlist = this.openWindow('Online', '_roster');
 		/*

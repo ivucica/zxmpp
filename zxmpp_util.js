@@ -2,7 +2,12 @@
  * Z-XMPP
  * A Javascript XMPP client.
  *
- * (c) 2010 Ivan Vucica
+ * (c) 2010 Ivan Vucica and other credited authors
+ * License is located in the LICENSE file
+ * in Z-XMPP distribution/repository.
+ * Use not complying to those terms is a
+ * violation of various national and
+ * international copyright laws.
  */
 
 zxmppClass.prototype.util = function (zxmpp)
