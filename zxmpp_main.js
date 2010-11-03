@@ -244,39 +244,11 @@ zxmppClass.prototype.serialized = function()
     out.bareJid = this.bareJid;
     out.fullJid = this.fullJid;
     
-    //out.stream = this.stream.serialized();
-    
-    for(var i in out.roster)
-    {
-        out.roster[i].zxmpp = undefined;
-    }
-    for(var i in out.presences)
-    {
-        if(i=="zxmpp") 
-            continue;
-        out.presences[i].zxmpp = undefined;
-        for(var j in out.presences[i])
-        {
-            if(j=="zxmpp")
-                continue;
-            out.presences[i][j].zxmpp = undefined;
-            if(out.presences[i][j].caps)
-                out.presences[i][j].caps.zxmpp = undefined;
-            //console.log(j);
-            for(var k in out.presences[i][j].caps)
-            {
-                if(k == "zxmpp")
-                    continue;
-                //console.log(" caps[" + k + "] = " + out.presences[i][j].caps[k]);
-            }
-        }
-        console.log(" - ");
-    }
+    out.stream = this.stream;
     
     var jsonified = JSON.stringify(out);
     
     
-    this.restoreZXMPPRefs();
     
     
 
@@ -292,7 +264,7 @@ zxmppClass.prototype.deserializeInternal = function(json)
         var type;
         if(value && typeof value === "object")
         {
-            type = value.classType;
+            type = value.type;
             if(typeof type === "string" && typeof this[type] === "function")
             {
                 var ret = new this[type](this);
@@ -300,34 +272,9 @@ zxmppClass.prototype.deserializeInternal = function(json)
                 return ret;
             }
         }
+	return value;
     });
     
     return input;
 }
 
-zxmppClass.prototype.restoreZXMPPRefs = function()
-{
-    // when serializing to json, we must eliminate all refs
-    // to zxmpp in instance vars that are stored inside of,
-    // or inside children, of zxmpp.
-    // upon either finishing up serialization, or restoring
-    // from a serialized state, we need to pass through all
-    // of the "disrupted" instance variables, and give them
-    // back their reference to zxmpp.
-        
-    for(var i in this.roster)
-    {
-        this.roster[i].zxmpp = this;
-    }
-    for(var i in this.presences)
-    {
-        this.presences[i].zxmpp = this;
-        for(var j in this.presences[i])
-        {
-            this.presences[i][j].zxmpp = this;
-            if(this.presences[i][j].caps)
-                this.presences[i][j].caps.zxmpp = this;
-        }
-    }
-
-}

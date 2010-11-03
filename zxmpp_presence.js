@@ -14,7 +14,6 @@
 zxmppClass.prototype.presence = function (zxmpp)
 {
 	this.zxmpp = zxmpp;
-	this.classType = "presence";
 
 	this.fullJid = false;
 	this.bareJid = false;
@@ -34,4 +33,17 @@ zxmppClass.prototype.presence = function (zxmpp)
 	this.priority = 0;
 	
 	this.caps = new this.zxmpp.caps(this.zxmpp);
+
+
+	this.toJSON = function(key)
+	{
+		oldzxmpp = this.zxmpp;
+		delete this.zxmpp;
+
+		var ret = oldzxmpp.util.cloneObject(this);
+		
+		this.zxmpp = oldzxmpp;
+
+		return ret;
+	}
 }

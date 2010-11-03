@@ -69,4 +69,15 @@ subscription "remove" is sent and received when we're supposed to REMOVE a conta
 			}
 		}
 	}
+	this.toJSON = function(key)
+	{
+		oldzxmpp = this.zxmpp;
+		delete this.zxmpp;
+
+		var ret = oldzxmpp.util.cloneObject(this);
+
+		this.zxmpp = oldzxmpp;
+
+		return ret;
+	}
 }
