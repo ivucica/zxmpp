@@ -53,6 +53,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 	this.hasSentSessionRequest = false;
 	this.hasSentInitialPresence = false;
 	this.sentUnrespondedRIDs = [];
+	this.reuseRIDs = [];
 
 	/* state funcs */
 	this.uniqueId = function(idType)
@@ -88,10 +89,31 @@ zxmppClass.prototype.stream = function (zxmpp)
 	
 	this.assignRID = function(just_polling_nextrid)
 	{
-		if(!just_polling_nextrid)
-			return (this.requestId++)-1;
+		if(!this.reuseRIDs.length)
+		{
+
+			if(!just_polling_nextrid)
+				return (++this.requestId)-1;
+			else
+				return this.requestId;
+
+		}
 		else
-			return this.requestId;
+		{
+			if(!just_polling_nextrid)
+			{
+				var r = this.reuseRIDs.shift();
+				if(this.requestId == r)
+					this.requestId ++;
+				return r;
+			}
+			else
+			{
+				var r = this.reuseRIDs.shift();
+				this.reuseRIDs.unshift(r);
+				return r;
+			}
+		}
 	}
 
 	this.assignKey = function()
@@ -222,6 +244,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 			conn.setRequestHeader("X-ZXMPPType",send_style);
 			conn.setRequestHeader("X-ZXMPPOldestRid", this.sentUnrespondedRIDs[0]);
 			conn.setRequestHeader("X-ZXMPPMyRid", this.assignRID(true));
+			conn.setRequestHeader("X-ZXMPPReuseRids", JSON.stringify(this.reuseRIDs));
 			conn.onreadystatechange = this.zxmpp.stream.handleConnectionStateChange;
 			conn.connrid = this.assignRID(true);
 			if(!conn.connoutgoing)
@@ -643,7 +666,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		setTimeout(1, "zxmppClass._STREAM.terminate();");
 	}
 	
-	this.terminate = function()
+	this.terminate = function(dont_reset_state)
 	{
 		console.log("Finishing stream termination");
 		for(var conn in this.connectionsHold)
@@ -659,17 +682,23 @@ zxmppClass.prototype.stream = function (zxmpp)
 				conn.abort();
 		}
 		
-		// reset pools
-		this.connectionsHold = [new XMLHttpRequest()];
-		this.connectionsPoll = [new XMLHttpRequest(), new XMLHttpRequest];
+		if(!dont_reset_state)
+		{
+			// reset pools
+			this.connectionsHold = [new XMLHttpRequest()];
+			this.connectionsPoll = [new XMLHttpRequest(), new XMLHttpRequest];
 		
-		// clean queue
-		this.pollPacketQueue = [];
+			// clean queue
+			this.pollPacketQueue = [];
+		}
 	}
-	
 
 	this.toJSON = function(key)
 	{
+		// FIXME
+		// this.sentUnrespondedRIDs shoudl also contain a copy of all
+		// the RIDs we should resend because we never received a response
+		// for them!
 
 		oldconnhold = this.connectionsHold;
 		oldconnpoll = this.connectionsPoll;
@@ -708,6 +737,8 @@ zxmppClass.prototype.stream = function (zxmpp)
 
 	this.wakeUp = function()
 	{
+		this.reuseRIDs = this.sentUnrespondedRIDs;
+		this.sentUnrespondedRIDs = [];
 		this.fillPollConnection();
 	}
 }
