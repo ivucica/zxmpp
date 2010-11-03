@@ -14,6 +14,7 @@
 zxmppClass.prototype.presence = function (zxmpp)
 {
 	this.zxmpp = zxmpp;
+	this.type = "presence";
 
 	this.fullJid = false;
 	this.bareJid = false;

@@ -243,7 +243,8 @@ zxmppClass.prototype.serialized = function()
     out.username = this.username;
     out.bareJid = this.bareJid;
     out.fullJid = this.fullJid;
-    
+    out.cfg = this.cfg;
+
     out.stream = this.stream;
     
     var jsonified = JSON.stringify(out);
@@ -257,18 +258,23 @@ zxmppClass.prototype.serialized = function()
 
 zxmppClass.prototype.deserializeInternal = function(json)
 {
+    var zxmppcontext = this;
     var input = JSON.parse(json, function(key, value)
     {
         // "reviver" function
         
         var type;
+	console.log("restoring " + key + " (a " + (typeof value) + ", classtype " + (value.type) + "): " + value);
         if(value && typeof value === "object")
         {
             type = value.type;
-            if(typeof type === "string" && typeof this[type] === "function")
+            if(typeof type === "string" && typeof zxmppClass.prototype[type] === "function")
             {
-                var ret = new this[type](this);
-                
+                var ret = new zxmppClass.prototype[type](zxmppcontext);
+		for(var i in value)
+		{
+		    ret[i] = value[i];
+		}
                 return ret;
             }
         }
@@ -276,5 +282,23 @@ zxmppClass.prototype.deserializeInternal = function(json)
     });
     
     return input;
+}
+
+zxmppClass.prototype.deserialize = function(json)
+{
+    var input = this.deserializeInternal(json);
+
+    this.presences = input.presences;
+    this.capsNodes = input.capsNodes;
+    this.capsNodesExt = input.capsNodesExt;
+    this.roster = input.roster;
+    this.username = input.username;
+    this.bareJid = input.bareJid;
+    this.fullJid = input.fullJid;
+    this.cfg = input.cfg;
+
+    this.stream = input.stream;
+
+    this.stream.wakeUp();
 }
 

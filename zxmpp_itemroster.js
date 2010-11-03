@@ -14,7 +14,7 @@
 zxmppClass.prototype.itemRoster = function (zxmpp)
 {
 	this.zxmpp = zxmpp;
-	this.classType = "itemRoster";
+	this.type = "itemRoster";
 
 	this.bareJid = false;
 	this.name = false;

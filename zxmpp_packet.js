@@ -13,6 +13,7 @@
 zxmppClass.prototype.packet = function (zxmpp)
 {
 	this.zxmpp = zxmpp;
+	this.type = "packet";
 
 	// build a document with httpbind namespace, and root element body 
 	this.xml = this.zxmpp.util.newXMLDocument("body","http://jabber.org/protocol/httpbind");

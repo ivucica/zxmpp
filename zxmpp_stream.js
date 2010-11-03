@@ -13,6 +13,7 @@
 zxmppClass.prototype.stream = function (zxmpp)
 {
 	this.zxmpp = zxmpp;
+	this.type = "stream";
 
 	/* initialize request id */
 	var maxRequestId=9007199254740991; // magic number from xep-0124, max number that some languages can accurately represent
@@ -111,7 +112,6 @@ zxmppClass.prototype.stream = function (zxmpp)
 			this.genKeys();
 			ret.newKey = this.keys.pop();
 		}
-		
 		return ret;
 	}
 	this.freeConnections = function(send_style)
@@ -661,7 +661,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		
 		// reset pools
 		this.connectionsHold = [new XMLHttpRequest()];
-		this.connectionsPoll = [new XMLHttpRequest()]; //, new XMLHttpRequest];
+		this.connectionsPoll = [new XMLHttpRequest(), new XMLHttpRequest];
 		
 		// clean queue
 		this.pollPacketQueue = [];
@@ -704,5 +704,10 @@ zxmppClass.prototype.stream = function (zxmpp)
 		}
 
 		return ret;
+	}
+
+	this.wakeUp = function()
+	{
+		this.fillPollConnection();
 	}
 }
