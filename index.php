@@ -44,6 +44,7 @@
 <button onclick="serialize();">serialize</button>
 <button onclick="reserialize();">reserialize</button>
 <button onclick="restore();">restore</button>
+<button onclick="terminate();">unclean terminate</button>
 <textarea cols="80" rows="15" id="serialized_output"></textarea>
 <script defer="defer">
 var zxmpp;
@@ -72,6 +73,10 @@ function createzxmpp()
 	zxmpp.onRosterUpdate.push(handler_rosterupdate);
 	zxmpp.onMessage.push(handler_message);
 
+	window.zxmppui = (new zxmpp.ui);//.inject('body');//.onPresenceUpdate(['perica', 'matija']);
+	window.zxmppui.inject('body');
+	window.zxmppui.backend = zxmpp;
+	
 	return cfg;
 }
 
@@ -83,16 +88,16 @@ function go()
 
 
 
-	window.zxmppui = (new zxmpp.ui);//.inject('body');//.onPresenceUpdate(['perica', 'matija']);
-	window.zxmppui.inject('body');
-	window.zxmppui.backend = zxmpp;
 }
 function restore()
 {
 	createzxmpp();
 	zxmpp.deserialize(document.getElementById("serialized_output").value);
 }
-
+function terminate()
+{
+	zxmpp.stream.terminate();
+}
 function dumppresences()
 {
 	zxmpp._debugDumpPresences();
