@@ -43,10 +43,11 @@
 <button onclick="logoff();">logoff</button>
 <button onclick="serialize();">serialize</button>
 <button onclick="reserialize();">reserialize</button>
+<button onclick="restore();">restore</button>
 <textarea cols="80" rows="15" id="serialized_output"></textarea>
 <script defer="defer">
 var zxmpp;
-function go()
+function createzxmpp()
 {
 	var zatecfg = {
 		"bind-url": "punjab-bind", //"z-http-bind/",
@@ -70,6 +71,13 @@ function go()
 	zxmpp.onPresenceUpdate.push(handler_presenceupdate);
 	zxmpp.onRosterUpdate.push(handler_rosterupdate);
 	zxmpp.onMessage.push(handler_message);
+
+	return cfg;
+}
+
+function go()
+{
+	var cfg = createzxmpp();
 	zxmpp.main(document.getElementById("zxmpp_root"), cfg, document.getElementById("usr").value, document.getElementById("pwd").value);
 	//var pack = new zxmpp.packet(zxmpp);
 
@@ -78,6 +86,11 @@ function go()
 	window.zxmppui = (new zxmpp.ui);//.inject('body');//.onPresenceUpdate(['perica', 'matija']);
 	window.zxmppui.inject('body');
 	window.zxmppui.backend = zxmpp;
+}
+function restore()
+{
+	createzxmpp();
+	zxmpp.deserialize(document.getElementById("serialized_output").value);
 }
 
 function dumppresences()
@@ -88,6 +101,7 @@ function dumpstreamfeatures()
 {
 	zxmpp._debugDumpStreamFeatures();
 }
+
 
 function logoff()
 {
