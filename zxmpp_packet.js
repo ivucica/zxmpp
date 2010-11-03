@@ -236,4 +236,16 @@ zxmppClass.prototype.packet = function (zxmpp)
 		}
 		return true;
 	}
+	this.toJSON = function(key)
+	{
+		return "";
+		oldzxmpp = this.zxmpp;
+		delete this.zxmpp;
+
+		var ret = JSON.stringify(this);
+
+		this.zxmpp = oldzxmpp;
+
+		return ret;
+	}
 }

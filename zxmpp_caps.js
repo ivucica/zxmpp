@@ -15,7 +15,6 @@
 zxmppClass.prototype.caps = function(zxmpp)
 {
 	this.zxmpp = zxmpp;
-	this.classType = "caps";
 
 	this.node = false;
 	this.ver = false;
@@ -190,6 +189,18 @@ zxmppClass.prototype.caps = function(zxmpp)
 		
 		if(needsSending)
 			packet.send("poll");
+	}
+
+	this.toJSON = function(key)
+	{
+		oldzxmpp = this.zxmpp;
+		delete this.zxmpp;
+
+		var ret = oldzxmpp.util.cloneObject(this);
+
+		this.zxmpp = oldzxmpp;
+
+		return ret;
 	}
 
 };

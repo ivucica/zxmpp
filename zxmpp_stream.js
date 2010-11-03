@@ -668,4 +668,41 @@ zxmppClass.prototype.stream = function (zxmpp)
 	}
 	
 
+	this.toJSON = function(key)
+	{
+
+		oldconnhold = this.connectionsHold;
+		oldconnpoll = this.connectionsPoll;
+		oldzxmpp = this.zxmpp;
+		oldiqsawaitingreply = this.iqsAwaitingReply;
+
+		delete this.connectionsHold;
+		delete this.connectionsPoll;
+		delete this.zxmpp;
+		delete this.iqsAwaitingReply;
+
+
+		var oldfuncs = {};
+		for(var i in this)
+		{
+			if(typeof this[i] == "function")
+			{
+				oldfuncs[i] = this[i];
+				delete this[i];
+			}
+		}
+		var ret = oldzxmpp.util.cloneObject(this);
+
+		this.connectionsHold = oldconnhold;
+		this.connectionsPoll = oldconnpoll;
+		this.zxmpp = oldzxmpp;
+		this.iqsAwaitingReply = oldiqsawaitingreply;
+		
+		for(var i in oldfuncs)
+		{
+			this[i] = oldfuncs[i];
+		}
+
+		return ret;
+	}
 }
