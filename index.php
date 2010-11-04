@@ -68,7 +68,7 @@ function createzxmpp()
 		"route": "xmpp:talk.google.com:5222",
 		"domain": "gmail.com"
 	}
-	var cfg = relativecfg;
+	var cfg = gtalkcfg;
 
 	zxmpp = new zxmppClass();
 	zxmpp.onConnectionTerminate.push(handler_connectionterminate);
@@ -119,7 +119,7 @@ function loadhandler()
 			zxmpp.deserialize(window.sessionStorage["zxmpp"]);
 			return;
 		}
-		go();
+		//go();
 	}
 	else
 	{
