@@ -33,8 +33,11 @@
 <script src="zxmpp_stanzasaslresult.js"></script>
 <script src="zxmpp_stanzamessage.js"></script>
 </head>
-<body onunload="zxmpp.logoff();">
-<div id="zxmpp_root">Loading zxmpp</div>
+<body onunload="unloadhandler();" onload="loadhandler();">
+<div id="zxmpp_root"></div>
+
+<a href="?a=<?=$_GET["a"] ? int($_GET["a"])+1 : ""?>">advance</a><br>
+
 <input id="usr" value="perica"><input type="password" id="pwd" value="123">
 
 <button onclick="go();">go</button>
@@ -94,6 +97,35 @@ function restore()
 	createzxmpp();
 	zxmpp.deserialize(document.getElementById("serialized_output").value);
 }
+
+function unloadhandler()
+{
+	if(window.sessionStorage)
+	{
+		if(zxmpp) window.sessionStorage["zxmpp"] = zxmpp.serialized();
+		else {
+			window.sessionStorage["zxmpp"] = undefined;
+			delete window.sessionStorage["zxmpp"];
+		}
+	}
+}
+function loadhandler()
+{
+	if(window.sessionStorage)
+	{
+		if(window.sessionStorage["zxmpp"] && window.sessionStorage["zxmpp"]!="undefined")
+		{
+			createzxmpp();
+			zxmpp.deserialize(window.sessionStorage["zxmpp"]);
+			return;
+		}
+		go();
+	}
+	else
+	{
+		console.log("No session storage");
+	}
+}
 function terminate()
 {
 	zxmpp.stream.terminate();
@@ -110,12 +142,16 @@ function dumpstreamfeatures()
 
 function logoff()
 {
-	zxmpp.stream.logoff();
+	try {
+		zxmpp.stream.logoff();
+	} catch(e) { }
+	zxmpp = undefined;
 }
 
 function serialize()
 {
-	document.getElementById("serialized_output").value = zxmpp.util.prettyJson(zxmpp.serialized());
+	if(zxmpp)
+		document.getElementById("serialized_output").value = zxmpp.util.prettyJson(zxmpp.serialized());
 }
 function reserialize()
 {

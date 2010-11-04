@@ -264,7 +264,7 @@ zxmppClass.prototype.deserializeInternal = function(json)
         // "reviver" function
         
         var type;
-	console.log("restoring " + key + " (a " + (typeof value) + ", classtype " + (value.type) + "): " + value);
+	//console.log("restoring " + key + " (a " + (typeof value) + ", classtype " + (value.type) + "): " + value);
         if(value && typeof value === "object")
         {
             type = value.type;
