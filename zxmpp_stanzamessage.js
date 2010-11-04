@@ -65,7 +65,7 @@ zxmppClass.prototype.stanzaMessage = function(zxmpp)
 		this.body = body;
 		this.type = type;
 		
-		var messageNode = this.messageNode = packet.xml.createElement("message");
+		var messageNode = this.messageNode = packet.xml.createElementNS("jabber:client", "message");
 		if(this.from) messageNode.setAttribute("from", this.from);
 		if(this.to) messageNode.setAttribute("to", this.to);
 		if(this.type)
