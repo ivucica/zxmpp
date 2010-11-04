@@ -71,6 +71,8 @@ zxmppClass.prototype.main = function(uiOwner, configDict, username, password)
 
 zxmppClass.prototype.getPresence = function(fullJid)
 {
+	if(!fullJid)
+		return undefined;
 	var jid = fullJid.split("/");
 	var bareJid = jid[0];
 	var resource = jid[1];

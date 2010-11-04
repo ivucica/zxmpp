@@ -250,8 +250,6 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 	{
 		//console.log("disco info: " + this.zxmpp.util.serializedXML(xml));
 		
-		var presence = this.zxmpp.getPresence(this.from);
-		var caps = presence.caps;
 		
 		var node = xml.attr["node"];
 		
@@ -260,6 +258,8 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		{
 			case "result":
 			
+			var presence = this.zxmpp.getPresence(this.from);
+			var caps = presence.caps;
 			
 			var askingIq = (this.zxmpp.stream.iqsAwaitingReply[this.id]);
 			if(!askingIq)
@@ -352,7 +352,9 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			if(node)
 				querynode.setAttribute("node", node);
 
-			var ext = node.split("#");
+			var ext;
+		       if(node)
+		       		ext = node.split("#");
 			if(ext && ext.length>1)
 				ext = ext[ext.length-1];
 			else
