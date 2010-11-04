@@ -141,8 +141,13 @@ zxmppClass.prototype.stream = function (zxmpp)
 		// if we don't have more keys left...
 		if(this.reuseKeys.length==0 && this.keys.length<=1)
 		{
-			this.genKeys();
-			ret.newKey = this.keys.pop();
+			if(!just_peek)
+			{
+				this.genKeys();
+				ret.newKey = this.keys.pop();
+			} else {
+				console.log("would generate newkey but just peeking");
+			}
 		}
 		return ret;
 	}
@@ -341,7 +346,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 			conn.connzxmpp.stream.connectionsPoll[conn2.connindex] = conn2;
 	}
 
-	this.retriesUpon404 = 10; // how many times can we retry sending packet?
+	this.retriesUpon404 = 5; // how many times can we retry sending packet?
 
 	this.handleConnectionStateChange = function()
 	{
@@ -424,8 +429,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		}
 
 		// success? reset 404 count
-		conn.connzxmpp.stream.retriesUpon404 = 10;
-		console.log("Retries are reset");
+		conn.connzxmpp.stream.retriesUpon404 = 5;
 
 		// clean connection slot, handle connection, try pushing stuff
 		if(conn.conntype == "hold")
@@ -764,7 +768,8 @@ zxmppClass.prototype.stream = function (zxmpp)
 	this.wakeUp = function()
 	{
 		this.reuseRIDs = this.sentUnrespondedRIDs;
-		this.reuseKeys = this.sentUnrespondedKeys;
+		this.reuseKeys = []; //this.sentUnrespondedKeys; // <== Key reusing must be done with ejabberd, but not with punjab.
+		// perhaps punjab insists that the packets are completely the same, not just the key+rid, like it seems to be with ejabberd?
 		this.sentUnrespondedRIDs = [];
 		this.sentUnrespondedKeys = [];
 		this.fillPollConnection();

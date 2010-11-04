@@ -56,6 +56,11 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				case "query":
 				this.parseQueryXML(child);
 				break;
+
+				case "item": // Psi can send us <item xmlns="jabber:iq:browse"/>
+				// TODO check
+				this.iqResultEmpty();
+				break;
 				
 				case "error":
 				console.error("zxmpp::stanzaIq::parseXML(): error node received: " + this.zxmpp.util.serializedXML(child));
@@ -142,8 +147,8 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		{
 			case "result":
 			
-			if(!xml.attrib)
-				xml.attrib = {"xmlns":"UNSET"}; // dummy so we throw error
+			if(!xml.attr)
+				xml.attr = {"xmlns":"UNSET"}; // dummy so we throw error
 			switch(xml.attr["xmlns"])
 			{
 				case "jabber:iq:roster":
@@ -163,15 +168,14 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			break;
 			
 			case "set":
-			if(!xml.attrib)
-				xml.attrib = {"xmlns":"UNSET"}; // dummy so we throw error
+			if(!xml.attr)
+				xml.attr = {"xmlns":"UNSET"}; // dummy so we throw error
 
-			switch(xml.attrib["xmlns"])
+			switch(xml.attr["xmlns"])
 			{
-				// behavior is the same.
+				// behavior is the same as if we requested roster contents.
 				case "jabber:iq:roster":
 				this.parseQueryRosterXML(xml);
-				this.iqResultEmpty();
 				break;
 
 				default:
@@ -182,7 +186,32 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			
 			break;
 			
-			
+			case "get":
+			if(!xml.attr)
+				xml.attr = {"xmlns":"UNSET"}; // dummy so we throw error
+
+			switch(xml.attr["xmlns"])
+			{
+				case "http://jabber.org/protocol/disco#info":
+				this.parseQueryDiscoInfoXML(xml);
+				break;
+
+				//case "jabber:iq:browse":
+				case "jabber:iq:agents":
+				// TODO should we expose something to browse when doing service discovery?
+				this.iqResultEmpty();
+				break;
+
+				case "http://jabber.org/protocol/disco#items":
+				this.iqResultEmpty();
+				break;
+
+				default:
+				console.warn("zxmpp::stanzaIq::parseQueryXML(): Unknown namespace " + xml.attr["xmlns"] + " (iqtype=get)");
+				this.iqFail();
+			}	
+			break;
+
 			default:
 			console.warn("zxmpp::stanzaIq::parseQueryXML(): unhandled iq type " + this.type);
 			this.iqFail();
@@ -213,6 +242,8 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				this.iqFail();
 			}
 		}
+		if(this.type == "set")
+			this.iqResultEmpty();
 	}
 	
 	this.parseQueryDiscoInfoXML = function(xml)
@@ -259,6 +290,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 					break;
 					
 					case "feature":
+					// FIXME we could extract inquiringExt from the <query node="..."> attribute
 					if(!askingIq.inquiringExt)
 					{
 						// generic feature list asking
@@ -290,6 +322,52 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			
 			break;
 			
+			case "get":
+
+
+			var ownpresence = this.zxmpp.getPresence(this.zxmpp.fullJid);
+			if(!ownpresence)
+			{
+				console.warn("zxmpp::stanzaIq::parseQueryDiscoInfoXML(): cant get own presence");
+				this.iqFail();
+				return;
+			}
+
+			var owncaps = ownpresence.caps;
+			if(!owncaps)
+			{
+				console.warn("zxmpp::stanzaIq::parseQueryDiscoInfoXML(): own presence does not have caps");
+				this.iqFail();
+				return;
+			}
+
+			var packet = new this.zxmpp.packet(this.zxmpp);
+			var iq = new this.zxmpp.stanzaIq(this.zxmpp);
+			var iqnode = iq.appendIqToPacket(packet, false, "result", this.from, this.id);
+			var querynode = iq.appendQueryToPacket(packet, "http://jabber.org/protocol/disco#info");
+			
+			// which extension are we being asked about?
+			// node == undefined: our always-supported features
+			// node == url#ext:   ext
+			if(node)
+				querynode.setAttribute("node", node);
+
+			var ext = node.split("#");
+			if(ext && ext.length>1)
+				ext = ext[ext.length-1];
+			else
+				ext = undefined;
+
+			if(owncaps.appendFeaturesToXML(packet, querynode, ext)) // FIXME add "ext" too, extracted from "node"
+			{
+				packet.send("poll");
+			}
+			else
+			{
+				this.iqFail();
+			}
+			break;
+
 			default:
 			console.warn("zxmpp::stanzaIq::parseQueryDiscoInfoXML(): unimplemented response to iq's of type " + this.type);
 			this.iqFail();
@@ -322,7 +400,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			console.warn("zxmpp::stanzaIq::iqFail(): responding to " + this.type + "-type iq failure ");
 			
 			// FIXME perhaps we MUST include failure reason?
-			// because currently we dont.
+			// because currently we don't do that.
 
 			var packet = new this.zxmpp.packet(this.zxmpp);
 			var iq = new this.zxmpp.stanzaIq(this.zxmpp);
@@ -362,8 +440,6 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			//console.log("remembering " + this.iqStanza.id);
 			this.zxmpp.stream.iqsAwaitingReply[this.id] = this;
 		}
-		
-
 	}
 
 	this.appendQueryToPacket = function(packet, namespace)
@@ -378,6 +454,8 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		iq.appendChild(query);
 		
 		packet.iqStanza = this;	
+
+		return query;
 	}
 	
 	this.appendErrorToPacket = function(packet, type, details)

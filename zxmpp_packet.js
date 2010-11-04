@@ -60,7 +60,7 @@ zxmppClass.prototype.packet = function (zxmpp)
 		if(keys.newKey)
 			body.setAttribute('newkey', keys.newKey);
 		
-		
+		console.log("(finalized: " + this.zxmpp.util.serializedXML(this.xml) + ")");	
 		return this.zxmpp.util.serializedXML(this.xml);
 		
 	}
