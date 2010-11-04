@@ -53,7 +53,9 @@ zxmppClass.prototype.stream = function (zxmpp)
 	this.hasSentSessionRequest = false;
 	this.hasSentInitialPresence = false;
 	this.sentUnrespondedRIDs = [];
+	this.sentUnrespondedKeys = [];
 	this.reuseRIDs = [];
+	this.reuseKeys = [];
 
 	/* state funcs */
 	this.uniqueId = function(idType)
@@ -116,20 +118,28 @@ zxmppClass.prototype.stream = function (zxmpp)
 		}
 	}
 
-	this.assignKey = function()
+	this.assignKey = function(just_peek)
 	{
 		// assign a key, as described in 15.x in XEP-0124
 		// if we're out of keys, then also generate a new base key
 		
 		// add a key, if available
 		var ret = new Object();
-		if(this.keys.length>0)
+		if(this.reuseKeys.length>0) // in case of stream restore/connection interrupt, reuse a key
+		{
+			ret.key = this.reuseKeys.shift();
+			if(just_peek)
+				this.reuseKeys.unshift(ret.key);
+		}
+		else if(this.keys.length>0)
 		{
 			ret.key = this.keys.pop();
+			if(just_peek)
+				this.keys.push(ret.key);
 		}
 	
 		// if we don't have more keys left...
-		if(this.keys.length<=1)
+		if(this.reuseKeys.length==0 && this.keys.length<=1)
 		{
 			this.genKeys();
 			ret.newKey = this.keys.pop();
@@ -247,9 +257,11 @@ zxmppClass.prototype.stream = function (zxmpp)
 			conn.setRequestHeader("X-ZXMPPReuseRids", JSON.stringify(this.reuseRIDs));
 			conn.onreadystatechange = this.zxmpp.stream.handleConnectionStateChange;
 			conn.connrid = this.assignRID(true);
+			conn.connkey = this.assignKey(true); if(conn.connkey) conn.connkey = conn.connkey.key;
 			if(!conn.connoutgoing)
 				conn.connoutgoing = packet.finalized();
 			this.sentUnrespondedRIDs.push(conn.connrid);
+			this.sentUnrespondedKeys.push(conn.connkey);
 			conn.send(conn.connoutgoing);
 
 
@@ -430,8 +442,10 @@ zxmppClass.prototype.stream = function (zxmpp)
 		console.log("That was received rid " + conn.connrid);
 		var idx = conn.connzxmpp.stream.sentUnrespondedRIDs.indexOf(conn.connrid);
 		if(idx!=-1)
+		{
 			conn.connzxmpp.stream.sentUnrespondedRIDs.splice(idx,1);
-
+			conn.connzxmpp.stream.sentUnrespondedKeys.splice(idx,1);
+		}
 		//if(conn.connrid > conn.connzxmpp.stream.lastReceivedRID)
 		//	conn.connzxmpp.stream.lastReceivedRID = conn.connrid;
 
@@ -708,8 +722,8 @@ zxmppClass.prototype.stream = function (zxmpp)
 	this.toJSON = function(key)
 	{
 		// FIXME
-		// this.sentUnrespondedRIDs shoudl also contain a copy of all
-		// the RIDs we should resend because we never received a response
+		// this.sentUnrespondedRIDs shoudl also contain a full copy of all
+		// the packets we should resend because we never received a response
 		// for them!
 
 		oldconnhold = this.connectionsHold;
@@ -750,7 +764,9 @@ zxmppClass.prototype.stream = function (zxmpp)
 	this.wakeUp = function()
 	{
 		this.reuseRIDs = this.sentUnrespondedRIDs;
+		this.reuseKeys = this.sentUnrespondedKeys;
 		this.sentUnrespondedRIDs = [];
+		this.sentUnrespondedKeys = [];
 		this.fillPollConnection();
 	}
 }
