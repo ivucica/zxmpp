@@ -1,7 +1,9 @@
-== RIDs apparently incorrectly sent upon restoration from JSON
+== Upon restoring stream from JSON, we don't resend aborted HTTP requests
 
-While we successfully restore connection with both PunJab and Prosody, it seems like ejabberd does not like what we're doing and very quickly
-sends us item-not-found.
+If we did not complete all connections, we need to go, resend requests and complete them now.
+If we did not send all packets from queue successfully prior to serialization, we need to go and send them now.
 
-Result: ejabberd disconnects us upon restoring from JSON
+We currently don't attempt to serialize or unserialize neither packets nor connections. That needs to be fixed.
+
+Result: some packets may be dropped upon execution of serialization/deserialization.
 
