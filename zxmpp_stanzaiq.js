@@ -100,7 +100,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 	this.parseBindXML = function(xml)
 	{
 		if(xml.attr["xmlns"] && xml.attr["xmlns"] != "urn:ietf:params:xml:ns:xmpp-bind")
-		{
+	        {
 			this.iqFail();
 			return;
 		}

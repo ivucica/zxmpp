@@ -207,6 +207,7 @@ zxmppClass.prototype.packet = function (zxmpp)
 					stanzaInstance = new this.zxmpp.stanzaSaslResult(this.zxmpp);
 					break;
 				}
+				case "http://jabber.org/protocol/httpbind": // COMPAT: Workaround for Prosody 0.7.0
 				case "jabber:client":
 				switch(stanza)
 				{
