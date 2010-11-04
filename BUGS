@@ -1,15 +1,7 @@
-== Outgoing out of order
+== RIDs apparently incorrectly sent upon restoration from JSON
 
-Since after sending a packet  we don't wait for the hold connection to interrupt before sending next poll
-packet, we may get disconnected for having our request-ids (rid) spread too far apart.
+While we successfully restore connection with both PunJab and Prosody, it seems like ejabberd does not like what we're doing and very quickly
+sends us item-not-found.
 
-Result: incorrect behavior
-
-== Incoming out of order
-
-We don't guarantee that we will process the messages in order we transmitted them; in fact, we process the
-packet as soon as it arrives. We don't queue the packets according to rids.
-
-Result: Blatant XEP-0124 violation (see 14.2)
-
+Result: ejabberd disconnects us upon restoring from JSON
 
