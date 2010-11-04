@@ -140,7 +140,7 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 		}
 		
 		
-		var presenceNode = this.presenceNode = packet.xml.createElement("presence");
+		var presenceNode = this.presenceNode = packet.xml.createElementNS("jabber:client", "presence");
 		if(this.from) presenceNode.setAttribute("from", this.from);
 		if(this.to) presenceNode.setAttribute("to", this.to);
 		if(this.type)
