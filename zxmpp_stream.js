@@ -461,6 +461,13 @@ zxmppClass.prototype.stream = function (zxmpp)
 			else
 			{
 				console.error("zxmpp::stream::handleConnection(): plain authentication mechanism unsupported. giving up");
+
+				conn.connzxmpp.stream.terminate();
+	
+				var code = "terminate/no-supported-auth";
+				var humanreadable = "No supported authentication mechanism provided by the server.";
+				conn.connzxmpp.notifyConnectionTerminate(code, humanreadable);
+
 			}
 			
 		}
@@ -492,6 +499,11 @@ zxmppClass.prototype.stream = function (zxmpp)
 		{
 			this.fillPollConnection();
 			//this.sendIdle("hold");
+		}
+		else
+		{
+			console.error("Something broke down");
+			console.log("Fulljid: " + this.zxmpp.fullJid);
 		}
 	}
 	this.fillPollConnection = function()
