@@ -217,9 +217,9 @@ zxmppClass.prototype.notifyRosterUpdate = function(rosteritem)
 zxmppClass.prototype.notifyMessage = function(messageStanza)
 {
 	
-	for(var rosterUpdateHandlerId in this.onMessage)
+	for(var messageHandlerId in this.onMessage)
 	{
-		var messageHandler = this.onMessage[rosterUpdateHandlerId];
+		var messageHandler = this.onMessage[messageHandlerId];
 		if(messageHandler.func)
 			messageHandler.func(messageHandler.context, this, messageStanza);
 		else
@@ -302,5 +302,19 @@ zxmppClass.prototype.deserialize = function(json)
     this.stream = input.stream;
 
     this.stream.wakeUp();
+
+    // finally, restore UI
+    for(var i in this.presences)
+    {
+        for(var j in this.presences[i])
+        {
+            this.notifyPresenceUpdate(this.presences[i][j]);
+        }
+    }
+    for(var i in this.roster)
+    {
+        this.notifyRosterUpdate(this.roster[i]);
+    }
+    // TODO restore messages?
 }
 
