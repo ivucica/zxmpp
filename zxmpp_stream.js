@@ -768,8 +768,15 @@ zxmppClass.prototype.stream = function (zxmpp)
 	this.wakeUp = function()
 	{
 		this.reuseRIDs = this.sentUnrespondedRIDs;
-		this.reuseKeys = []; //this.sentUnrespondedKeys; // <== Key reusing must be done with ejabberd, but not with punjab.
-		// perhaps punjab insists that the packets are completely the same, not just the key+rid, like it seems to be with ejabberd?
+		if(0) 
+		{
+			this.reuseKeys = []; 
+		} 
+		else
+		{
+			this.reuseKeys = this.sentUnrespondedKeys; // <== Key reusing must be done with ejabberd, but not with punjab.
+			// perhaps punjab insists that the packets are completely the same, not just the key+rid, like it seems to be with ejabberd?
+		}
 		this.sentUnrespondedRIDs = [];
 		this.sentUnrespondedKeys = [];
 		this.fillPollConnection();
