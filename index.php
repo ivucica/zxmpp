@@ -223,7 +223,7 @@ function handler_rosterupdate(sender, item)
 		console.log("Presence icon: " + presence.show);
 	}
 */
-	if(item.subscription != "removed")
+	if(item.subscription != "removed" && item.subscription != "none")
 	{
 		zxmppui.rosterAdded(item.bareJid, presence ? presence.show : "unavailable", item.name ? item.name : item.bareJid, presence ? presence.status : "");
 		

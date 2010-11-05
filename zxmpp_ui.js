@@ -70,7 +70,6 @@ zxmppClass.prototype.ui = function() {
 		var entries = this.userlist.find('.zxmpp_content > .user' + safejid);
 		if(!status)
 			status = "";
-
 		entries.each(function(i,entry) {
 			entry.className="zxmpp_user zxmpp_status" + icon + " user" + safejid;
 			entry.innerHTML=display + '<div class="zxmpp_statustext">' + status + '</div>';
