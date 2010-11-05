@@ -85,7 +85,7 @@ zxmppClass.prototype.ui = function() {
 		
 		this.messageWindow(barejid); // FIXME get roster item from backend, and get display name
 		//$('#zxmpp_window_msg_' + safejid + ' > input').remove();
-		console.log("zxmpp_window_msg_" + safejid);
+		
 		var msgcontainer = document.getElementById("zxmpp_window_msg_" + safejid).firstChild.firstChild
 		msgcontainer.innerHTML += 
 			'<div class="zxmpp_message_in">' + txt + '</div>';
@@ -112,7 +112,9 @@ zxmppClass.prototype.ui = function() {
 		// FIXME we reference zxmppui because "this" might not be an instance of zxmppui
 
 		var safejid = jid.replace(/[^a-zA-Z 0-9]+/g,'');
-		
+
+		if(!display)
+			display = jid;		
 		console.log("GETTING WINDOW FOR " + jid);
 
 		// FIXME use jquery, not document.getElementById
