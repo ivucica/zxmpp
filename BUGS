@@ -7,3 +7,10 @@ We currently don't attempt to serialize or unserialize neither packets nor conne
 
 Result: some packets may be dropped upon execution of serialization/deserialization.
 
+== No user input sanitization
+
+User can send whatever we want, and we interpret and just print out whatever we get. That's doubleplusungood.
+
+Result: how about some javascript sent in a <message><body></body></message>? How about breaking the XML?
+
+
