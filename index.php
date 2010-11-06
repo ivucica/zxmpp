@@ -230,7 +230,7 @@ function handler_rosterupdate(sender, item)
 	}
 	else
 	{
-		zxmpp.rosterRemoved(item.bareJid);
+		zxmppui.rosterRemoved(item.bareJid);
 	}
 }
 function handler_message(sender, messagestanza)
