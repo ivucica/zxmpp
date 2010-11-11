@@ -29,12 +29,11 @@ function zxmppClass()
 	this.onMessage = [];
 }
 
-zxmppClass.prototype.init = function(uiOwner, configDict)
+zxmppClass.prototype.init = function(configDict)
 {
 	/****************************
 	 * store received variables *
 	 ****************************/
-	this.uiOwner = uiOwner; // html element that will serve as ZXMPP UI's root
 	this.cfg = configDict; // configuration
 	
 	
@@ -59,9 +58,9 @@ zxmppClass.prototype.setPassword = function(password)
 	this.password = password;
 }
 
-zxmppClass.prototype.main = function(uiOwner, configDict, username, password)
+zxmppClass.prototype.main = function(configDict, username, password)
 {	
-	this.init(uiOwner, configDict);
+	this.init(configDict);
 	
 	this.setUsername(username);
 	this.setPassword(password);
