@@ -76,9 +76,9 @@ function createzxmpp()
 	zxmpp.onRosterUpdate.push(handler_rosterupdate);
 	zxmpp.onMessage.push(handler_message);
 
-	window.zxmppui = (new zxmpp.ui);//.inject('body');//.onPresenceUpdate(['perica', 'matija']);
-	window.zxmppui.inject('body');
+	window.zxmppui = new zxmpp.ui;
 	window.zxmppui.backend = zxmpp;
+	window.zxmppui.inject('body');
 	
 	return cfg;
 }
@@ -86,7 +86,7 @@ function createzxmpp()
 function go()
 {
 	var cfg = createzxmpp();
-	zxmpp.main(document.getElementById("zxmpp_root"), cfg, document.getElementById("usr").value, document.getElementById("pwd").value);
+	zxmpp.main(cfg, document.getElementById("usr").value, document.getElementById("pwd").value);
 	//var pack = new zxmpp.packet(zxmpp);
 
 
