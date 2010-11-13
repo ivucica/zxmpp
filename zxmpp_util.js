@@ -484,16 +484,15 @@ zxmppClass.prototype.util = function (zxmpp)
 
 
 
-if(!console)
+if(!window.console)
 {
-	console = function()
-	{
-		this.log = function(msg)
+	window.console = {
+		log: function(msg)
 		{
 			// stub
 		}
-		this.warn = this.log;
-		this.error = this.log;
 	};
+	window.console.warn = window.console.log;
+	window.console.error = window.console.log;
 
 }
