@@ -78,7 +78,7 @@ zxmppClass.prototype.stanzaMessage = function(zxmpp)
 		if(this.body)
 		{
 			console.log("appending " + this.body);
-			var bodyNode = packet.xml.createElement("body");
+			var bodyNode = packet.xml.createElementNS("jabber:client", "body");
 			var bodyText = packet.xml.createTextNode(this.body);
 			bodyNode.appendChild(bodyText);
 			messageNode.appendChild(bodyNode);
