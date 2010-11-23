@@ -153,14 +153,25 @@ zxmppClass.prototype.caps = function(zxmpp)
 		if(!this.ver)	
 			this.ver = "0.1." + (new Date().getTime());
 
-		this.featuresExt["voice-v1"]=[];
-		this.featuresExt["video-v1"]=[];
-		this.featuresExt["camera-v1"]=[];
+		// FIXME we're faking jingle support
+		// the only one we truly support in this list is disco#info
+		this.features = ["urn:xmpp:jingle:1", "urn:xmpp:jingle:transports:ice-udp:1", "urn:xmpp:jingle:apps:rtp:1", "urn:xmpp:jingle:apps:rtp:audio", "http://jabber.org/protocol/disco#info"];
+		this.featuresExt["voice-v1"]=["http://www.google.com/xmpp/protocol/voice/v1"];
+		this.featuresExt["video-v1"]=["http://www.google.com/xmpp/protocol/video/v1"];
+		this.featuresExt["camera-v1"]=["http://www.google.com/xmpp/protocol/camera/v1"];
+	
 		
+		var extString = "";
+		for(var ftr in this.featuresExt)
+		{
+			extString += ftr + " ";
+		}
+		extString = extString.substring(0, extString.length - 1);
+
 		var cnode = packet.xml.createElementNS("http://jabber.org/protocol/caps", "c");
-		cnode.setAttribute("node", "http://ivan.vucica.net/zxmpp/heh"); // FIXME move client identifier to global var
+		cnode.setAttribute("node", "http://ivan.vucica.net/zxmpp/"); // FIXME move client identifier to global var
 		cnode.setAttribute("ver", this.ver); // TODO implement proper, hashed "ver"-ification string
-		cnode.setAttribute("ext", "voice-v1 video-v1 camera-v1"); // TODO Send some capabilities! Avoid 'ext'
+		cnode.setAttribute("ext", extString); // TODO Avoid 'ext'
 		// TODO calculate hash, use the hash under "ver", and set "hash" to "sha-1"
 		xml.appendChild(cnode);
 	}
@@ -191,60 +202,14 @@ zxmppClass.prototype.caps = function(zxmpp)
 			xml.appendChild(idnode);
 
 			// then add features
-			/*for(var f in ftrs) // TODO whoops, where do we get feature namespaces?
-			{
-				
-			}*/
-			
-			// FIXME stub!
-			// FIXME we're faking jingle support
-			// the only one we truly support in this list is disco#info
 			var ftrnode;
-		       
-			if(ext=="" || ext == this.ver)
-			{
+			for(var f in ftrs)
+			{	
 				ftrnode = packet.xml.createElement("feature");
-				ftrnode.setAttribute("var", "urn:xmpp:jingle:1");
-				xml.appendChild(ftrnode);
-
-				ftrnode = packet.xml.createElement("feature");
-				ftrnode.setAttribute("var", "urn:xmpp:jingle:transports:ice-udp:1");
-				xml.appendChild(ftrnode);
-
-				ftrnode = packet.xml.createElement("feature");
-				ftrnode.setAttribute("var", "urn:xmpp:jingle:apps:rtp:1");
-				xml.appendChild(ftrnode);
-
-				ftrnode = packet.xml.createElement("feature");
-				ftrnode.setAttribute("var", "urn:xmpp:jingle:apps:rtp:audio");
-				xml.appendChild(ftrnode);
-
-				ftrnode = packet.xml.createElement("feature");
-				ftrnode.setAttribute("var", "http://jabber.org/protocol/disco#info");
+				ftrnode.setAttribute("var", ftrs[f]);
 				xml.appendChild(ftrnode);
 			}
-			else if(ext == "voice-v1")
-			{
-				ftrnode = packet.xml.createElement("feature");
-				ftrnode.setAttribute("var", "http://www.google.com/xmpp/protocol/voice/v1");
-				xml.appendChild(ftrnode);
-			}
-			else if(ext == "video-v1")
-			{
-				ftrnode = packet.xml.createElement("feature");
-				ftrnode.setAttribute("var", "http://www.google.com/xmpp/protocol/video/v1");
-				xml.appendChild(ftrnode);
-			}
-			else if(ext == "camera-v1")
-			{
-				ftrnode = packet.xml.createElement("feature");
-				ftrnode.setAttribute("var", "http://www.google.com/xmpp/protocol/camera/v1");
-				xml.appendChild(ftrnode);
-			}
-			else
-			{
-				return false;
-			}
+			
 
 			console.log("SENDING for EXT: " + ext);
 			return true;
@@ -270,6 +235,7 @@ zxmppClass.prototype.caps = function(zxmpp)
 		for(var extId in exts)
 		{
 			var ext = exts[extId];
+			// FIXME sometimes, "exts" may contain a function! dont send that query.
 			if(extdest[ext])
 			{
 				var feature = extdest[ext];
