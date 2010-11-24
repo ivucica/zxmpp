@@ -222,6 +222,8 @@ zxmppClass.prototype.caps = function(zxmpp)
 			var ftrnode;
 			for(var f in ftrs)
 			{	
+				if(typeof ftrs[f] != "string")
+					continue;
 				ftrnode = packet.xml.createElement("feature");
 				ftrnode.setAttribute("var", ftrs[f]);
 				xml.appendChild(ftrnode);
