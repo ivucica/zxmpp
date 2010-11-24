@@ -97,7 +97,8 @@ zxmppClass.prototype.ui = function() {
 	}
 
 	this.messageReceived = function(from, body) {
-		this.showMessage(from, 'other: ' + body);
+		// FIXME add better html escaping
+		this.showMessage(from, 'other: ' + body.replace(/&/g, "&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"));
 	}
 
 	this.userClick = function(event) {
