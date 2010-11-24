@@ -96,9 +96,12 @@ zxmppClass.prototype.ui = function() {
 		*/
 	}
 
-	this.messageReceived = function(from, body) {
+	this.escapedHTML = function(txt) {
 		// FIXME add better html escaping
-		this.showMessage(from, 'other: ' + body.replace(/&/g, "&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"));
+		return txt.replace(/&/g, "&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+	}
+	this.messageReceived = function(from, body) {
+		this.showMessage(from, 'other: ' + this.escapedHTML(body));
 	}
 
 	this.userClick = function(event) {
@@ -148,7 +151,7 @@ function zxmppui_handlekeydown(event)
 	{
 		// FIXME dont use zxmppui
 		zxmppui.backend.sendMessage(event.target.jid, event.target.value);
-		zxmppui.showMessage(event.target.jid, 'you: ' + event.target.value); 
+		zxmppui.showMessage(event.target.jid, 'you: ' + zxmppui.escapedHTML(event.target.value)); 
 		event.target.value = "";
 	}
 }
