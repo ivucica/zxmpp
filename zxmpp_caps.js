@@ -159,7 +159,24 @@ zxmppClass.prototype.caps = function(zxmpp)
 		this.featuresExt["voice-v1"]=["http://www.google.com/xmpp/protocol/voice/v1"];
 		this.featuresExt["video-v1"]=["http://www.google.com/xmpp/protocol/video/v1"];
 		this.featuresExt["camera-v1"]=["http://www.google.com/xmpp/protocol/camera/v1"];
-	
+
+		// FIXME also faking ichat support
+		this.features.push("apple:profile:bundle-transfer");
+		this.features.push("apple:profile:efh-transfer");
+		this.features.push("apple:profile:transfer-extensions:rsrcfork");
+		this.features.push("http://www.apple.com/xmpp/message-attachments");
+		this.featuresExt["ice"] = ["apple:iq:vc:ice"];
+		this.featuresExt["recauth"] = ["apple:iq:vc:recauth"];
+		this.featuresExt["rdserver"] = ["apple:iq:rd:server"];
+		this.featuresExt["maudio"] = ["apple:iq:vc:multiaudio"];
+		this.featuresExt["audio"] = ["apple:iq:vc:audio"];
+		this.featuresExt["rdclient"] = ["apple:iq:rd:client"];
+		this.featuresExt["mvideo"] = ["apple:iq:vc:multivideo"];
+		this.featuresExt["auxvideo"] = ["apple:iq:vc:auxvideo"];
+		this.featuresExt["rdmuxing"] = ["apple:iq:rd:muxing"];
+		this.featuresExt["avcap"] = ["apple:iq:vc:capable"];
+		this.featuresExt["avavail"] = ["apple:iq:vc:available"];
+		this.featuresExt["video"] = ["apple:iq:vc:video"];
 		
 		var extString = "";
 		for(var ftr in this.featuresExt)
