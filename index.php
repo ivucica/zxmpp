@@ -202,7 +202,7 @@ function handler_presenceupdate(sender, presence)
 	if(toppresence)
 	{
 		//console.log("Updating " + toppresence.bareJid);
-		zxmppui.presenceUpdate(toppresence.bareJid, toppresence.show, toppresence.bareJid, toppresence.status);
+		zxmppui.presenceUpdate(toppresence.bareJid, toppresence.show, false, toppresence.status);
 	}
 }
 function handler_rosterupdate(sender, item)
