@@ -503,6 +503,17 @@ zxmppClass.prototype.stream = function (zxmpp)
 		}
 		else if(this.hasSentSessionRequest && this.zxmpp.fullJid && !this.hasSentInitialPresence)
 		{
+			// set up initial presence
+			var ownPresence = this.zxmpp.getPresence(this.zxmpp.fullJid);
+			if(ownPresence.show == "unavailable")
+			{
+				// if set to unavail, let's presume
+				// the presence was not set up until now
+				ownPresence.show = "avail";
+				ownPresence.status = "Using Z-XMPP";
+				ownPresence.priority = 1;
+			}
+
 			// send initial presence
 			this.sendCurrentPresence();
 			
@@ -626,12 +637,14 @@ zxmppClass.prototype.stream = function (zxmpp)
 		// TODO server must support presence capability!
 		// check if it does.
 		// but, we dont have caps parsing yet
+		// (for server)
+	
+		var ownPresence = this.zxmpp.getPresence(this.zxmpp.fullJid);
 		
-		// TODO send actual presence, not hardcoded stuff
-		
+
 		var packet = new this.zxmpp.packet(this.zxmpp);
-		var presence = new this.zxmpp.stanzaPresence(this.zxmpp);
-		presence.appendToPacket(packet, this.zxmpp.fullJid, false, "avail", "Using Z-XMPP", 1);
+		var presencestanza = new this.zxmpp.stanzaPresence(this.zxmpp);
+		presencestanza.appendToPacket(packet, this.zxmpp.fullJid, false, ownPresence.show, ownPresence.status, ownPresence.priority);
 		
 		this.hasSentInitialPresence = true;
 		packet.send(send_style);
