@@ -239,8 +239,10 @@ zxmppClass.prototype.setOwnPresence = function(show, status, priority)
 	presence.status = status;
 	presence.priority = priority;
 
-	if(this.stream && this.stream.sentInitialPresence)
+	if(this.stream && this.stream.hasSentInitialPresence)
 		this.stream.sendCurrentPresence();
+	else
+		console.log("Not sending pres");
 }
 
 zxmppClass.prototype.serialized = function()
