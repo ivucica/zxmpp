@@ -232,6 +232,16 @@ zxmppClass.prototype.sendMessage = function(to, body)
 	this.stream.sendMessage("poll", this.fullJid, to, "chat", body);
 }
 
+zxmppClass.prototype.setOwnPresence = function(show, status, priority)
+{
+	var presence = this.getPresence(this.fullJid);
+	presence.show = show;
+	presence.status = status;
+	presence.priority = priority;
+
+	if(this.stream && this.stream.sentInitialPresence)
+		this.stream.sendCurrentPresence();
+}
 
 zxmppClass.prototype.serialized = function()
 {
