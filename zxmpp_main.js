@@ -40,10 +40,11 @@ zxmppClass.prototype.init = function(configDict)
 	/****************
 	 * client state *
 	 ****************/
-	this.presences = {};
-	this.capsNodes = {};
-	this.capsNodesExt = {};
-	this.roster = {};
+	this.presences = {}; // maps barejid => list of presences
+	this.capsNodes = {}; // maps fulljid => features
+	this.capsNodesExt = {}; // maps fulljid => extensions => features
+	this.roster = {}; 
+	this.vCards = []; // maps barejid => vcard
 	
 }
 
