@@ -15,8 +15,6 @@
 <link href="application.css" rel="stylesheet" type="text/css">
 
 <!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>-->
-<script src="jquery.min.js"></script>
-<script src="deepCopy.js"></script>
 
 <?php
 // while you could manually list all required scripts,
@@ -112,7 +110,10 @@ function unloadhandler()
 {
 	if(window.sessionStorage)
 	{
-		if(zxmpp) window.sessionStorage["zxmpp"] = zxmpp.serialized();
+		if(zxmpp && zxmpp.stream && zxmpp.stream.hasFullConnection) 
+		{
+			window.sessionStorage["zxmpp"] = zxmpp.serialized();
+		}
 		else {
 			window.sessionStorage["zxmpp"] = undefined;
 			delete window.sessionStorage["zxmpp"];
@@ -199,6 +200,8 @@ function handler_connectionterminate(sender, code, humanreadable)
 		alert("Termination with code \'" + code + "\'\n\n" + humanreadable);
 		break;
 	}
+	window.sessionStorage["zxmpp"] = undefined;
+	delete window.sessionStorage["zxmpp"];
 }
 function handler_presenceupdate(sender, presence)
 {
