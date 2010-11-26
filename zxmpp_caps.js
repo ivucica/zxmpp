@@ -205,7 +205,8 @@ zxmppClass.prototype.caps = function(zxmpp)
 		else
 			ftrs = this.featuresExt[ext];
 
-		console.warn("TRYING TO GET EXT " + ext);
+		if(typeof ext != "string")
+			return false;
 		if(ftrs)
 		{
 
@@ -254,7 +255,8 @@ zxmppClass.prototype.caps = function(zxmpp)
 		for(var extId in exts)
 		{
 			var ext = exts[extId];
-			// FIXME sometimes, "exts" may contain a function! dont send that query.
+			if(typeof ext != "string" || typeof extId != "string")
+				continue;
 			if(extdest[ext])
 			{
 				var feature = extdest[ext];
