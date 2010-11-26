@@ -235,6 +235,8 @@ zxmppClass.prototype.sendMessage = function(to, body)
 zxmppClass.prototype.setOwnPresence = function(show, status, priority)
 {
 	var presence = this.getPresence(this.fullJid);
+	if(!presence)
+		return;
 	presence.show = show;
 	presence.status = status;
 	presence.priority = priority;
