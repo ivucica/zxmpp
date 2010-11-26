@@ -153,6 +153,9 @@ zxmppClass.prototype.caps = function(zxmpp)
 		if(!this.ver)	
 			this.ver = "0.1." + (new Date().getTime());
 
+		this.features = ['http://jabber.org/protocol/disco#info'];
+
+/*
 		// FIXME we're faking jingle support
 		// the only one we truly support in this list is disco#info
 		this.features = ["urn:xmpp:jingle:1", "urn:xmpp:jingle:transports:ice-udp:1", "urn:xmpp:jingle:apps:rtp:1", "urn:xmpp:jingle:apps:rtp:audio", "http://jabber.org/protocol/disco#info"];
@@ -177,7 +180,8 @@ zxmppClass.prototype.caps = function(zxmpp)
 		this.featuresExt["avcap"] = ["apple:iq:vc:capable"];
 		this.featuresExt["avavail"] = ["apple:iq:vc:available"];
 		this.featuresExt["video"] = ["apple:iq:vc:video"];
-		
+*/		
+
 		var extString = "";
 		for(var ftr in this.featuresExt)
 		{
