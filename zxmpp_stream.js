@@ -46,6 +46,8 @@ zxmppClass.prototype.stream = function (zxmpp)
 	this.iqsAwaitingReply = {};
 	
 	/* state tracking variables */
+	this.hasFullConnection = false;
+
 	this.hasSentAuth = false;
 	this.authSuccess = undefined;
 	this.hasSentRestart = false;
@@ -523,9 +525,12 @@ zxmppClass.prototype.stream = function (zxmpp)
 			this.sendIqQuery("jabber:iq:roster", "get");//, this.zxmpp.bareJid);
 			
 			this.hasSentInitialPresence = true;
+			this.hasFullConnection = true; // FIXME not exactly right. we need to receive a bit of roster first.
 		}
 		else if(this.hasSentInitialPresence && this.findFreeConnection("poll")/* && !this.pollPacketQueue.length*/) // if we haven't held yet, and we have a free holding slot, and nothing is waiting to poll...
 		{
+
+
 			this.fillPollConnection();
 			//this.sendIdle("hold");
 		}
