@@ -11,12 +11,13 @@ function zxmppGetZXMPPScripts()
 		'zxmpp_presence.js',
 		'zxmpp_caps.js',
 		'zxmpp_itemroster.js',
+		'zxmpp_vcard.js',
 
 		'zxmpp_stanzaiq.js',
 		'zxmpp_stanzapresence.js',
 		'zxmpp_stanzastreamfeatures.js',
 		'zxmpp_stanzasaslresult.js',
-		'zxmpp_stanzamessage.js'
+		'zxmpp_stanzamessage.js',
 		);
 }
 

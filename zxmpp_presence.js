@@ -34,7 +34,7 @@ zxmppClass.prototype.presence = function (zxmpp)
 	this.priority = 0;
 	
 	this.caps = new this.zxmpp.caps(this.zxmpp);
-
+	this.vcard = new this.zxmpp.vCard(this.zxmpp);
 
 	this.toJSON = function(key)
 	{

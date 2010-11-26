@@ -18,20 +18,30 @@
 <script src="jquery.min.js"></script>
 <script src="deepCopy.js"></script>
 
-<script src="zxmpp_main.js"></script>
-<script src="zxmpp_util.js"></script>
-<script src="zxmpp_ui.js"></script>
-<script src="zxmpp_stream.js"></script>
-<script src="zxmpp_packet.js"></script>
-<script src="zxmpp_presence.js"></script>
-<script src="zxmpp_caps.js"></script>
-<script src="zxmpp_itemroster.js"></script>
+<?php
+// while you could manually list all required scripts,
+// to facilitate easier upgrade, you should prefer using
+// scriptlist.php which returns list of scripts as a handy
+// php array. 
+//
+// if you don't use php, then just add the script references
+// manually.
+//
+// for default GUI, there's also a list of stylesheets that
+// need to be included.
+require_once 'scriptlist.php';
+$zxp = "./"; // zxmpp path, including trailing slash
+foreach(zxmppGetStylesheets() as $fn)
+{
+	echo '<link href="' . $zxp . $fn . '" rel="stylesheet" type="text/css">' . "\n";
+}
 
-<script src="zxmpp_stanzaiq.js"></script>
-<script src="zxmpp_stanzapresence.js"></script>
-<script src="zxmpp_stanzastreamfeatures.js"></script>
-<script src="zxmpp_stanzasaslresult.js"></script>
-<script src="zxmpp_stanzamessage.js"></script>
+foreach(zxmppGetAllScripts() as $fn)
+{
+	echo '<script type="text/javascript" src="' . $zxp . $fn . '"></script>' . "\n";
+}
+
+?>
 </head>
 <body onunload="unloadhandler();" onload="loadhandler();">
 <div id="zxmpp_root"></div>
