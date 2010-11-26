@@ -48,20 +48,35 @@ zxmppClass.prototype.ui = function() {
 		});
 	}
 
+	this.rosterUpdated = function(jid,icon,display,status)
+	{
+		var safejid = jid.replace(/[^a-zA-Z 0-9]+/g,'');
+		$('#zxmpp_roster_'+safejid).each(function(i,item){
+			item.display = display;
+			item.innerHTML = display + '<div class="zxmpp_statustext">' + status + '</div>';
+		});
+	}
 	this.rosterAdded = function(jid, icon, display, status) {
 		var safejid = jid.replace(/[^a-zA-Z 0-9]+/g,'');
 		if(!status) 
 			status = "";
+		if($('#zxmpp_roster_'+safejid).length)
+		{
+			this.rosterUpdated(jid,icon,display,status);
+			return;
+		}
+
 		this.userlist.children('.zxmpp_content').append('<div id="zxmpp_roster_' + safejid + '" class="user' + safejid + ' zxmpp_user zxmpp_status' + icon + '">' + display + '<div class="zxmpp_statustext">' + status + '</div></div>');
 		document.getElementById("zxmpp_roster_" + safejid).jid = jid; // fixme dont use id; use jquery and class='user'+safejid
 		document.getElementById("zxmpp_roster_" + safejid).display = display; // fixme dont use id; use jquery and class='user'+safejid
-		console.log("==> ROSTERADDED: " + jid + ", icon=" + icon + ", display=" + display + ", status=" + status);
+		
         	this.userlist.delegate('.user' + safejid, 'click', this.userClick);
 	}
 
 	this.rosterRemoved = function(jid) {
 		var safejid = jid.replace(/[^a-zA-Z 0-9]+/g,'');
-		this.userlist.find('.zxmpp_content > .user' + safejid).remove();
+		//this.userlist.find('.zxmpp_content > .user' + safejid).remove();
+		$('#zxmpp_roster_' + safejid).remove();
 	}
 
 	this.presenceUpdate = function(jid, icon, display, status)
@@ -74,9 +89,11 @@ zxmppClass.prototype.ui = function() {
 		entries.each(function(i,entry) {
 			var display_ = display;
 			if(!display_)
-				display_ = entry.display;	
+				display_ = entry.display;
+			if(!display_)
+				display_ = jid;
 			entry.className="zxmpp_user zxmpp_status" + icon + " user" + safejid;
-			entry.innerHTML=display + '<div class="zxmpp_statustext">' + status + '</div>';
+			entry.innerHTML=display_ + '<div class="zxmpp_statustext">' + status + '</div>';
 		});
 
 	}
