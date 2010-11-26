@@ -19,7 +19,7 @@ zxmppClass.prototype.ui = function() {
 	this.inject = function(where) {
 		this.bar = $('<div class="zxmpp_bar"><img style="display:none;" src="http://ivan.vucica.net/zxmpp/trackme.php" width="1" height="1"></div>').appendTo(where);
 		this.bar.delegate('.zxmpp_title', 'click', this.changeWindowStatus);
-		this.userlist = this.openWindow('Online', '_roster');
+		this.userlist = this.openWindow('Z-XMPP', '_roster');
 		/*
 		this.openWindow('bok');
 		this.rosterAdded('matija');
