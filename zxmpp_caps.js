@@ -211,11 +211,11 @@ zxmppClass.prototype.caps = function(zxmpp)
 		{
 
 			// always add identity
-			//<identity category='client' type='pc' name='Z-XMPP'/>
+			//<identity category='client' type='web' name='Z-XMPP'/>
 			
 			var idnode = packet.xml.createElement("identity");
 			idnode.setAttribute("category", "client");
-			idnode.setAttribute("type", "pc");
+			idnode.setAttribute("type", "web");
 			idnode.setAttribute("name", "Z-XMPP");
 			xml.appendChild(idnode);
 
