@@ -37,7 +37,7 @@ zxmppClass.prototype.vCard = function (zxmpp)
 		this.zxmpp = oldzxmpp;
 
 		doc = this.zxmpp.newXMLDocument("some_tag_name", "vcard-temp");
-		doc.laod(this.vcardXML);
+		doc.load(this.vcardXML);
 		this.vcardXML = doc;
 		return ret;
 	}
