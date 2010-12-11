@@ -43,7 +43,7 @@ zxmppClass.prototype.init = function(configDict)
 	this.presences = {}; // maps barejid => list of presences
 	this.capsNodes = {}; // maps fulljid => features
 	this.capsNodesExt = {}; // maps fulljid => extensions => features
-	this.roster = {}; 
+	this.roster = {}; // maps barejid => group => rosteritem 
 	this.vCards = []; // maps barejid => vcard
 	
 }

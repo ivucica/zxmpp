@@ -242,6 +242,9 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				this.iqFail();
 			}
 		}
+		// if this was a server-initiated update of roster,
+		// we need to tell the server we were successful
+		// and just return it an empty iq result
 		if(this.type == "set")
 			this.iqResultEmpty();
 	}
