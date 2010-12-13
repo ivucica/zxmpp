@@ -150,8 +150,16 @@ zxmppClass.prototype.caps = function(zxmpp)
 		// we should actually add values stored in this caps instance!
 		// idea: function "this.useThisClientDefaults" which'll set defaults
 	
-		if(!this.ver)	
-			this.ver = "0.1." + (new Date().getTime());
+		if(!this.ver)
+		{
+			this.ver = this.zxmpp.clientVersion;
+			if(this.zxmpp.clientDebugMode)
+				this.ver += "." + (new Date().getTime());
+		}
+		if(!this.node)
+		{
+			this.node = this.zxmpp.clientURL;
+		}
 
 		this.features = [
 				'http://jabber.org/protocol/disco#info', 
@@ -192,8 +200,9 @@ zxmppClass.prototype.caps = function(zxmpp)
 		}
 		extString = extString.substring(0, extString.length - 1);
 
+		// now, actually write this stuff
 		var cnode = packet.xml.createElementNS("http://jabber.org/protocol/caps", "c");
-		cnode.setAttribute("node", "http://ivan.vucica.net/zxmpp/"); // FIXME move client identifier to global var
+		cnode.setAttribute("node", this.node); 
 		cnode.setAttribute("ver", this.ver); // TODO implement proper, hashed "ver"-ification string
 		cnode.setAttribute("ext", extString); // TODO Avoid 'ext'
 		// TODO calculate hash, use the hash under "ver", and set "hash" to "sha-1"
