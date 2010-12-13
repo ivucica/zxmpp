@@ -27,15 +27,6 @@ function zxmppClass()
 	this.onPresenceUpdate = [];
 	this.onRosterUpdate = [];
 	this.onMessage = [];
-}
-
-zxmppClass.prototype.init = function(configDict)
-{
-	/****************************
-	 * store received variables *
-	 ****************************/
-	this.cfg = configDict; // configuration
-	
 	
 	/****************
 	 * client state *
@@ -45,7 +36,21 @@ zxmppClass.prototype.init = function(configDict)
 	this.capsNodesExt = {}; // maps fulljid => extensions => features
 	this.roster = {}; // maps barejid => group => rosteritem 
 	this.vCards = []; // maps barejid => vcard
-	
+
+	// client info
+	this.clientName = "Z-XMPP";
+	this.clientVersion = "0.1";
+	this.clientOS = navigator.userAgent;
+	this.clientURL = "http://ivan.vucica.net/zxmpp/";
+	this.clientDebugMode = true; // randomize version sent as part of caps
+}
+
+zxmppClass.prototype.init = function(configDict)
+{
+	/****************************
+	 * store received variables *
+	 ****************************/
+	this.cfg = configDict; // configuration
 }
 
 zxmppClass.prototype.setUsername = function(username)

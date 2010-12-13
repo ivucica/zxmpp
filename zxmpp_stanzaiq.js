@@ -214,14 +214,14 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				var querynode = iq.appendQueryToPacket(packet, "jabber:iq:version");
 				var namenode = packet.xml.createElementNS("jabber:iq:version", "name");
 				querynode.appendChild(namenode);
-				namenode.appendChild(packet.xml.createTextNode("Z-XMPP"));
+				namenode.appendChild(packet.xml.createTextNode(this.zxmpp.clientName));
 				var versionnode = packet.xml.createElementNS("jabber:iq:version", "version");
 				querynode.appendChild(versionnode);
-				versionnode.appendChild(packet.xml.createTextNode("0.1"));
+				versionnode.appendChild(packet.xml.createTextNode(this.zxmpp.clientVersion));
 				
 				var osnode = packet.xml.createElementNS("jabber:iq:version", "os");
 				querynode.appendChild(osnode);
-				osnode.appendChild(packet.xml.createTextNode(navigator.userAgent));
+				osnode.appendChild(packet.xml.createTextNode(this.zxmpp.clientOS));
 				packet.send("poll");
 			
 				break;
