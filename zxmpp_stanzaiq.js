@@ -206,6 +206,25 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				this.iqResultEmpty();
 				break;
 
+				case "jabber:iq:version": // XEP 0092
+				// FIXME this doesnt sync with info send in caps
+				var packet = new this.zxmpp.packet(this.zxmpp);
+				var iq = new this.zxmpp.stanzaIq(this.zxmpp);
+				var iqnode = iq.appendIqToPacket(packet, false, "result", this.from, this.id);
+				var querynode = iq.appendQueryToPacket(packet, "jabber:iq:version");
+				var namenode = packet.xml.createElementNS("jabber:iq:version", "name");
+				querynode.appendChild(namenode);
+				namenode.appendChild(packet.xml.createTextNode("Z-XMPP"));
+				var versionnode = packet.xml.createElementNS("jabber:iq:version", "version");
+				querynode.appendChild(versionnode);
+				versionnode.appendChild(packet.xml.createTextNode("0.1"));
+				
+				var osnode = packet.xml.createElementNS("jabber:iq:version", "os");
+				querynode.appendChild(osnode);
+				osnode.appendChild(packet.xml.createTextNode(navigator.userAgent));
+				packet.send("poll");
+			
+				break;
 				default:
 				console.warn("zxmpp::stanzaIq::parseQueryXML(): Unknown namespace " + xml.attr["xmlns"] + " (iqtype=get)");
 				this.iqFail();

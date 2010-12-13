@@ -153,7 +153,10 @@ zxmppClass.prototype.caps = function(zxmpp)
 		if(!this.ver)	
 			this.ver = "0.1." + (new Date().getTime());
 
-		this.features = ['http://jabber.org/protocol/disco#info'];
+		this.features = [
+				'http://jabber.org/protocol/disco#info', 
+				'jabber:iq:version' // XEP 0092
+				];
 
 /*
 		// FIXME we're faking jingle support
