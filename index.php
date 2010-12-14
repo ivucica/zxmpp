@@ -5,6 +5,7 @@
 	}
 	else
 	{
-		header("Location: http://bitbucket.org/ivucica/zxmpp/"); 
+		//header("Location: http://bitbucket.org/ivucica/zxmpp/"); 
+		include 'home.php';
 	}
 ?>
