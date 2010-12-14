@@ -172,6 +172,15 @@ make my heart all warm and fuzzy.
 <ul><li>Also consider contributing code :-)</li></ul></li>
 </ul>
 
+<h3>Browser compatibility</h3>
+<ul>
+<li>Firefox: 3.6+ (3.5, if you don't care about serialization; window.sessionStorage doesn't seem to work in onUnload); 4.0beta7 tested</li>
+<li>MSIE: n/a (only standards-based XHR is used, plus I don't like MSIE nor use Windows most of the time)</li>
+<li>Opera: not tested</li>
+<li>Chrome: 8.0 tested, may work in earlier versions</li>
+<li>Safari: 5.0 tested, may work in earlier versions</li>
+</ul>
+
 <h3>To do</h3>
 My personal want-to-do minilist, in order of necessity:
 <ul>
