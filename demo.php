@@ -196,6 +196,7 @@ function shownotification(icon, title, msg)
 		// (otherwise notification permission request won't work)
 		// it might be a good idea to display htem a dialog; here we won't :)
 		document.getElementById('notificationsbtn').style.display = 'inherit';
+		return;
 	}
 
 	if(!icon)
@@ -316,8 +317,8 @@ function handler_message(sender, messagestanza)
 	console.log("> " + messagestanza.from + ": " + messagestanza.body);
 	if(messagestanza.body)
 	{
+		shownotification(undefined, messagestanza.from, messagestanza.body);
 		zxmppui.messageReceived(messagestanza.from, messagestanza.body);
-		shownotification(undefined, messagestanza.from, presence.status);
 	}
 }
 
