@@ -8,6 +8,16 @@
  * international copyright laws.
 -->
 
+<!--
+This example is NOT the perfect way to use Z-XMPP, and it in fact uses some
+pretty nasty JS code. It is a hack that was created for development purposes.
+
+It should give you the idea of what you can do and where to get started with
+Z-XMPP.
+
+I suggest you start looking at the onload handler, the function 'loadhandler()'.
+-->
+
 <html>
 <head>
 <title>Z-XMPP</title>
@@ -56,6 +66,7 @@ foreach(zxmppGetAllScripts() as $fn)
 <button onclick="reserialize();">reserialize</button>
 <button onclick="restore();">restore</button>
 <button onclick="terminate();">unclean terminate</button>
+<button onclick="enablenotifications();" style="display: none;" id="notificationsbtn">enable webkit notifications</button>
 <textarea cols="80" rows="15" id="serialized_output"></textarea>
 <script defer="defer">
 var zxmpp;
@@ -150,6 +161,54 @@ function dumpstreamfeatures()
 	zxmpp._debugDumpStreamFeatures();
 }
 
+function enablenotifications()
+{
+	if(!window.webkitNotifications)
+		return;
+
+	// this enables html5 notifications as per 
+        //  http://www.html5rocks.com/tutorials/notifications/quick/
+	// this function is called from a button handler; above url
+	// doesn't want implementations to provide notification
+	// api enabled from anything but user input handlers.
+	// (chrome does allow you to enable this if you create
+	//  a "chrome app" an request permission in manifest file)
+
+	if (window.webkitNotifications.checkPermission() == 0) { // 0 is PERMISSION_ALLOWED
+		// all is well, nothing to do except hide btn
+		document.getElementById('notificationsbtn').style.display = 'none';
+	} else {
+		window.webkitNotifications.requestPermission();
+	}
+}
+
+function shownotification(icon, title, msg)
+{
+	if(!window.webkitNotifications)
+		return;
+	if (window.webkitNotifications.checkPermission() == 0) // 0 is PERMISSION_ALLOWED
+	{
+		// all is well
+	}
+	else
+	{
+		// user must enable notifications by clicking a button
+		// (otherwise notification permission request won't work)
+		// it might be a good idea to display htem a dialog; here we won't :)
+		document.getElementById('notificationsbtn').style.display = 'inherit';
+	}
+
+	if(!icon)
+		icon = zxmpplogo;
+
+        var popup = window.webkitNotifications.createNotification(icon, title, msg);
+        popup.show();
+	setTimeout(function(popup)
+		{
+			popup.cancel(); 
+		}, 2000, popup);
+
+}
 
 function logoff()
 {
@@ -178,6 +237,7 @@ function handler_connectionterminate(sender, code, humanreadable)
 		switch(codesplit[1])
 		{
 			default:
+			shownotification(undefined, "Connection terminated", "Server-side termination with code \'" + code + "\'\n\n" + humanreadable);
 			alert("Server-side termination with code \'" + code + "\'\n\n" + humanreadable);
 			break;
 		}
@@ -187,16 +247,18 @@ function handler_connectionterminate(sender, code, humanreadable)
 		switch(codesplit[1])
 		{
 			case "not-authorized":
+			shownotification(undefined, "Connection terminated", "Wrong username or password!\n\n" + humanreadable);
 			alert("Wrong username or password!\n\n" + humanreadable);
 			break;
 			
 			default:
+			shownotification(undefined, "Connection terminated", "Login error with code \'" + code + "\'\n\n" + humanreadable);
 			alert("Login error with code \'" + code + "\'\n\n" + humanreadable);
-
 		}
 		break;
 		
 		default:
+		shownotification(undefined, "Connection terminated", "Termination with code \'" + code + "\'\n\n" + humanreadable);
 		alert("Termination with code \'" + code + "\'\n\n" + humanreadable);
 		break;
 	}
@@ -217,6 +279,9 @@ function handler_presenceupdate(sender, presence)
 		//console.log("Updating " + toppresence.bareJid);
 		zxmppui.presenceUpdate(toppresence.bareJid, toppresence.show, false, toppresence.status);
 	}
+	
+	if(presence.show == "avail")
+		shownotification(undefined, presence.fullJid + " is now online", presence.status);
 }
 function handler_rosterupdate(sender, item)
 {
@@ -250,8 +315,21 @@ function handler_message(sender, messagestanza)
 {
 	console.log("> " + messagestanza.from + ": " + messagestanza.body);
 	if(messagestanza.body)
+	{
 		zxmppui.messageReceived(messagestanza.from, messagestanza.body);
+		shownotification(undefined, messagestanza.from, presence.status);
+	}
 }
+
+// for use in notifications:
+var zxmpplogo = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAAXNSR0IArs4c6QAAAARnQU1BAACx'+
+'jwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAQdJREFU'+
+'SEvdlUkShSAMRPk39+bKXAnpII3F5lusNPbLzO++73D0iYCjTziqntLzL4AQK7122IhTihaluxnF'+
+'2AGEi6hcNeWC2ACkRF0BHFsYRv29TcfIshN0DbwfvqvPIgBVQb4Xs0lM+BtUt8mRZgOjgwFgUX0Y'+
+'IAnQChq9rm4ntCu5AEodrgD0UkQA22belwsT2gAb6nU8J1syzo2TOHe52o50gyirgQXYrseANvOq'+
+'TRcSmiMTEzf5pbiuASmityPW0asxWBV4p+pF21wzrmD/qN3otVzOWz1jDniAN48O4ztAVqW2pswe'+
+'D1D7wFxBKlFyDlhQTwj8sXydXTgsz7PnLtgN6nHAA0wtfhnz+3TSAAAAAElFTkSuQmCC';
+
 //go();
 </script>
 </body>
