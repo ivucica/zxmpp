@@ -36,6 +36,7 @@ zxmppClass.prototype.ui = function() {
 
 	this.setRosterHeading = function(title) {
 		this.roster.children(".zxmpp_window_heading").html(title);
+		this.roster.children(".zxmpp_window_heading").each(function(i,obj){obj.style.display = 'inherit';});
 	}
 
 	this.changeWindowStatus = function() {
@@ -113,14 +114,22 @@ zxmppClass.prototype.ui = function() {
 		this.messageWindow(barejid); // FIXME get roster item from backend, and get display name
 		//$('#zxmpp_window_msg_' + safejid + ' > input').remove();
 		
-		var msgcontainer = document.getElementById("zxmpp_window_msg_" + safejid).firstChild.firstChild
-		msgcontainer.innerHTML += 
+		var msgcontainer = document.getElementById("zxmpp_window_msg_" + safejid).children[1].firstChild;
+		if(!msgcontainer)
+		{
+			console.error("No zxmpp_window_msg_" + safejid + " found");
+			
+		}
+		else
+		{
+			msgcontainer.innerHTML += 
 			'<div class="zxmpp_message_in">' + txt + '</div>';
-		msgcontainer.scrollTop = msgcontainer.scrollHeight;
+			$('#zxmpp_window_msg_' + safejid).find(".zxmpp_content").scrollTop(msgcontainer.scrollHeight);
 			/*
-		$('#zxmpp_window_msg_' + safejid).append('<div class="zxmpp_message_in">other: ' + txt + '</div>');
-		$('#zxmpp_window_msg_' + safejid).append('<input/>');
-		*/
+			$('#zxmpp_window_msg_' + safejid).append('<div class="zxmpp_message_in">other: ' + txt + '</div>');
+			$('#zxmpp_window_msg_' + safejid).append('<input/>');
+			*/
+		}
 	}
 
 	this.escapedHTML = function(txt) {
