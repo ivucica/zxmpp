@@ -13,13 +13,13 @@
 
 zxmppClass.prototype.ui = function() {
 	this.bar = undefined,
-	this.userlist = undefined,
+	this.roster = undefined,
 	this.backend = undefined;
 
 	this.inject = function(where) {
 		this.bar = $('<div class="zxmpp_bar"><img style="display:none;" src="https://ivan.vucica.net:444/zxmpp/trackme.php" width="1" height="1"></div>').appendTo(where);
 		this.bar.delegate('.zxmpp_title', 'click', this.changeWindowStatus);
-		this.userlist = this.openWindow('Z-XMPP', '_roster');
+		this.roster = this.openWindow('Z-XMPP', '_roster');
 		/*
 		this.openWindow('bok');
 		this.rosterAdded('matija');
@@ -31,7 +31,11 @@ zxmppClass.prototype.ui = function() {
 	}
 
 	this.openWindow = function(title, id) {
-		return $('<div class="zxmpp_window" id="zxmpp_window_' + id + '"><div class="zxmpp_content"></div><div class="zxmpp_title"><div>' + title + '</div></div></div>').appendTo(this.bar);
+		return $('<div class="zxmpp_window" id="zxmpp_window_' + id + '"><div id="zxmpp_window_' + id + '_heading" class="zxmpp_window_heading"></div><div class="zxmpp_content"></div><div class="zxmpp_title"><div>' + title + '</div></div></div>').appendTo(this.bar);
+	}
+
+	this.setRosterHeading = function(title) {
+		this.roster.children(".zxmpp_window_heading").html(title);
 	}
 
 	this.changeWindowStatus = function() {
@@ -66,23 +70,25 @@ zxmppClass.prototype.ui = function() {
 			return;
 		}
 
-		this.userlist.children('.zxmpp_content').append('<div id="zxmpp_roster_' + safejid + '" class="user' + safejid + ' zxmpp_user zxmpp_status' + icon + '">' + display + '<div class="zxmpp_statustext">' + status + '</div></div>');
+		this.roster.children('.zxmpp_content').append('<div id="zxmpp_roster_' + safejid + '" class="user' + safejid + ' zxmpp_user zxmpp_status' + icon + '">' + display + '<div class="zxmpp_statustext">' + status + '</div></div>');
 		document.getElementById("zxmpp_roster_" + safejid).jid = jid; // fixme dont use id; use jquery and class='user'+safejid
 		document.getElementById("zxmpp_roster_" + safejid).display = display; // fixme dont use id; use jquery and class='user'+safejid
 		
-        	this.userlist.delegate('.user' + safejid, 'click', this.userClick);
+        	this.roster.delegate('.user' + safejid, 'click', this.userClick);
+
+
 	}
 
 	this.rosterRemoved = function(jid) {
 		var safejid = jid.replace(/[^a-zA-Z 0-9]+/g,'');
-		//this.userlist.find('.zxmpp_content > .user' + safejid).remove();
+		//this.roster.find('.zxmpp_content > .user' + safejid).remove();
 		$('#zxmpp_roster_' + safejid).remove();
 	}
 
 	this.presenceUpdate = function(jid, icon, display, status)
 	{
 		var safejid = jid.replace(/[^a-zA-Z 0-9]+/g,'');
-		var entries = this.userlist.find('.zxmpp_content > .user' + safejid);
+		var entries = this.roster.find('.zxmpp_content > .user' + safejid);
 		if(!status)
 			status = "";
 		

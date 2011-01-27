@@ -49,7 +49,7 @@
 	padding: 2px;
 }
 
-.zxmpp_content {
+.zxmpp_content, .zxmpp_window_heading {
 	border-left: 1px solid #eee;
 	border-top: 1px solid #eee;
 	border-right: 1px solid #333;
@@ -59,7 +59,7 @@
 	font-size: 8pt;
 	font-family: Arial;
 
-	max-height: 150px;
+	max-height: 200px;
 	overflow: auto;
 }
 
