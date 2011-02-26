@@ -317,8 +317,11 @@ function handler_message(sender, messagestanza)
 	console.log("> " + messagestanza.from + ": " + messagestanza.body);
 	if(messagestanza.body)
 	{
-		shownotification(undefined, messagestanza.from, messagestanza.body);
-		zxmppui.messageReceived(messagestanza.from, messagestanza.body);
+		var text = messagestanza.body;
+		if(messagestanza.type == "error")
+			text = "ERROR with message: " + text;
+		shownotification(undefined, messagestanza.from, text);
+		zxmppui.messageReceived(messagestanza.from, text);
 	}
 }
 
