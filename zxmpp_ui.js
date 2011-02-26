@@ -124,7 +124,7 @@ zxmppClass.prototype.ui = function() {
 		{
 			msgcontainer.innerHTML += 
 			'<div class="zxmpp_message_in">' + txt + '</div>';
-			$('#zxmpp_window_msg_' + safejid).find(".zxmpp_content").scrollTop(msgcontainer.scrollHeight);
+			$('#zxmpp_window_msg_' + safejid).find(".zxmpp_content").scrollTop(msgcontainer.scrollHeight - 16);
 			/*
 			$('#zxmpp_window_msg_' + safejid).append('<div class="zxmpp_message_in">other: ' + txt + '</div>');
 			$('#zxmpp_window_msg_' + safejid).append('<input/>');
