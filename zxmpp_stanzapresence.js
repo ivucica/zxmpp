@@ -36,7 +36,7 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 
 		var presence = this.zxmpp.getPresence(this.from);
 		presence.show = "avail";
-		if(this.type == "unavailable")
+		if(this.type == "unavailable" || this.type == "error")
 		{
 			presence.show = "unavailable";
 			this.zxmpp.notifyPresenceUpdate(presence);
