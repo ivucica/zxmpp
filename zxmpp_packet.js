@@ -37,7 +37,7 @@ zxmppClass.prototype.packet = function (zxmpp)
 	
 	/* functions */
 	
-	this.finalized = function()
+	this.finalized = function zxmppPacket_finalized()
 	{
 		var body = this.xml_body;
 		
@@ -65,7 +65,7 @@ zxmppClass.prototype.packet = function (zxmpp)
 		
 	}
 	
-	this.send = function(send_style)
+	this.send = function zxmppPacket_send(send_style)
 	{	
 		
 		// queue for wire
@@ -82,7 +82,7 @@ zxmppClass.prototype.packet = function (zxmpp)
 	}
 	
 	
-	this.parseXML = function(xml)
+	this.parseXML = function zxmppPacket_parseXML(xml)
 	{
 		if(!xml || !xml.firstChild)
 		{
@@ -238,8 +238,12 @@ zxmppClass.prototype.packet = function (zxmpp)
 		}
 		return true;
 	}
-	this.toJSON = function(key)
+	this.toJSON = function zxmppPacket_toJSON(key)
 	{
+		// TODO not encoding here means that empty string
+		// will get stored upon serialization, instead of encoded 
+		// package from pollPacketQueue.
+
 		return "";
 		oldzxmpp = this.zxmpp;
 		delete this.zxmpp;

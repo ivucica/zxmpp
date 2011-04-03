@@ -17,7 +17,7 @@ function zxmppGetZXMPPScripts()
 		'zxmpp_stanzapresence.js',
 		'zxmpp_stanzastreamfeatures.js',
 		'zxmpp_stanzasaslresult.js',
-		'zxmpp_stanzamessage.js',
+		'zxmpp_stanzamessage.js'
 		);
 }
 
@@ -27,6 +27,7 @@ function zxmppGetAllScripts()
 
 	$scripts[] = 'jquery.min.js';
 	$scripts[] = 'deepCopy.js';
+	$scripts[] = 'stacktrace.js';
 
 	return $scripts;
 }

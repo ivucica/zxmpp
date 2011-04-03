@@ -60,7 +60,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 	this.reuseKeys = [];
 
 	/* state funcs */
-	this.uniqueId = function(idType)
+	this.uniqueId = function zxmppStream_uniqueId(idType)
 	{
 		// return a unique id with type "idType"
 		
@@ -75,7 +75,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 	
 	
 	/* connection/stream functions */
-	this.establish = function()
+	this.establish = function zxmppStream_establish()
 	{
 		var packet = new this.zxmpp.packet(this.zxmpp);
 		var body = packet.xml_body;
@@ -91,7 +91,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		packet.send();
 	}
 	
-	this.assignRID = function(just_polling_nextrid)
+	this.assignRID = function zxmppStream_assignRID(just_polling_nextrid)
 	{
 		if(!this.reuseRIDs.length)
 		{
@@ -120,7 +120,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		}
 	}
 
-	this.assignKey = function(just_peek)
+	this.assignKey = function zxmppStream_assignKey(just_peek)
 	{
 		// assign a key, as described in 15.x in XEP-0124
 		// if we're out of keys, then also generate a new base key
@@ -153,7 +153,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		}
 		return ret;
 	}
-	this.freeConnections = function(send_style)
+	this.freeConnections = function zxmppStream_freeConnection(send_style)
 	{
 
 		var availableConns = 0;
@@ -180,7 +180,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		}
 		return availableConns;
 	}	
-	this.findFreeConnection = function(send_style)
+	this.findFreeConnection = function zxmppStream_findFreeConnection(send_style)
 	{
 		var availableConn = false;
 
@@ -217,7 +217,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		
 	}
 	
-	this.transmitPacket = function(packet,send_style,sending_from_queue)
+	this.transmitPacket = function zxmppStream_transmitPacket(packet,send_style,sending_from_queue)
 	{
 		// send "packet" (zxmpp.packet) using "send_style"-type
 		// connection (either "hold" or "poll", default hold)
@@ -237,8 +237,23 @@ zxmppClass.prototype.stream = function (zxmpp)
 		console.log("=======================================");		
 		*/
 		
-		
-
+		if(!packet)
+		{
+			if(packet == "")
+			
+				console.error("A packet passed into transmitPacket is an empty string!");
+			else
+				console.error("A packet passed into transmitPacket is null, false or zero!");
+			if(printStackTrace)
+			{
+				var st = printStackTrace();
+				for(var frame in st)
+				{
+					console.error(st[frame]);
+				}
+			}
+			return;
+		}
 
 		var conn = this.findFreeConnection(send_style);
 		
@@ -283,12 +298,17 @@ zxmppClass.prototype.stream = function (zxmpp)
 
 	}
 
-	this.tryEmptyingPollQueue = function()
+	this.tryEmptyingPollQueue = function zxmppStream_tryEmptyingPollQueue()
 	{
 		while(this.pollPacketQueue.length && this.findFreeConnection("poll"))
 		{
 			// grab a packet that waits longest
 			var packet = this.pollPacketQueue.shift();
+			if(!packet)
+			{
+				console.warn("zxmppStream tryEmptyingPollQueue(): Invalid packet found in poll queue has been skipped and is not sent: " + packet);
+				continue;
+			}
 			
 			if(!this.transmitPacket(packet, "poll", true))
 			{
@@ -299,7 +319,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 
 	}
 	
-	this.genKeys = function()
+	this.genKeys = function zxmppStream_genKeys()
 	{
 		// implementation of 15.x in XEP-0124
 		// generate 1000-1500 sha-1 keys, sufficient for 1000-1500
@@ -315,7 +335,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 	}
 
 
-	this.retryConn = function(conn)
+	this.retryConn = function zxmppStream_retryConn(conn)
 	{
 		// retry sending after timeout
 		// also, only if poll queue is completely free.
@@ -350,7 +370,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 
 	this.retriesUpon404 = 5; // how many times can we retry sending packet?
 
-	this.handleConnectionStateChange = function()
+	this.handleConnectionStateChange = function zxmppStream_handleConnectionStateChange()
 	{
 		
 		if(typeof this.readyState == "undefined")
@@ -458,7 +478,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		conn.connzxmpp.stream.tryEmptyingPollQueue();
 	}
 	
-	this.handleConnection = function(conn)
+	this.handleConnection = function zxmppStream_handleConnection(conn)
 	{
 		var packet = new this.zxmpp.packet(this.zxmpp);
 		if(!packet.parseXML(conn.responseXML)) // packet not intended for further processing
@@ -540,14 +560,14 @@ zxmppClass.prototype.stream = function (zxmpp)
 			console.log("Fulljid: " + this.zxmpp.fullJid);
 		}
 	}
-	this.fillPollConnection = function()
+	this.fillPollConnection = function zxmppStream_findPollConnection()
 	{
 		if(this.pollPacketQueue.length == 0 && this.freeConnections() > 1)
 			this.sendIdle("poll");
 		else if(this.pollPacketQueue.length)
 			this.tryEmptyingPollQueue();
 	}
-	this.sendIdle = function(send_style)
+	this.sendIdle = function zxmppStream_sendIdle(send_style)
 	{
 		// sends empty packet
 		// for example, on "hold" connections
@@ -555,7 +575,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		packet.send(send_style);
 	}
 	
-	this.sendPlainAuth = function(send_style)
+	this.sendPlainAuth = function zxmppStream_sendPlainAuth(send_style)
 	{
 		// FIXME move packet fillout to zxmpp_packet.js
 		
@@ -579,7 +599,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		packet.send(send_style);
 	}
 
-	this.sendXmppRestart = function(send_style)
+	this.sendXmppRestart = function zxmppStream_sendXmppRestart(send_style)
 	{
 		// FIXME move packet fillout to zxmpp_packet.js
 		
@@ -591,7 +611,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		packet.send(send_style);
 	}
 	
-	this.sendBindRequest = function(send_style)
+	this.sendBindRequest = function zxmppStream_sendBindRequest(send_style)
 	{
 		// FIXME move packet fillout to zxmpp_packet.js
 		
@@ -613,7 +633,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		
 	}
 	
-	this.sendSessionRequest = function(send_style)
+	this.sendSessionRequest = function zxmppStream_sendSessionRequest(send_style)
 	{
 		// FIXME move packet fillout to zxmpp_packet.js
 		
@@ -635,7 +655,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 
 	}
 	
-	this.sendCurrentPresence = function(send_style)
+	this.sendCurrentPresence = function zxmppStream_sendCurrentPresence(send_style)
 	{
 		// FIXME move packet fillout to zxmpp_packet.js
 		
@@ -657,7 +677,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 	}
 	
 	
-	this.sendIqQuery = function(namespace, type, destination, send_style, extra_query_attribs)
+	this.sendIqQuery = function zxmppStream_sendIqQuery(namespace, type, destination, send_style, extra_query_attribs)
 	{
 		// FIXME move packet fillout to zxmpp_packet.js
 		
@@ -685,7 +705,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 	}
 
 
-	this.sendMessage = function(send_style, from, to, type, body)
+	this.sendMessage = function zxmppStream_sendMessage(send_style, from, to, type, body)
 	{
 		// FIXME move packet fillout to zxmpp_packet.js
 		
@@ -697,7 +717,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		
 	}
 
-	this.logoff = function()
+	this.logoff = function zxmppStream_logoff()
 	{
 		// first send logoff "presence"
 		
@@ -714,7 +734,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		setTimeout(1, "zxmppClass._STREAM.terminate();");
 	}
 	
-	this.terminate = function(dont_reset_state)
+	this.terminate = function zxmppStream_terminate(dont_reset_state)
 	{
 		console.log("Finishing stream termination");
 		for(var conn in this.connectionsHold)
@@ -741,7 +761,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		}
 	}
 
-	this.toJSON = function(key)
+	this.toJSON = function zxmppStream_toJSON(key)
 	{
 		// FIXME
 		// this.sentUnrespondedRIDs shoudl also contain a full copy of all
@@ -783,7 +803,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		return ret;
 	}
 
-	this.wakeUp = function()
+	this.wakeUp = function zxmppStream_wakeUp()
 	{
 		this.reuseRIDs = this.sentUnrespondedRIDs;
 		if(0) 

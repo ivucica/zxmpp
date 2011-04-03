@@ -123,7 +123,7 @@ zxmppClass.prototype.caps = function(zxmpp)
 		
 	}
 
-	this.finishProcessing = function()
+	this.finishProcessing = function zxmppCaps_finishProcessing()
 	{
 		
 		// TODO must copy, not reference, and then replace ownerJid with 'false'!
@@ -144,7 +144,7 @@ zxmppClass.prototype.caps = function(zxmpp)
 	}
 
 
-	this.appendToXML = function(packet, xml)
+	this.appendToXML = function zxmppCaps_appendToXML(packet, xml)
 	{
 		// FIXME currently we add constant values.
 		// we should actually add values stored in this caps instance!
@@ -209,7 +209,7 @@ zxmppClass.prototype.caps = function(zxmpp)
 		xml.appendChild(cnode);
 	}
 
-	this.appendFeaturesToXML = function(packet, xml, ext)
+	this.appendFeaturesToXML = function zxmppCaps_(packet, xml, ext)
 	{
 
 		if(!ext)
@@ -261,7 +261,7 @@ zxmppClass.prototype.caps = function(zxmpp)
 	}
 
 
-	this.unpackExt = function(extdest)
+	this.unpackExt = function zxmppCaps_unpackExt(extdest)
 	{
 		if(!this.ext) return;
 		var exts = this.ext.split(" ");
@@ -295,7 +295,7 @@ zxmppClass.prototype.caps = function(zxmpp)
 			packet.send("poll");
 	}
 
-	this.toJSON = function(key)
+	this.toJSON = function zxmppCaps_toJSON(key)
 	{
 		var oldzxmpp = this.zxmpp;
 		var oldtojson = this.toJSON; // firefox4 beta7; when we return cloned, cleaned copy of this object, it attempts to stringify once again using this same function, causing this.zxmpp to be undefined. we need to remove the function too
