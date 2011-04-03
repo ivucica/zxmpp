@@ -478,6 +478,46 @@ zxmppClass.prototype.util = function (zxmpp)
 	    }
 	    return prettyjson;
     }
+
+
+    this.exceptionDescription = function(e)
+    {
+        var et = "";
+
+	if (typeof(e.name)!="undefined")
+		et += e.name + ": " + "<i>" + e.message + "</i><br><br>";
+	else
+		et += e.toString();
+
+	if (typeof(e["description"])!="undefined")
+	{
+		// IE
+		et += "<b>Error description:</b> " + e["description"] + "<br>";	
+	} 
+	if (typeof(e["fileName"])!="undefined")
+	{
+		// FF
+		et += "<b>Error occured in:</b> " + e["fileName"];
+		if (typeof(e["lineNumber"])!="undefined")
+			// FF
+			et += " on line " + e["lineNumber"];
+		et += "<br>";
+	}
+	if (typeof(e["stack"])!="undefined")
+	{
+		// FF
+		et += "<b>Callstack:</b> <pre>" + e["stack"] + "</pre><br>";
+	}
+
+	if (window.ActiveXObject) {
+		et += "You are using Internet Explorer which is an unsupported browser. Try using Opera or Firefox; if the problem persists, then report this problem." + "<br>";
+	} else {
+
+	}
+
+
+	return et;
+    }
 	
 };
 

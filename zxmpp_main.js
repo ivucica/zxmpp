@@ -45,7 +45,7 @@ function zxmppClass()
 	this.clientDebugMode = true; // randomize version sent as part of caps
 }
 
-zxmppClass.prototype.init = function(configDict)
+zxmppClass.prototype.init = function zxmppMain_init(configDict)
 {
 	/****************************
 	 * store received variables *
@@ -53,18 +53,18 @@ zxmppClass.prototype.init = function(configDict)
 	this.cfg = configDict; // configuration
 }
 
-zxmppClass.prototype.setUsername = function(username)
+zxmppClass.prototype.setUsername = function zxmppMain_setUsername(username)
 {
 	this.username = username;
 	this.bareJid = username + "@" + this.cfg["domain"]; 
 	this.presences[this.bareJid] = {};
 }
-zxmppClass.prototype.setPassword = function(password)
+zxmppClass.prototype.setPassword = function zxmppMain_setPassword(password)
 {
 	this.password = password;
 }
 
-zxmppClass.prototype.main = function(configDict, username, password)
+zxmppClass.prototype.main = function zxmppMain_main(configDict, username, password)
 {	
 	this.init(configDict);
 	
@@ -74,7 +74,7 @@ zxmppClass.prototype.main = function(configDict, username, password)
 	this.stream.establish();	
 }
 
-zxmppClass.prototype.getPresence = function(fullJid)
+zxmppClass.prototype.getPresence = function zxmppMain_getPresence(fullJid)
 {
 	if(!fullJid)
 		return undefined;
@@ -97,11 +97,11 @@ zxmppClass.prototype.getPresence = function(fullJid)
 	
 	return presence;
 }
-zxmppClass.prototype.getPresencesForBareJid = function(bareJid)
+zxmppClass.prototype.getPresencesForBareJid = function zxmppMain_getPresencesForBareJid(bareJid)
 {
 	return this.presences[bareJid];
 }
-zxmppClass.prototype.getTopPresenceForBareJid = function(bareJid)
+zxmppClass.prototype.getTopPresenceForBareJid = function zxmppMain_getTopPresenceForBareJid(bareJid)
 {
 	var topPresence = false;
 	var presences = this.presences[bareJid];
@@ -128,7 +128,7 @@ zxmppClass.prototype.getTopPresenceForBareJid = function(bareJid)
 }
 
 
-zxmppClass.prototype.removePresence = function(fullJid)
+zxmppClass.prototype.removePresence = function zxmppMain_removePresence(fullJid)
 {
 	var jid = fullJid.split("/");
 	var bareJid = jid[0];
@@ -139,7 +139,7 @@ zxmppClass.prototype.removePresence = function(fullJid)
 		delete this.presences[bareJid];
 }
 
-zxmppClass.prototype._debugDumpPresences = function()
+zxmppClass.prototype._debugDumpPresences = function zxmppMain__debugDumpPresences()
 {
 	console.log(" ");
 	console.log("======= PRESENCES ======== ");
@@ -167,7 +167,7 @@ zxmppClass.prototype._debugDumpPresences = function()
 	console.log(" ");
 }
 
-zxmppClass.prototype._debugDumpStreamFeatures = function()
+zxmppClass.prototype._debugDumpStreamFeatures = function zxmppMain__debugDumpStreamFeatures()
 {
 	console.log(" ");
 	console.log("======= STREAM:FEATURES ======== ");
@@ -183,7 +183,7 @@ zxmppClass.prototype._debugDumpStreamFeatures = function()
 	console.log(" ");
 }
 
-zxmppClass.prototype.notifyConnectionTerminate = function(code,humanreadable)
+zxmppClass.prototype.notifyConnectionTerminate = function zxmppMain_notifyConnectionTerminate(code,humanreadable)
 {
 	for(var terminateHandlerId in this.onConnectionTerminate)
 	{
@@ -195,7 +195,7 @@ zxmppClass.prototype.notifyConnectionTerminate = function(code,humanreadable)
 	}
 }
 
-zxmppClass.prototype.notifyPresenceUpdate = function(presence)
+zxmppClass.prototype.notifyPresenceUpdate = function zxmppMain_notifyPresenceUpdate(presence)
 {
 	for(var presenceHandlerId in this.onPresenceUpdate)
 	{
@@ -206,7 +206,7 @@ zxmppClass.prototype.notifyPresenceUpdate = function(presence)
 			presenceHandler(this, presence);
 	}
 }
-zxmppClass.prototype.notifyRosterUpdate = function(rosteritem)
+zxmppClass.prototype.notifyRosterUpdate = function zxmppMain_notifyRosterUpdate(rosteritem)
 {
 	
 	for(var rosterUpdateHandlerId in this.onRosterUpdate)
@@ -219,7 +219,7 @@ zxmppClass.prototype.notifyRosterUpdate = function(rosteritem)
 	}
 }
 
-zxmppClass.prototype.notifyMessage = function(messageStanza)
+zxmppClass.prototype.notifyMessage = function zxmppMain_notifyMessage(messageStanza)
 {
 	
 	for(var messageHandlerId in this.onMessage)
@@ -233,12 +233,12 @@ zxmppClass.prototype.notifyMessage = function(messageStanza)
 }
 
 
-zxmppClass.prototype.sendMessage = function(to, body)
+zxmppClass.prototype.sendMessage = function zxmppMain_sendMessage(to, body)
 {
 	this.stream.sendMessage("poll", this.fullJid, to, "chat", body);
 }
 
-zxmppClass.prototype.setOwnPresence = function(show, status, priority)
+zxmppClass.prototype.setOwnPresence = function zxmppMain_setOwnPresence(show, status, priority)
 {
 	var presence = this.getPresence(this.fullJid);
 	if(!presence)
@@ -253,7 +253,7 @@ zxmppClass.prototype.setOwnPresence = function(show, status, priority)
 		console.log("Not sending pres");
 }
 
-zxmppClass.prototype.serialized = function()
+zxmppClass.prototype.serialized = function zxmppMain_serialized()
 {
     var out = new Object();
     
@@ -277,10 +277,10 @@ zxmppClass.prototype.serialized = function()
     return jsonified;
 }
 
-zxmppClass.prototype.deserializeInternal = function(json)
+zxmppClass.prototype.deserializeInternal = function zxmppMain_deserializeInternal(json)
 {
     var zxmppcontext = this;
-    var input = JSON.parse(json, function(key, value)
+    var input = JSON.parse(json, function zxmppMain_reviverFunction(key, value)
     {
         // "reviver" function
         
@@ -305,7 +305,7 @@ zxmppClass.prototype.deserializeInternal = function(json)
     return input;
 }
 
-zxmppClass.prototype.deserialize = function(json)
+zxmppClass.prototype.deserialize = function zxmppMain_deserialize(json)
 {
     var input = this.deserializeInternal(json);
 
