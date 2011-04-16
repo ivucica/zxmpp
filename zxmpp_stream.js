@@ -712,7 +712,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		var packet = new this.zxmpp.packet(this.zxmpp);
 		var message = new this.zxmpp.stanzaMessage(this.zxmpp);
 		message.appendToPacket(packet, from, to, type, body);
-		var activeNode = packet.xml.createElementNS("jabber:client", "active");
+		var activeNode = packet.xml.createElementNS("http://jabber.org/protocol/chatstates", "active");
 		packet.messageXML.appendChild(activeNode);
 		
 		packet.send(send_style);
