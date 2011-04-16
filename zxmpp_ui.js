@@ -168,7 +168,7 @@ zxmppClass.prototype.ui = function() {
 		var msgwindowjq = zxmppui.openWindow(display, "msg_" + safejid); 
 
 		msgwindowjq.children('.zxmpp_content').append('<div class="zxmpp_content_msg"/>');
-		msgwindowjq.children('.zxmpp_content').append('<input onkeypress="zxmppui_handlekeydown(event);" id="zxmpp_input_msg_' + safejid + '"/>');
+		msgwindowjq.children('.zxmpp_content').append('<input onkeydown="zxmppui_handlekeydown(event);" id="zxmpp_input_msg_' + safejid + '"/>');
 		
 		document.getElementById("zxmpp_input_msg_" + safejid).jid = jid;
 
@@ -189,5 +189,35 @@ function zxmppui_handlekeydown(event)
 		zxmppui.backend.sendMessage(event.target.jid, event.target.value);
 		zxmppui.showMessage(event.target.jid, 'you: ' + zxmppui.escapedHTML(event.target.value)); 
 		event.target.value = "";
+		return;
+	}
+
+
+	// XEP-0085: chat state notifications
+	// This is incorrect.
+	// 1. Inactive and Paused should be related primarily to timing
+	// 2. Inactive should be preceded by Paused
+	if(event.target.value == "")
+	{	
+		var packet = new zxmppui.backend.packet(this.zxmpp);
+		var message = new this.zxmpp.stanzaMessage(this.zxmpp);
+		message.appendToPacket(packet, zxmppui.backend.fullJid, event.target.jid, "chat", false); // pass no body
+		var inactiveNode = packet.xml.createElementNS("jabber:client", "inactive");
+		packet.messageXML.appendChild(inactiveNode);
+		packet.send("poll");
+	}
+	else
+	if(event.target.value != "")
+	{	
+		var packet = new zxmppui.backend.packet(this.zxmpp);
+		var message = new this.zxmpp.stanzaMessage(this.zxmpp);
+		message.appendToPacket(packet, zxmppui.backend.jid, event.target.jid, "chat", false); // pass no body
+		var composingNode = packet.xml.createElementNS("jabber:client", "composing");
+		packet.messageXML.appendChild(composingNode);
+		packet.send("poll");
+
+		// TODO: cancel previous instance of that timer,
+		//       and instantiate a new timer that would send
+		//       'paused' state
 	}
 }
