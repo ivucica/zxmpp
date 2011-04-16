@@ -39,9 +39,9 @@ zxmppClass.prototype.stanzaMessage = function(zxmpp)
 			this.zxmpp.util.easierAttrs(child);
 			if(!child.attr)
 				child.attr = {"xmlns":"UNSET"}; // dummy so we throw error
-			switch(child.nodeName)
+			switch(child.extendedNodeName)
 			{
-				case "body":
+				case "jabber:client+body":
 				if(child.firstChild)
 					this.body = child.firstChild.nodeValue;
 				else
@@ -49,28 +49,19 @@ zxmppClass.prototype.stanzaMessage = function(zxmpp)
 				break;
 
 				// XEP-0085
-				case "active":
-				case "inactive":
-				case "composing":
-				case "paused":
-				case "gone":
-				if(child.attr["xmlns"]=="http://jabber.org/protocol/chatstates")
-				{
-					console.error("Found a state");
-					this.chatState = child.nodeName;
-				}
-				else
-				{
-					console.error("Wrong NS for state: " + child.attr["xmlns"]);
-				}
+				case "http://jabber.org/protocol/chatstates+active":
+				case "http://jabber.org/protocol/chatstates+inactive":
+				case "http://jabber.org/protocol/chatstates+composing":
+				case "http://jabber.org/protocol/chatstates+paused":
+				case "http://jabber.org/protocol/chatstates+gone":
+				this.chatState = child.simpleNodeName;
 				break;
 
-				case "#text":
-				// ignore!
-				break;
-				
 				default:
-				console.log("zxmpp::stanzaMessage::parseXML(): Unhandled child node " + child.nodeName);	
+				// ignore some:
+				if(child.nodeName == "#text")
+					continue;
+				console.log("zxmpp::stanzaMessage::parseXML(): Unhandled child node " + child.nodeName + " (" + child.extendedNodeName + ")");	
 			}
 			
 		}

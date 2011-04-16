@@ -68,6 +68,16 @@
 	font-weight: bold;
 	content: "Typing";
 }
+.zxmpp_window_msg_paused .zxmpp_content .zxmpp_content_msg:after
+{
+	font-weight: bold;
+	content: "Thinking";
+}
+.zxmpp_window_msg_gone .zxmpp_content .zxmpp_content_msg:after
+{
+	font-weight: bold;
+	content: "Gone";
+}
 
 .zxmpp_user {
 	border: 1px solid #ccc;

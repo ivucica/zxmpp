@@ -148,18 +148,17 @@ zxmppClass.prototype.ui = function() {
 
 		// FIXME use jquery, not document.getElementById
 		var msgwindow = document.getElementById("zxmpp_window_msg_" + safejid);
-		if(stanza.chatState == "composing")
-		{	
-			if(msgwindow)
-			{
-				$(msgwindow).addClass("zxmpp_window_msg_composing");
-			}
-		}
-		else
+		if(msgwindow)
 		{
-			if(msgwindow)
+			if(stanza.chatState)
 			{
 				$(msgwindow).removeClass("zxmpp_window_msg_composing");
+				$(msgwindow).removeClass("zxmpp_window_msg_active");
+				$(msgwindow).removeClass("zxmpp_window_msg_paused");
+				$(msgwindow).removeClass("zxmpp_window_msg_gone");
+				$(msgwindow).removeClass("zxmpp_window_msg_inactive");
+				$(msgwindow).addClass("zxmpp_window_msg_" + stanza.chatState);
+				
 			}
 		}
 		if(stanza.body)
