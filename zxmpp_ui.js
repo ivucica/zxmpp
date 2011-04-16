@@ -136,7 +136,39 @@ zxmppClass.prototype.ui = function() {
 		// FIXME add better html escaping
 		return txt.replace(/&/g, "&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
 	}
+	this.messageStanzaReceived = function(stanza) {
+
+		jid = stanza.from;
+		if(!jid)
+			return;
+		var barejid = jid.split("/")[0];
+		var safejid = barejid.replace(/[^a-zA-Z 0-9]+/g,'');
+
+		console.log("GETTING WINDOW FOR " + barejid);
+
+		// FIXME use jquery, not document.getElementById
+		var msgwindow = document.getElementById("zxmpp_window_msg_" + safejid);
+		if(stanza.chatState == "composing")
+		{	
+			if(msgwindow)
+			{
+				$(msgwindow).addClass("zxmpp_window_msg_composing");
+			}
+		}
+		else
+		{
+			if(msgwindow)
+			{
+				$(msgwindow).removeClass("zxmpp_window_msg_composing");
+			}
+		}
+		if(stanza.body)
+		{
+			this.showMessage(stanza.from, 'other: ' + stanza.body);
+		}
+	}	
 	this.messageReceived = function(from, body) {
+		// DEPRECATED
 		this.showMessage(from, 'other: ' + this.escapedHTML(body));
 	}
 
@@ -194,16 +226,21 @@ function zxmppui_handlekeydown(event)
 
 
 	// XEP-0085: chat state notifications
-	// This is incorrect.
+	// This is slightly incorrect.
+	// TODO
 	// 1. Inactive and Paused should be related primarily to timing
-	// 2. Inactive should be preceded by Paused
-	if(event.target.value == "")
+	// 2. Composing should be sent only on one character.
+	// 3. Need to send only if last received received state is 
+	//    active, composing, paused. Don't do it if inactive, if 
+	//    gone, if unset.
+	// 4. Don't send if remote does not have caps
+	if(event.target.value.length == 1 && event.keyCode == 8)
 	{	
 		var packet = new zxmppui.backend.packet(this.zxmpp);
 		var message = new this.zxmpp.stanzaMessage(this.zxmpp);
 		message.appendToPacket(packet, zxmppui.backend.fullJid, event.target.jid, "chat", false); // pass no body
-		var inactiveNode = packet.xml.createElementNS("http://jabber.org/protocol/chatstates", "inactive");
-		packet.messageXML.appendChild(inactiveNode);
+		var pausedNode = packet.xml.createElementNS("http://jabber.org/protocol/chatstates", "paused");
+		packet.messageXML.appendChild(pausedNode);
 		packet.send("poll");
 	}
 	else

@@ -63,6 +63,12 @@
 	overflow: auto;
 }
 
+.zxmpp_window_msg_composing .zxmpp_content .zxmpp_content_msg:after
+{
+	font-weight: bold;
+	content: "Typing";
+}
+
 .zxmpp_user {
 	border: 1px solid #ccc;
 	background: #ccc;
