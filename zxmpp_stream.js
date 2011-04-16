@@ -704,7 +704,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		return iq; 
 	}
 
-
+	// 'body' can be false/null, to prevent appending <body>
 	this.sendMessage = function zxmppStream_sendMessage(send_style, from, to, type, body)
 	{
 		// FIXME move packet fillout to zxmpp_packet.js
@@ -712,9 +712,10 @@ zxmppClass.prototype.stream = function (zxmpp)
 		var packet = new this.zxmpp.packet(this.zxmpp);
 		var message = new this.zxmpp.stanzaMessage(this.zxmpp);
 		message.appendToPacket(packet, from, to, type, body);
+		var activeNode = packet.xml.createElementNS("jabber:client", "active");
+		packet.messageXML.appendChild(activeNode);
 		
 		packet.send(send_style);
-		
 	}
 
 	this.logoff = function zxmppStream_logoff()

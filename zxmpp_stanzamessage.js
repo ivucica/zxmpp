@@ -56,8 +56,8 @@ zxmppClass.prototype.stanzaMessage = function(zxmpp)
 		this.zxmpp.notifyMessage(this);
 
 	}
-	
-	
+		
+	// 'body' can be false/null, to prevent appending <body>
 	this.appendToPacket = function(packet, from, to, type, body)
 	{
 		this.from = from;

@@ -163,7 +163,8 @@ zxmppClass.prototype.caps = function(zxmpp)
 
 		this.features = [
 				'http://jabber.org/protocol/disco#info', 
-				'jabber:iq:version' // XEP 0092
+				'jabber:iq:version', // XEP 0092
+				'http://jabber.org/protocol/chatstates'
 				];
 
 /*
