@@ -89,13 +89,66 @@ zxmppClass.prototype.util = function (zxmpp)
 	}
 	
 	// by Ivan Vucica
-	this.easierAttrs = function(xml)
+	this.easierAttrs = function zxmpp_util_easierAttrs(xml, defaultNS)
 	{
+		if(!defaultNS)
+			defaultNS = "jabber:client";
+		if(!xml.attributes)
+		{
+			console.warn("easierAttrs received an xml object with null 'attributes' property.");
+			return;
+		}
+
+		xml.namespaces = new Object();	
+		for(var attribute in xml.attributes)
+		{
+			var attr = xml.attributes[attribute].nodeName;
+			if(!attr)
+				continue; // a function or something similar
+			var colonsplit = attr.split(":");
+			if(colonsplit[0]=="xmlns" && colonsplit[1])
+			{
+				xml.namespaces[colonsplit[1]] = xml.attributes[attribute].nodeValue;
+				console.log("NAMESPACE " + colonsplit[1]);
+			}
+		}
+
+		if(xml.attributes["xmlns"] && xml.attributes["xmlns"].nodeValue)
+		{
+			defaultNS = xml.attributes["xmlns"].nodeValue;
+		}
+
 		xml.attr = {};
+		xml.attrWithNS = {};
 		for(var i in xml.attributes)
 		{
+			if(!xml.attributes[i].nodeName) // not an xml node
+				continue;
+			if(!xml.attributes[i])
+				continue;
 			xml.attr[xml.attributes[i].nodeName] = xml.attributes[i].nodeValue;
+			xml.attrWithNS[defaultNS + "+" + xml.attributes[i].nodeName] = xml.attributes[i].nodeValue;
+			var namespaceHelper = xml.attributes[i].nodeName.split(':');
+			if(namespaceHelper.length > 1 && xml.namespaces[namespaceHelper[0]])
+			{
+				xml.attrWithNS[xml.namespaces[namespaceHelper[0]] + "+" + namespaceHelper[1]] = xml.attributes[i].nodeValue;
+			}
 		}
+	
+		xml.simpleNodeName = xml.nodeName;
+		xml.extendedNodeName = defaultNS + "+" + xml.simpleNodeName;
+
+		var namespaceHelper = xml.nodeName.split(":");
+		if(namespaceHelper.length > 1)
+		{
+			if(xml.namespaces[namespaceHelper[0]])
+			{
+				xml.simpleNodeName = namespaceHelper[1];
+				xml.extendedNodeName = xml.namespaces[namespaceHelper[0]] + "+" + xml.simpleNodeName;
+			}
+		}
+	
+
 		return xml.attr;
 	}
 	
