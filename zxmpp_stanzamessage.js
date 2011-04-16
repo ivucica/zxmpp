@@ -20,7 +20,8 @@ zxmppClass.prototype.stanzaMessage = function(zxmpp)
 	this.type = false;
 
 	this.body = false;
-	
+	this.chatState = false;
+
 	this.parseXML = function (xml)
 	{
 		
@@ -35,6 +36,9 @@ zxmppClass.prototype.stanzaMessage = function(zxmpp)
 			var child = xml.childNodes[i];
 			if(!child.nodeName) continue;
 			
+			this.zxmpp.util.easierAttrs(child);
+			if(!child.attr)
+				child.attr = {"xmlns":"UNSET"}; // dummy so we throw error
 			switch(child.nodeName)
 			{
 				case "body":
@@ -42,6 +46,23 @@ zxmppClass.prototype.stanzaMessage = function(zxmpp)
 					this.body = child.firstChild.nodeValue;
 				else
 					this.body = "";
+				break;
+
+				// XEP-0085
+				case "active":
+				case "inactive":
+				case "composing":
+				case "paused":
+				case "gone":
+				if(child.attr["xmlns"]=="http://jabber.org/protocol/chatstates")
+				{
+					console.error("Found a state");
+					this.chatState = child.nodeName;
+				}
+				else
+				{
+					console.error("Wrong NS for state: " + child.attr["xmlns"]);
+				}
 				break;
 
 				case "#text":

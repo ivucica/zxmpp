@@ -321,8 +321,9 @@ function handler_message(sender, messagestanza)
 		if(messagestanza.type == "error")
 			text = "ERROR with message: " + text;
 		shownotification(undefined, messagestanza.from, text);
-		zxmppui.messageReceived(messagestanza.from, text);
 	}
+
+	zxmppui.messageStanzaReceived(messagestanza);
 }
 
 // for use in notifications:
