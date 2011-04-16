@@ -202,7 +202,7 @@ function zxmppui_handlekeydown(event)
 		var packet = new zxmppui.backend.packet(this.zxmpp);
 		var message = new this.zxmpp.stanzaMessage(this.zxmpp);
 		message.appendToPacket(packet, zxmppui.backend.fullJid, event.target.jid, "chat", false); // pass no body
-		var inactiveNode = packet.xml.createElementNS("jabber:client", "inactive");
+		var inactiveNode = packet.xml.createElementNS("http://jabber.org/protocol/chatstates", "inactive");
 		packet.messageXML.appendChild(inactiveNode);
 		packet.send("poll");
 	}
@@ -212,7 +212,7 @@ function zxmppui_handlekeydown(event)
 		var packet = new zxmppui.backend.packet(this.zxmpp);
 		var message = new this.zxmpp.stanzaMessage(this.zxmpp);
 		message.appendToPacket(packet, zxmppui.backend.jid, event.target.jid, "chat", false); // pass no body
-		var composingNode = packet.xml.createElementNS("jabber:client", "composing");
+		var composingNode = packet.xml.createElementNS("http://jabber.org/protocol/chatstates", "composing");
 		packet.messageXML.appendChild(composingNode);
 		packet.send("poll");
 
