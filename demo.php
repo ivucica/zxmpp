@@ -315,7 +315,10 @@ function handler_rosterupdate(sender, item)
 */
 	if(item.subscription != "removed" && item.subscription != "none")
 	{
-		zxmppui.rosterAdded(item.bareJid, presence ? presence.show : "unavailable", item.name ? item.name : item.bareJid, presence ? presence.status : "");
+		var presenceShow = presence ? presence.show : "unavailable";
+		var display = item.name ? item.name : item.bareJid.split('@')[0];
+		var presenceStatus = presence ? presence.status : "";
+		zxmppui.rosterAdded(item.bareJid, presenceShow, display, presenceStatus);
 		
 	}
 	else
