@@ -59,5 +59,10 @@ zxmppClass.prototype.stanzaSaslResult = function(zxmpp)
 	}
 	
 	
-	
+	this.toJSON = function()
+	{
+		// TODO
+		console.warn("skipping encoding of stanzaSaslResult");
+		return "< not encoding stanzaSaslResult >";
+	}	
 }

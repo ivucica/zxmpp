@@ -181,6 +181,11 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 		packet.presenceStanza = this;
 	}
 	
-	
+	this.toJSON = function()
+	{
+		// TODO
+		console.warn("skipping encoding of stanzaPresence");
+		return "< not encoding stanzaPresence >";
+	}	
 	
 }

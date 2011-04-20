@@ -240,18 +240,49 @@ zxmppClass.prototype.packet = function (zxmpp)
 	}
 	this.toJSON = function zxmppPacket_toJSON(key)
 	{
-		// TODO not encoding here means that empty string
-		// will get stored upon serialization, instead of encoded 
-		// package from pollPacketQueue.
-
-		return "";
-		oldzxmpp = this.zxmpp;
+		console.log("zxmppPacket_toJSON()");
+		var oldzxmpp = this.zxmpp;
+		var oldtojson = this.toJSON; // firefox4 beta7; when we return cloned, cleaned copy of this object, it attempts to stringify once again using this same function, causing this.zxmpp to be undefined. we need to remove the function too
+		var oldiqstanza = this.iqStanza;
+		var oldmessagestanza = this.messageStanza;
+		var oldpresencestanza = this.presenceStanza;
+		var oldxml = this.xml;
+		var oldiqxml = this.iqXML;
+		var oldmessagexml = this.messageXML;
+		var oldpresencexml = this.presenceXML;
+		var oldxmlbody = this.xml_body;
 		delete this.zxmpp;
+		delete this.toJSON;
+		delete this.iqStanza;
+		delete this.messageStanza;
+		delete this.presenceStanza;
+		delete this.iqXML;
+		delete this.messageXML;
+		delete this.presenceXML;
+		delete this.xml_body;
 
-		var ret = JSON.stringify(this);
+		this.xml = oldzxmpp.util.serializedXML(this.xml);
+
+		var ret = oldzxmpp.util.cloneObject(this);
 
 		this.zxmpp = oldzxmpp;
+		this.toJSON = oldtojson;
+		this.iqStanza = oldiqstanza;
+		this.messageStanza = oldmessagestanza;
+		this.presenceStanza = oldpresencestanza;
+		this.iqXML = oldiqxml;
+		this.messageXML = oldmessagexml;
+		this.presenceXML = oldpresencexml;
+		this.xml = oldxml;
+		this.xml_body = oldxmlbody;
 
+		this.zxmpp.util.describeWhatCantYouStringify("zxmppPacket_toJSON()", ret)
 		return ret;
+	}
+
+	this.wakeUp = function(zxmpp)
+	{
+		var doc = this.zxmpp.util.parsedXMLDocument(this.xml);
+		this.parseXML(doc); // sets this.xml
 	}
 }

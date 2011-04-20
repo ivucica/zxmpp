@@ -267,7 +267,6 @@ zxmppClass.prototype.serialized = function zxmppMain_serialized()
     out.cfg = this.cfg;
 
     out.stream = this.stream;
-    
     var jsonified = JSON.stringify(out);
     
     
