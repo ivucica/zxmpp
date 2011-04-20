@@ -28,10 +28,17 @@ zxmppClass.prototype.ui = function() {
 		this.rosterAdded('jeej');
 		*/
 		this.adjustWindows();
+
+		this.bar.hide().fadeIn();
+
 	}
 
 	this.openWindow = function(title, id) {
-		return $('<div class="zxmpp_window" id="zxmpp_window_' + id + '"><div id="zxmpp_window_' + id + '_heading" class="zxmpp_window_heading"></div><div class="zxmpp_content"></div><div class="zxmpp_title"><div>' + title + '</div></div></div>').appendTo(this.bar);
+		returnValue = $('<div class="zxmpp_window" id="zxmpp_window_' + id + '"><div id="zxmpp_window_' + id + '_heading" class="zxmpp_window_heading"></div><div class="zxmpp_content"></div><div class="zxmpp_title"><div>' + title + '</div></div></div>').appendTo(this.bar);
+
+		returnValue.hide().fadeIn();
+
+		return returnValue;
 	}
 
 	this.setRosterHeading = function(title) {
@@ -40,7 +47,7 @@ zxmppClass.prototype.ui = function() {
 	}
 
 	this.changeWindowStatus = function() {
-		$('.zxmpp_content', $(this).parent()).toggle();
+		$('.zxmpp_content', $(this).parent()).slideToggle();
 	}
 
 	this.adjustWindows = function() {
@@ -111,8 +118,10 @@ zxmppClass.prototype.ui = function() {
 		var safejid = barejid.replace(/[^a-zA-Z 0-9]+/g,'');
 		
 		this.messageWindow(barejid); // FIXME get roster item from backend, and get display name
-		
-		$('#zxmpp_window_msg_' + safejid + " .zxmpp_content .zxmpp_content_msg").append('<div class="zxmpp_message_in">' + txt + '</div>');
+		var message = $('<div class="zxmpp_message_in">' + txt + '</div>');
+		var destination = $('#zxmpp_window_msg_' + safejid + " .zxmpp_content .zxmpp_content_msg");
+		message.appendTo(destination).hide().fadeIn();
+
 		$('#zxmpp_window_msg_' + safejid).find(".zxmpp_content").scrollTop($('#zxmpp_window_msg_' + safejid + ' .zxmpp_content')[0].scrollHeight - 16);
 	}
 
