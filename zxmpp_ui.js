@@ -148,7 +148,8 @@ zxmppClass.prototype.ui = function() {
 		}
 		if(stanza.body)
 		{
-			this.showMessage(stanza.from, 'other: ' + stanza.body);
+			display = $('#zxmpp_roster_'+safejid)[0].display;
+			this.showMessage(stanza.from, display + ': ' + stanza.body);
 		}
 	}	
 	this.messageReceived = function(from, body) {
