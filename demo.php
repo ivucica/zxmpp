@@ -133,6 +133,12 @@ function unloadhandler()
 }
 function loadhandler()
 {
+	// by delaying load slightly, we are preventing continuous
+	// "loading" display on some browsers such as safari
+	setTimeout(function(){loadhandler_delayed();}, 1);
+}
+function loadhandler_delayed()
+{
 	if(window.sessionStorage)
 	{
 		if(window.sessionStorage["zxmpp"] && window.sessionStorage["zxmpp"]!="undefined")
