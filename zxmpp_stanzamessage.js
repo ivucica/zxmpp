@@ -31,6 +31,8 @@ zxmppClass.prototype.stanzaMessage = function(zxmpp)
 		this.to = xml.attr["to"];
 		this.type = xml.attr["type"];
 
+		var presence = this.zxmpp.getPresence(this.from);
+
 		for(var i in xml.childNodes)
 		{
 			var child = xml.childNodes[i];
@@ -55,6 +57,7 @@ zxmppClass.prototype.stanzaMessage = function(zxmpp)
 				case "http://jabber.org/protocol/chatstates+paused":
 				case "http://jabber.org/protocol/chatstates+gone":
 				this.chatState = child.simpleNodeName;
+				presence.chatState = this.chatState;
 				break;
 
 				default:

@@ -207,16 +207,25 @@ function zxmppui_handlekeydown(event)
 		return;
 	}
 
+	// TODO why is "this.zxmpp" valid here?!
+
 
 	// XEP-0085: chat state notifications
 	// This is slightly incorrect.
 	// TODO
 	// 1. Inactive and Paused should be related primarily to timing
 	// 2. Composing should be sent only on one character.
-	// 3. Need to send only if last received received state is 
-	//    active, composing, paused. Don't do it if inactive, if 
-	//    gone, if unset.
 	// 4. Don't send if remote does not have caps
+
+	// FIXME we currently know event.target.jid is a bare jid
+	// fix for full jid!
+
+	var presence = this.zxmpp.getTopPresenceForBareJid(event.target.jid);
+	var weMaySend = (presence.chatState == "active" || presence.chatState == "composing" || presence.chatState == "paused");
+
+	if(!weMaySend)
+		return;
+
 	if(event.target.value.length == 1 && event.keyCode == 8)
 	{	
 		var packet = new zxmppui.backend.packet(this.zxmpp);
