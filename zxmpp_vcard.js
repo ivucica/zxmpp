@@ -25,6 +25,8 @@ zxmppClass.prototype.vCard = function (zxmpp)
 	}
 	this.toJSON = function(key)
 	{
+		var oldvcardxml = this.vcardXML;
+
 		this.vcardXML = this.zxmpp.util.serializedXML(this.vcardXML);
 
 		var oldzxmpp = this.zxmpp;
@@ -35,10 +37,16 @@ zxmppClass.prototype.vCard = function (zxmpp)
 		var ret = oldzxmpp.util.cloneObject(this);
 
 		this.zxmpp = oldzxmpp;
+		this.toJSON = oldtojson;
+		this.vcardXML = oldvcardxml;
 
-		doc = this.zxmpp.newXMLDocument("some_tag_name", "vcard-temp");
-		doc.load(this.vcardXML);
-		this.vcardXML = doc;
+		console.warn("SERIALIZED vCard. Big TODO: we implemented vCard wakeUp(), but it is not called, and it is required for functioning!");
 		return ret;
+	}
+
+	this.wakeUp = function()
+	{
+		var doc = this.zxmpp.util.parsedXMLDocument(this.xml);
+		this.parseXML(doc); // sets this.xml
 	}
 }

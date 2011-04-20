@@ -298,16 +298,18 @@ zxmppClass.prototype.caps = function(zxmpp)
 
 	this.toJSON = function zxmppCaps_toJSON(key)
 	{
+		console.log("zxmppCaps_toJSON()");
 		var oldzxmpp = this.zxmpp;
 		var oldtojson = this.toJSON; // firefox4 beta7; when we return cloned, cleaned copy of this object, it attempts to stringify once again using this same function, causing this.zxmpp to be undefined. we need to remove the function too
 		delete this.zxmpp;
 		delete this.toJSON;
-
+		
 		var ret = oldzxmpp.util.cloneObject(this);
-
+		
 		this.zxmpp = oldzxmpp;
 		this.toJSON = oldtojson;
 
+		this.zxmpp.util.describeWhatCantYouStringify("zxmppCaps_toJSON()", ret)
 		return ret;
 	}
 

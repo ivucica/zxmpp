@@ -532,7 +532,6 @@ zxmppClass.prototype.util = function (zxmpp)
 	    return prettyjson;
     }
 
-
     this.exceptionDescription = function(e)
     {
         var et = "";
@@ -571,7 +570,23 @@ zxmppClass.prototype.util = function (zxmpp)
 
 	return et;
     }
-	
+    
+
+
+    this.describeWhatCantYouStringify = function(whereAreWe, stringifiableObject)
+    {
+        for(var i in stringifiableObject)
+	{
+            try
+            {
+                JSON.stringify(stringifiableObject[i]);
+            }
+	    catch(e)
+            {
+                console.error("Cannot stringify " + i + " in " + whereAreWe + " : " + e);
+            }
+	}
+    }
 };
 
 

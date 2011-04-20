@@ -22,7 +22,7 @@ zxmppClass.prototype.itemRoster = function (zxmpp)
 	this.ask = false;
 	this.groups = [];
 
-	this.parseXML = function(xml){
+	this.parseXML = function zxmppItemRoster_parseXML(xml){
 		this.zxmpp.util.easierAttrs(xml);
 
 		this.bareJid = xml.attr["jid"]; // required. user's bare jid
@@ -69,8 +69,9 @@ subscription "remove" is sent and received when we're supposed to REMOVE a conta
 			}
 		}
 	}
-	this.toJSON = function(key)
+	this.toJSON = function zxmppItemRoster_toJSON(key)
 	{
+		console.log("zxmppItemRoster_toJSON()");
 		var oldzxmpp = this.zxmpp;
 		var oldtojson = this.toJSON; // firefox4 beta7; when we return cloned, cleaned copy of this object, it attempts to stringify once again using this same function, causing this.zxmpp to be undefined. we need to remove the function too
 		delete this.zxmpp;
@@ -79,7 +80,9 @@ subscription "remove" is sent and received when we're supposed to REMOVE a conta
 		var ret = oldzxmpp.util.cloneObject(this);
 
 		this.zxmpp = oldzxmpp;
+		this.toJSON = oldtojson;
 
+		this.zxmpp.util.describeWhatCantYouStringify("zxmppItemRoster_toJSON()", ret)
 		return ret;
 	}
 }

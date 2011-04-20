@@ -779,7 +779,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		delete this.zxmpp;
 		delete this.iqsAwaitingReply;
 
-
+		
 		var oldfuncs = {};
 		for(var i in this)
 		{
@@ -801,6 +801,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 			this[i] = oldfuncs[i];
 		}
 
+		this.zxmpp.util.describeWhatCantYouStringify("zxmppStream_toJSON()", ret)
 		return ret;
 	}
 
@@ -818,6 +819,10 @@ zxmppClass.prototype.stream = function (zxmpp)
 		}
 		this.sentUnrespondedRIDs = [];
 		this.sentUnrespondedKeys = [];
+		for(var i in this.pollPacketQueue)
+		{
+			this.pollPacketQueue[i].wakeUp(this.zxmpp);
+		}
 		this.fillPollConnection();
 	}
 }

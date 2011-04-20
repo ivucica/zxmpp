@@ -81,5 +81,12 @@ zxmppClass.prototype.stanzaStreamFeatures = function(zxmpp)
 		}
 		return saslMechanisms;
 	}
+
+	this.toJSON = function()
+	{
+		// TODO
+		console.warn("skipping encoding of stanzaStreamFeatures");
+		return "< not encoding stanzaStreamFeatures >";
+	}
 	
 }

@@ -98,6 +98,11 @@ zxmppClass.prototype.stanzaMessage = function(zxmpp)
 		packet.messageStanza = this;
 	}
 	
-	
+	this.toJSON = function()
+	{
+		// TODO
+		console.warn("skipping encoding of stanzaMessage");
+		return "< not encoding stanzaMessage >";
+	}
 	
 }

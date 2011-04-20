@@ -602,5 +602,12 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		
 		this.iqXML.setAttribute("to", zxmpp.fullJid);
 	}
+
+	this.toJSON = function()
+	{
+		// TODO
+		console.warn("skipping encoding of stanzaIq");
+		return "< not encoding stanzaIq >";
+	}
 }
 
