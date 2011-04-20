@@ -252,6 +252,11 @@ function handler_connectionterminate(sender, code, humanreadable)
 			alert("Wrong username or password!\n\n" + humanreadable);
 			break;
 			
+			case "account-disabled":
+			shownotification(undefined, "Connection terminated", "Your account has been disabled!\n\n" + humanreadable);
+			alert("Your account has been disabled!\n\n" + humanreadable);
+			break;
+
 			default:
 			shownotification(undefined, "Connection terminated", "Login error with code \'" + code + "\'\n\n" + humanreadable);
 			alert("Login error with code \'" + code + "\'\n\n" + humanreadable);
