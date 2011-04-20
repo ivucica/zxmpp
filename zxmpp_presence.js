@@ -34,6 +34,7 @@ zxmppClass.prototype.presence = function (zxmpp)
 	this.priority = 0;
 	
 	this.caps = new this.zxmpp.caps(this.zxmpp);
+	this.chatState = false; // XEP-0085 - last registered chat state (e.g. false, 'composing', 'active', ...)
 
 	this.toJSON = function zxmppPresence_toJSON(key)
 	{
