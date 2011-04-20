@@ -732,7 +732,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		// then ...
 		// TODO do nicer cleanup
 		zxmppClass._STREAM=this;
-		setTimeout(1, "zxmppClass._STREAM.terminate();");
+		setTimeout("zxmppClass._STREAM.terminate();", 1);
 	}
 	
 	this.terminate = function zxmppStream_terminate(dont_reset_state)
