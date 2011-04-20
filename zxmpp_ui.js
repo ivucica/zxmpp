@@ -72,10 +72,10 @@ zxmppClass.prototype.ui = function() {
 		}
 
 		this.roster.children('.zxmpp_content').append('<div id="zxmpp_roster_' + safejid + '" class="user' + safejid + ' zxmpp_user zxmpp_status' + icon + '">' + display + '<div class="zxmpp_statustext">' + status + '</div></div>');
-		document.getElementById("zxmpp_roster_" + safejid).jid = jid; // fixme dont use id; use jquery and class='user'+safejid
-		document.getElementById("zxmpp_roster_" + safejid).display = display; // fixme dont use id; use jquery and class='user'+safejid
-		
-        	this.roster.delegate('.user' + safejid, 'click', this.userClick);
+
+		$("#zxmpp_roster_" + safejid)[0].jid = jid; // fixme dont use id; use class='user'+safejid
+		$("#zxmpp_roster_" + safejid)[0].display = display; // fixme dont use id; use class='user'+safejid
+		this.roster.delegate('.user' + safejid, 'click', this.userClick);
 
 
 	}
@@ -106,30 +106,14 @@ zxmppClass.prototype.ui = function() {
 	}
 
 	this.showMessage = function(jid, txt) {
-		// FIXME dont use document.getElementById
 
 		var barejid = jid.split("/")[0];
 		var safejid = barejid.replace(/[^a-zA-Z 0-9]+/g,'');
 		
 		this.messageWindow(barejid); // FIXME get roster item from backend, and get display name
-		//$('#zxmpp_window_msg_' + safejid + ' > input').remove();
 		
-		var msgcontainer = document.getElementById("zxmpp_window_msg_" + safejid).children[1].firstChild;
-		if(!msgcontainer)
-		{
-			console.error("No zxmpp_window_msg_" + safejid + " found");
-			
-		}
-		else
-		{
-			msgcontainer.innerHTML += 
-			'<div class="zxmpp_message_in">' + txt + '</div>';
-			$('#zxmpp_window_msg_' + safejid).find(".zxmpp_content").scrollTop(msgcontainer.scrollHeight - 16);
-			/*
-			$('#zxmpp_window_msg_' + safejid).append('<div class="zxmpp_message_in">other: ' + txt + '</div>');
-			$('#zxmpp_window_msg_' + safejid).append('<input/>');
-			*/
-		}
+		$('#zxmpp_window_msg_' + safejid + " .zxmpp_content .zxmpp_content_msg").append('<div class="zxmpp_message_in">' + txt + '</div>');
+		$('#zxmpp_window_msg_' + safejid).find(".zxmpp_content").scrollTop($('#zxmpp_window_msg_' + safejid + ' .zxmpp_content')[0].scrollHeight - 16);
 	}
 
 	this.escapedHTML = function(txt) {
@@ -146,8 +130,7 @@ zxmppClass.prototype.ui = function() {
 
 		console.log("GETTING WINDOW FOR " + barejid);
 
-		// FIXME use jquery, not document.getElementById
-		var msgwindow = document.getElementById("zxmpp_window_msg_" + safejid);
+		var msgwindow = $("#zxmpp_window_msg_" + safejid)[0];
 		if(msgwindow)
 		{
 			if(stanza.chatState)
@@ -158,7 +141,9 @@ zxmppClass.prototype.ui = function() {
 				$(msgwindow).removeClass("zxmpp_window_msg_gone");
 				$(msgwindow).removeClass("zxmpp_window_msg_inactive");
 				$(msgwindow).addClass("zxmpp_window_msg_" + stanza.chatState);
-				
+			
+				// refresh height	
+				$('#zxmpp_window_msg_' + safejid).find(".zxmpp_content").scrollTop($('#zxmpp_window_msg_' + safejid + ' .zxmpp_content')[0].scrollHeight - 16);
 			}
 		}
 		if(stanza.body)
@@ -188,8 +173,7 @@ zxmppClass.prototype.ui = function() {
 			display = jid;		
 		console.log("GETTING WINDOW FOR " + jid);
 
-		// FIXME use jquery, not document.getElementById
-		var msgwindow = document.getElementById("zxmpp_window_msg_" + safejid);
+		var msgwindow = $("#zxmpp_window_msg_" + safejid)[0];
 		if(msgwindow)
 		{
 		//	return msgwindow;
