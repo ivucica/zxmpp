@@ -140,6 +140,12 @@ zxmppClass.prototype.ui = function() {
 		console.log("GETTING WINDOW FOR " + barejid);
 
 		var msgwindow = $("#zxmpp_window_msg_" + safejid)[0];
+		if(!msgwindow && stanza.body) // no window? open it, but only if we are receiving a message
+		{
+			this.messageWindow(barejid);
+			msgwindow = $("#zxmpp_window_msg_" + safejid)[0];
+		}
+
 		if(msgwindow)
 		{
 			if(stanza.chatState)
@@ -157,7 +163,14 @@ zxmppClass.prototype.ui = function() {
 		}
 		if(stanza.body)
 		{
-			display = $('#zxmpp_roster_'+safejid)[0].display;
+			if($('#zxmpp_roster_'+safejid)[0])
+			{
+				display = $('#zxmpp_roster_'+safejid)[0].display;
+			}
+			else
+			{
+				display = barejid;
+			}
 			this.showMessage(stanza.from, display + ': ' + stanza.body);
 		}
 	}	

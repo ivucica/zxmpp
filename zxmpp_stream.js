@@ -819,9 +819,21 @@ zxmppClass.prototype.stream = function (zxmpp)
 		}
 		this.sentUnrespondedRIDs = [];
 		this.sentUnrespondedKeys = [];
-		for(var i in this.pollPacketQueue)
+		try
 		{
-			this.pollPacketQueue[i].wakeUp(this.zxmpp);
+			for(var i in this.pollPacketQueue)
+			{
+				if(typeof this.pollPacketQueue[i] == "function")
+					continue;
+				console.log("Unpacking " + i);
+				this.pollPacketQueue[i].wakeUp(this.zxmpp);
+			}
+		}
+		catch(e)
+		{
+			console.error(e);
+			console.log(this.zxmpp.util.prettyJson(window.sessionStorage.zxmpp));
+			this.pollPacketQueue = [];
 		}
 		this.fillPollConnection();
 	}
