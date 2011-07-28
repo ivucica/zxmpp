@@ -110,11 +110,103 @@ zxmppClass.prototype.packet = function (zxmpp)
 					if(attrs["condition"])
 						code+="/"+attrs["condition"];
 						
-					var humanreadable = "Terminate requested by server with unset condition.";
+					var humanreadable = "Terminate requested by server with unset or unknown condition.";
 					switch(attrs["condition"])
 					{
+						case "bad-format":
+						humanreadable = "Server did not understand something it received.";
+						break;
+
+						case "bad-namespace-prefix":
+						humanreadable = "Server did not understand something it received. (XML: bad namespace prefix)."
+						break;
+						
+						case "conflict":
+						humanreadable = "Looks like you've logged in elsewhere, and that caused a conflict.";
+						break;
+
+						case "connection-timeout":
+						humanreadable = "Connection has timed out.";
+						break;
+
+						case "host-gone":
+						humanreadable = "Host you're trying to talk to is no longer served by this server.";
+						break;
+
 						case "host-unknown":
-						humanreadable = "Server does not handle the specified hostname.";
+						humanreadable = "Server does not handle the hostname you tried to talk to.";
+						break;
+
+						case "improper-addressing":
+						humanreadable = "A message was sent that was missing 'to' or 'from' attribute.";
+						break;
+
+						case "internal-server-error":
+						humanreadable = "Server experienced an internal error. Ouch.";
+						break;
+
+						case "invalid-from":
+						humanreadable = "A message was sent that had an invalid 'from' attribute.";
+						break;
+
+						case "invalid-id":
+						humanreadable = "Stream ID or dialback ID is invalid or does not match an ID previously provided.";
+						break;
+
+						case "invalid-namespace":
+						humanreadable = "Streams namespace is set to an invalid value.";
+						break;
+
+						case "invalid-xml":
+						humanreadable = "Server did not understand something it received. (XML can't be validated)";
+						break;
+
+						case "not-authorized":
+						humanreadable = "Some action was performed that was not (yet) authorized.";
+						break;
+
+						case "policy-violation":
+						humanreadable = "Some action was performed that violated some server-specific policy.";
+						break;
+
+						case "remote-connection-failed":
+						humanreadable = "Server could not create a connection to a required remote service.";
+						break;
+
+						case "resource-constraint":
+						humanreadable = "Server lacks the system resources necessary to service the stream.";
+						break;
+
+						case "restricted-xml":
+						humanreadable = "An attempt was made to transmit a feature of XML that is restricted.";
+						break;
+
+						case "see-other-host":
+						humanreadable = "You are being redirected to another host. Note that this client ignores the redirect.";
+						break;
+
+						case "system-shutdown":
+						humanreadable = "Chat service is shutting down or restarting. Try reconnecting in a minute.";
+						break;
+
+						case "undefined-condition":
+						humanreadable = "Terminate requested by server with undefined condition.";
+						break;
+
+						case "unsupported-encoding":
+						humanreadable = "Initiating entity has encoded the stream in an encoding that is not supported by the server";
+						break;
+
+						case "unsupported-stanza-type":
+						humanreadable = "Initiating entity has sent a first-level child of the stream that is not supported by the server";
+						break;
+
+						case "unsupported-version":
+						humanreadable = "Server does not understand the chat protocol we're using.";
+						break;
+
+						case "xml-not-well-formed":
+						humanreadable = "Initiating entity has sent XML that is not well-formed as defined by XML specification";
 						break;
 					}
 					this.zxmpp.notifyConnectionTerminate(code, humanreadable);
