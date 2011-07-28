@@ -244,8 +244,8 @@ function handler_connectionterminate(sender, code, humanreadable)
 		switch(codesplit[1])
 		{
 			default:
-			shownotification(undefined, "Connection terminated", "Server-side termination with code \'" + code + "\'\n\n" + humanreadable);
-			alert("Server-side termination with code \'" + code + "\'\n\n" + humanreadable);
+			shownotification(undefined, "Connection terminated", "Server has disconnected you with code \'" + code + "\'\n\n" + humanreadable);
+			alert("Server has disconnected you with code \'" + code + "\'\n\n" + humanreadable);
 			break;
 		}
 		break;
