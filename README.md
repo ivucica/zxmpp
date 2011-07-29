@@ -1,5 +1,7 @@
 # Z-XMPP #
 
+For more info, visit <http://ivan.vucica.net/zxmpp/>.
+
 ## What is it? ##
 This is an implementation of an XMPP client in Javascript. It uses BOSH concept 
 of HTTP binding as defined by XEP-0124 and XEP-0206. 
