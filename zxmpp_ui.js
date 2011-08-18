@@ -171,12 +171,12 @@ zxmppClass.prototype.ui = function() {
 			{
 				display = barejid;
 			}
-			this.showMessage(stanza.from, display + ': ' + stanza.body);
+			this.showMessage(stanza.from, '<b>' + display + '</b>: ' + stanza.body);
 		}
 	}	
 	this.messageReceived = function(from, body) {
 		// DEPRECATED
-		this.showMessage(from, 'other: ' + this.escapedHTML(body));
+		this.showMessage(from, '<b>other:</b> ' + this.escapedHTML(body));
 	}
 
 	this.userClick = function(event) {
@@ -184,9 +184,9 @@ zxmppClass.prototype.ui = function() {
 		var jid = this.jid;
 		var display = this.display;
 		
-		zxmppui.messageWindow(jid, display);//FIXME dont use zxmppui
+		zxmppui.messageWindow(jid, display, true);//FIXME dont use zxmppui
 	}
-	this.messageWindow = function(jid, display) {
+	this.messageWindow = function(jid, display, allow_focus) {
 
 		// FIXME we reference zxmppui because "this" might not be an instance of zxmppui
 
@@ -209,6 +209,8 @@ zxmppClass.prototype.ui = function() {
 		msgwindowjq.children('.zxmpp_content').append('<input onkeydown="zxmppui_handlekeydown(event);" id="zxmpp_input_msg_' + safejid + '"/>');
 		
 		document.getElementById("zxmpp_input_msg_" + safejid).jid = jid;
+		if(allow_focus)
+			document.getElementById("zxmpp_input_msg_" + safejid).focus();
 
 		zxmppui.adjustWindows();
 
@@ -225,7 +227,7 @@ function zxmppui_handlekeydown(event)
 	{
 		// FIXME dont use zxmppui
 		zxmppui.backend.sendMessage(event.target.jid, event.target.value);
-		zxmppui.showMessage(event.target.jid, 'you: ' + zxmppui.escapedHTML(event.target.value)); 
+		zxmppui.showMessage(event.target.jid, '<b>you:</b> ' + zxmppui.escapedHTML(event.target.value)); 
 		event.target.value = "";
 		return;
 	}

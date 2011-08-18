@@ -76,7 +76,7 @@
 .zxmpp_window_msg_gone .zxmpp_content .zxmpp_content_msg:after
 {
 	font-weight: bold;
-	content: "Gone";
+	content: "Gone";	
 }
 
 .zxmpp_user {
