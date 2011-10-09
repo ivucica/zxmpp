@@ -34,17 +34,17 @@ zxmppClass.prototype.stanzaSaslResult = function(zxmpp)
 					code+="/"+xml.firstChild.nodeName;
 				}
 				
-				var humanreadable = "A SASL authentication failure has occured. ";
+				var humanreadable = "SASL authentication failure.";
 				if(xml.firstChild)
 				{
 					switch(xml.firstChild.nodeName)
 					{
 						case "not-authorized":
-						humanreadable += "Provided authentication details do not give you access.";
+						humanreadable = "Provided authentication details do not give you access. (" + humanreadable + ")";
 						break;
 
 						case "account-disabled":
-						humanreadable += "Your account has been disabled.";
+						humanreadable = "Your account has been disabled. (" + humanreadable + ")";
 						break;
 					}
 				}
