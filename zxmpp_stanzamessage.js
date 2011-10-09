@@ -27,6 +27,8 @@ zxmppClass.prototype.stanzaMessage = function(zxmpp)
 		
 		this.zxmpp.util.easierAttrs(xml);
 		
+		this.messageNode = xml;
+
 		this.from = xml.attr["from"];
 		this.to = xml.attr["to"];
 		this.type = xml.attr["type"];
