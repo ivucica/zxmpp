@@ -148,7 +148,7 @@ zxmppClass.prototype.ui = function() {
 
 		if(msgwindow)
 		{
-			if(stanza.chatState)
+			if(stanza.type != "error" && stanza.chatState)
 			{
 				$(msgwindow).removeClass("zxmpp_window_msg_composing");
 				$(msgwindow).removeClass("zxmpp_window_msg_active");
@@ -161,7 +161,7 @@ zxmppClass.prototype.ui = function() {
 				$('#zxmpp_window_msg_' + safejid).find(".zxmpp_content").scrollTop($('#zxmpp_window_msg_' + safejid + ' .zxmpp_content')[0].scrollHeight - 16);
 			}
 		}
-		if(stanza.body)
+		if(stanza.body && stanza.type != "error")
 		{
 			if($('#zxmpp_roster_'+safejid)[0])
 			{
@@ -173,6 +173,12 @@ zxmppClass.prototype.ui = function() {
 			}
 			this.showMessage(stanza.from, '<b>' + display + '</b>: ' + stanza.body);
 		}
+		
+		if(stanza.body && stanza.type == "error")
+		{
+			this.showMessage(stanza.from, "<b>ERROR SENDING</b>: " + stanza.body);
+		}
+		
 	}	
 	this.messageReceived = function(from, body) {
 		// DEPRECATED
