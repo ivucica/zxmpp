@@ -318,6 +318,11 @@ function handler_rosterupdate(sender, item)
 		var presenceShow = presence ? presence.show : "unavailable";
 		var display = item.name ? item.name : item.bareJid.split('@')[0];
 		var presenceStatus = presence ? presence.status : "";
+
+		var vcard = sender.vCards[item.bareJid];
+		if(vcard && vcard.fn)
+			display = vcard.fn;
+
 		zxmppui.rosterAdded(item.bareJid, presenceShow, display, presenceStatus);
 		
 	}

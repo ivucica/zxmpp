@@ -86,7 +86,7 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 					presence.priority = this.priority;
 				break;
 				
-				case "c": // TODO check namespace? 
+				case "c": // TODO check namespace - should be http://jabber.org/protocol/caps
 				if(this.from != this.zxmpp.fullJid)
 				{
 					this.caps = presence.caps = new this.zxmpp.caps(this.zxmpp);
@@ -98,7 +98,11 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 					this.caps = presence.caps;
 				}
 				break;
-				
+
+				case "x": // TODO check namespace - should be vcard-temp:x:update
+				this.zxmpp.stream.sendIqVCardRequest(presence.bareJid);
+				break;
+
 				case "#text":
 				// ignore!
 				break;

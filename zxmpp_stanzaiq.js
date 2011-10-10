@@ -36,6 +36,8 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		
 		this.iqXML = xml;
 		
+		var presence = this.zxmpp.getPresence(this.from);
+		
 		for(var i in xml.childNodes)
 		{
 			var child = xml.childNodes[i];
@@ -88,8 +90,21 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 
 				case "vCard":
 				// TODO implement
-				console.error("***** VCARD PARSING NOT IMPLEMENTED");
-				this.iqFail();
+				//console.error("***** VCARD PARSING NOT IMPLEMENTED");
+				//this.iqFail();
+				
+							// TODO handle error vCard responses
+							// in case a person has no vcard, we must not
+							// continuously request a vcard from the server.
+
+							// suggestion:
+							// - just store a "false" in "vCards"
+								
+				var vcard = new this.zxmpp.vCard(this.zxmpp);
+				vcard.parseXML(child);
+				this.zxmpp.vCards[presence.bareJid] = vcard;
+				var rosteritem = this.zxmpp.roster[presence.bareJid];
+				this.zxmpp.notifyRosterUpdate(rosteritem);
 				break;
 				
 				default:
@@ -338,8 +353,11 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 						}
 						// remember in db:
 						askingIq.extDest[askingIq.inquiringExt] = child.attr["var"];
-					
-						this.zxmpp.stream.sendIqVCardRequest(presence.bareJid);
+				
+						if(!this.zxmpp.vCards[presence.bareJid])
+						{
+							this.zxmpp.stream.sendIqVCardRequest(presence.bareJid);
+						}
 					}
 					
 					

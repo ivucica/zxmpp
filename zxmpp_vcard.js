@@ -16,12 +16,28 @@ zxmppClass.prototype.vCard = function (zxmpp)
 	this.zxmpp = zxmpp;
 	this.type = "vCard";
 
+	this.fn = false;
+
 	this.vcardXML = false;
 
 	this.parseXML = function(xml){
 		this.zxmpp.util.easierAttrs(xml);
 
 		this.vcardXML = xml;
+
+		for (var i in xml.childNodes)
+		{
+			var childNode = xml.childNodes[i];
+			if(!childNode.nodeName) continue;
+			
+			switch(childNode.nodeName)
+			{
+				case "FN":
+					if(childNode.firstChild && childNode.firstChild.nodeValue)
+						this.fn = childNode.firstChild.nodeValue;
+					break;
+			}
+		}
 	}
 	this.toJSON = function(key)
 	{
