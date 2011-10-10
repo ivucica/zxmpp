@@ -703,6 +703,17 @@ zxmppClass.prototype.stream = function (zxmpp)
 		// this zxmpp::stanzaIq, return it.
 		return iq; 
 	}
+	
+	this.sendIqVCardRequest = function zxmppStream_sendIqVCardRequest(destination)
+	{
+		var packet = new this.zxmpp.packet(this.zxmpp);
+		var iq = new this.zxmpp.stanzaIq(this.zxmpp);
+		iq.appendIqToPacket(packet, "query", "get", destination);
+		
+		iq.appendEmptyVCardToPacket(packet);
+
+		packet.send();
+	}
 
 	// 'body' can be false/null, to prevent appending <body>
 	this.sendMessage = function zxmppStream_sendMessage(send_style, from, to, type, body)
@@ -717,7 +728,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		
 		packet.send(send_style);
 	}
-
+	
 	this.logoff = function zxmppStream_logoff()
 	{
 		// first send logoff "presence"

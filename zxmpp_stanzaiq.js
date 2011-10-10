@@ -85,6 +85,12 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				// so let's just include it here so we don't send iqFail to
 				// server and so that we don't log this as a warning.
 				break;
+
+				case "vCard":
+				// TODO implement
+				console.error("***** VCARD PARSING NOT IMPLEMENTED");
+				this.iqFail();
+				break;
 				
 				default:
 				console.warn("zxmpp::stanzaIq::parseXML(): Unknown child " + child.nodeName);
@@ -332,7 +338,8 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 						}
 						// remember in db:
 						askingIq.extDest[askingIq.inquiringExt] = child.attr["var"];
-						
+					
+						this.zxmpp.stream.sendIqVCardRequest(presence.bareJid);
 					}
 					
 					
@@ -537,6 +544,24 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		var iq = this.iqXML = packet.iqXML;
 		var session = this.session = packet.xml.createElementNS("urn:ietf:params:xml:ns:xmpp-session", "session");
 		iq.appendChild(session);
+	}
+
+	this.appendEmptyVCardToPacket = function(packet)
+	{
+		// For a given packet initialized with an <iq>,
+		// append a <vcard>, initializing this.vcardNode
+		
+		// Also, attach that <iq> to this class, 
+		// initializing this.iqXML
+		
+		// Full VCards will be appended using:
+		//  someInstanceOfZXMPP_Vcard.appendToXml(packet, iqnode)
+		var iq = this.iqXML = packet.iqXML;
+		var vcardNode = this.vcardNode = packet.xml.createElementNS("vcard-temp", "vCard");
+		iq.appendChild(vcardNode);
+		
+		packet.iqStanza = this;	
+
 	}
 
 
