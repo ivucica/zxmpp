@@ -237,7 +237,10 @@ zxmppClass.prototype.sendMessage = function zxmppMain_sendMessage(to, body)
 {
 	this.stream.sendMessage("poll", this.fullJid, to, "chat", body);
 }
-
+zxmppClass.prototype.getOwnPresence = function zxmppMain_getOwnPresence()
+{
+	return this.getPresence(this.fullJid);
+}
 zxmppClass.prototype.setOwnPresence = function zxmppMain_setOwnPresence(show, status, priority)
 {
 	var presence = this.getPresence(this.fullJid);
@@ -260,6 +263,7 @@ zxmppClass.prototype.serialized = function zxmppMain_serialized()
     out.presences = this.presences;
     out.capsNodes = this.capsNodes;
     out.capsNodesExt = this.capsNodesExt;
+    out.vCards = this.vCards; // TODO check if vcards are correctly serialized
     out.roster = this.roster;
     out.username = this.username;
     out.bareJid = this.bareJid;
@@ -311,6 +315,7 @@ zxmppClass.prototype.deserialize = function zxmppMain_deserialize(json)
     this.presences = input.presences;
     this.capsNodes = input.capsNodes;
     this.capsNodesExt = input.capsNodesExt;
+    this.vCards = input.vCards; // TODO check if vcards are correctly serialized
     this.roster = input.roster;
     this.username = input.username;
     this.bareJid = input.bareJid;

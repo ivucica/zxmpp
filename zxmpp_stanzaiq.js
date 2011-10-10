@@ -36,6 +36,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		
 		this.iqXML = xml;
 		
+		//var from_barejid = this.from.split("/")[0];
 		var presence = this.zxmpp.getPresence(this.from);
 		
 		for(var i in xml.childNodes)
@@ -96,15 +97,23 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 							// TODO handle error vCard responses
 							// in case a person has no vcard, we must not
 							// continuously request a vcard from the server.
+					// (currently prevented by setting "false" immediately after request,
+					// also solving problem of repeated requests just because
+					// a reply was not received)
 
-							// suggestion:
-							// - just store a "false" in "vCards"
 								
 				var vcard = new this.zxmpp.vCard(this.zxmpp);
 				vcard.parseXML(child);
+				if(!this.from)
+					presence = this.zxmpp.getOwnPresence();
+				console.warn("Now receiving vcard for " + presence.bareJid);
+				console.warn(vcard);
 				this.zxmpp.vCards[presence.bareJid] = vcard;
 				var rosteritem = this.zxmpp.roster[presence.bareJid];
-				this.zxmpp.notifyRosterUpdate(rosteritem);
+				if(rosteritem)
+				{
+					this.zxmpp.notifyRosterUpdate(rosteritem);
+				}
 				break;
 				
 				default:
@@ -356,7 +365,9 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				
 						if(!this.zxmpp.vCards[presence.bareJid])
 						{
+							console.warn("Now requesting vcard for " + presence.bareJid);
 							this.zxmpp.stream.sendIqVCardRequest(presence.bareJid);
+							this.zxmpp.vCards[presence.bareJid] = false; // record that a request was made. don't ask again
 						}
 					}
 					
