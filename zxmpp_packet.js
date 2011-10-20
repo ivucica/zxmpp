@@ -290,14 +290,13 @@ zxmppClass.prototype.packet = function (zxmpp)
 				break;
 				
 				case "urn:ietf:params:xml:ns:xmpp-sasl":
-				// TODO TODO TODO: just pass to current auth engine (this.zxmpp.auth)
 				// READ: http://web.archive.org/web/20050224191820/http://cataclysm.cx/wip/digest-md5-crash.html
 				switch(stanza)
 				{
 					case "success":
-					stanzaInstance = new this.zxmpp.stanzaSASL(this.zxmpp);
-					break;
 					case "failure":
+					case "challenge":
+					case "abort":
 					stanzaInstance = new this.zxmpp.stanzaSASL(this.zxmpp);
 					break;
 				}

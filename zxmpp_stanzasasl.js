@@ -19,11 +19,11 @@ zxmppClass.prototype.stanzaSASL = function(zxmpp)
 	{
 		if(xml.nodeName == "success")
 		{
-			this.zxmpp.stream.authSuccess = true;
+			this.zxmpp.stream.auth.handleSuccess(xml);
 		}
 		else if(xml.nodeName == "failure")
 		{
-			this.zxmpp.stream.authSuccess = false;
+			this.zxmpp.stream.auth.handleFailure(xml);
 			
 			this.zxmpp.stream.terminate();
 			
@@ -52,9 +52,31 @@ zxmppClass.prototype.stanzaSASL = function(zxmpp)
 			}
 			
 		}
+		else if(xml.nodeName == "abort")
+		{
+			this.zxmpp.stream.auth.handleAbort(xml);
+			
+			this.zxmpp.stream.terminate();
+			
+			{
+				var code = "saslabort";
+				if(xml.firstChild)
+				{
+					code+="/"+xml.firstChild.nodeName;
+				}
+				
+				var humanreadable = "SASL authentication aborted.";
+				this.zxmpp.notifyConnectionTerminate(code, humanreadable);
+			}
+			
+		}
+		else if (xml.nodeName == "challenge")
+		{
+			this.zxmpp.stream.auth.handleChallenge(xml);
+		}
 		else
 		{
-			console.warn("zxmpp::stanzaSaslResult::parseXML(): Unhandled nodename " + xml.nodeName);
+			console.warn("zxmpp::stanzaSASL::parseXML(): Unhandled nodename " + xml.nodeName);
 		}
 	}
 	
@@ -62,7 +84,7 @@ zxmppClass.prototype.stanzaSASL = function(zxmpp)
 	this.toJSON = function()
 	{
 		// TODO
-		console.warn("skipping encoding of stanzaSaslResult");
-		return "< not encoding stanzaSaslResult >";
+		console.warn("skipping encoding of stanzaSASL");
+		return "< not encoding stanzaSASL >";
 	}	
 }

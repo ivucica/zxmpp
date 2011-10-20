@@ -48,7 +48,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 	/* state tracking variables */
 	this.hasFullConnection = false;
 
-	this.hasSentAuth = false;
+	this.auth = false;
 	this.authSuccess = undefined;
 	this.hasSentRestart = false;
 	this.hasSentBind = false;
@@ -493,32 +493,51 @@ zxmppClass.prototype.stream = function (zxmpp)
 			console.error(e);
 		}
 		
-		if(!this.hasSentAuth)
+		if(!this.auth)
 		{
-			// FIXME design an auth class,
-			//       and then call this.auth.doStep();
-			//       this will allow multistep non-PLAIN
-			//       auth such as SCRAM-SHA-1
-			
-			if(this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"] && 
-			this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"]["mechanisms"]["PLAIN"])
+			// Weighted, ordered list of supported mechanisms.
+			// 0 is the favorite mechanism,
+			// 1 is the less favored mechanism,
+			// etc.
+			var supportedMechanisms = new Array();
+			supportedMechanisms[0] = ["PLAIN", this.zxmpp.authPlain];
+
+			var pickedMechanism = false;
+			for(var mechanismId = 0; mechanismId < supportedMechanisms.length; mechanismId++)
 			{
-				this.sendPlainAuth("poll");
+				var mechanism = supportedMechanisms[mechanismId];
+				var mechanismName = mechanism[0];
+				var mechanismClass = mechanism[1];
+
+				if(this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"] &&
+				   this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"]["mechanisms"][mechanismName])
+				{
+					pickedMechanism = mechanism;
+					break;
+				}
+			}
+
+			if(pickedMechanism)
+			{
+				var pickedMechanismName = pickedMechanism[0];
+				var pickedMechanismClass = pickedMechanism[1];
+
+				console.log("Picked authentication mechanism " + pickedMechanismName);
+				this.auth = new pickedMechanismClass(this.zxmpp);
+				this.auth.startAuth();
 			}
 			else
 			{
-				console.error("zxmpp::stream::handleConnection(): plain authentication mechanism unsupported. giving up");
+				console.error("zxmpp::stream::handleConnection(): no authentication mechanism supported. giving up");
 
-				conn.connzxmpp.stream.terminate();
+				this.zxmpp.stream.terminate();
 	
 				var code = "terminate/no-supported-auth";
 				var humanreadable = "No supported authentication mechanism provided by the server.";
-				conn.connzxmpp.notifyConnectionTerminate(code, humanreadable);
-
+				this.zxmpp.notifyConnectionTerminate(code, humanreadable);
 			}
-			
 		}
-		else if(this.authSuccess && !this.hasSentRestart) // success is not false and not undefined
+		else if(this.auth.authSucceeded() && !this.hasSentRestart) // success is not false and not undefined
 		{
 			this.sendXmppRestart();
 		}
@@ -582,30 +601,6 @@ zxmppClass.prototype.stream = function (zxmpp)
 		packet.send(send_style);
 	}
 	
-	this.sendPlainAuth = function zxmppStream_sendPlainAuth(send_style)
-	{
-		// FIXME move packet fillout to zxmpp_packet.js
-		
-		// send authorization
-		var packet = new this.zxmpp.packet(this.zxmpp);
-		
-		var authnode = packet.xml.createElementNS("urn:ietf:params:xml:ns:xmpp-sasl", "auth");
-		authnode.setAttribute("mechanism", "PLAIN");
-		packet.xml_body.appendChild(authnode);
-
-		// create child text node
-		var authnode_text = packet.xml.createTextNode(
-			this.zxmpp.util.encode64(
-				this.zxmpp.bareJid + "\0" + 
-				this.zxmpp.username + "\0" + 
-				this.zxmpp.password
-			));
-		authnode.appendChild(authnode_text);
-
-		this.hasSentAuth=true;
-		packet.send(send_style);
-	}
-
 	this.sendXmppRestart = function zxmppStream_sendXmppRestart(send_style)
 	{
 		// FIXME move packet fillout to zxmpp_packet.js

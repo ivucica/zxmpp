@@ -19,20 +19,19 @@ zxmppClass.prototype.authPlain = function (zxmpp)
 	this.hasSentAuth = false;
 	this.authSuccess = undefined;
 	
-	this.doStep = function zxmppAuthPlain_doStep()
-	{
-		
+	this.startAuth = function zxmppAuthPlain_startAuth()
+	{	
 		if(!this.hasSentAuth)
 		{
 			
 			if(this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"] && 
-			this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"]["mechanisms"]["PLAIN"])
+			   this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"]["mechanisms"]["PLAIN"])
 			{
 				this.sendPlainAuth("poll");
 			}
 			else
 			{
-				console.error("zxmpp::stream::handleConnection(): plain authentication mechanism unsupported. giving up");
+				console.error("zxmpp::authPlain::doStep(): plain authentication mechanism unsupported. giving up");
 
 				this.zxmpp.stream.terminate();
 	
@@ -43,6 +42,24 @@ zxmppClass.prototype.authPlain = function (zxmpp)
 			}
 			
 		}
+	}
+	this.handleChallenge = function zxmppAuthPlain_handleChallenge(xml)
+	{
+		// PLAIN should never have to handle a challenge.
+		// For now, we just won't respond to the challenge.
+		console.log("zxmpp::authPlain::handleChallenge: ignoring challenge!");
+	}
+	this.handleSuccess = function zxmppAuthPlain_handleSuccess(xml)
+	{
+		this.authSuccess = true;
+	}
+	this.handleFailure = function zxmppAuthPlain_handleFailure(xml)
+	{
+		this.authSuccess = false;
+	}
+	this.handleAbort = function zxmppAuthPlain_handleAbort(xml)
+	{
+		this.authSuccess = false;
 	}
 	this.sendPlainAuth = function zxmppAuthPlain_sendPlainAuth()
 	{
@@ -65,11 +82,10 @@ zxmppClass.prototype.authPlain = function (zxmpp)
 		this.hasSentAuth=true;
 		packet.send();
 	}
-
-	this.parseXML = function zxmppAuthPlain_parseXML(xml)
+	this.authSucceeded = function zxmppAuthPLain_authSucceeded()
 	{
+		return this.authSuccess;
 	}
-
 	this.toJSON = function zxmppAuthPlain_toJSON(key)
 	{
 
