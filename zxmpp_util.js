@@ -258,8 +258,24 @@ zxmppClass.prototype.util = function (zxmpp)
 	
 		return output.toString();
 	}
+
+	this.decodeHex = function(hex)
+	{
+		var str = '';
+		for (var i = 0; i < hex.length; i += 2)
+			str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+		return str;
+	}
 	
-	
+	this.md5 = function(msg, as_binary)
+	{
+		//return MD5(msg).toLowerCase();
+
+		if(!as_binary)
+			return MD5.hexdigest(msg);
+		else
+			return MD5.hash(msg);
+	}
 	
 	
 	// webtoolkit.info/javascript-sha1.html

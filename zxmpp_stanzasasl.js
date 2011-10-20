@@ -29,14 +29,10 @@ zxmppClass.prototype.stanzaSASL = function(zxmpp)
 			
 			{
 				var code = "saslfailure";
-				if(xml.firstChild)
-				{
-					code+="/"+xml.firstChild.nodeName;
-				}
-				
 				var humanreadable = "SASL authentication failure.";
 				if(xml.firstChild)
 				{
+					code+="/"+xml.firstChild.nodeName;
 					switch(xml.firstChild.nodeName)
 					{
 						case "not-authorized":
@@ -48,6 +44,17 @@ zxmppClass.prototype.stanzaSASL = function(zxmpp)
 						break;
 					}
 				}
+
+				for(var i in xml.childNodes)
+				{
+					var child = xml.childNodes[i];
+					if(child && child.nodeName == "text")
+					{
+						if(child.firstChild && child.firstChild.nodeValue)
+							humanreadable += "\n\nServer message: " + child.firstChild.nodeValue;
+					}
+				}
+
 				this.zxmpp.notifyConnectionTerminate(code, humanreadable);
 			}
 			

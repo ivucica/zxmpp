@@ -19,7 +19,8 @@ function zxmppGetZXMPPScripts()
 		'zxmpp_stanzasasl.js',
 		'zxmpp_stanzamessage.js',
 
-		'zxmpp_authplain.js'
+		'zxmpp_authplain.js',
+		'zxmpp_authdigestmd5.js'
 		);
 }
 
@@ -30,6 +31,7 @@ function zxmppGetAllScripts()
 	$scripts[] = 'jquery.min.js';
 	$scripts[] = 'deepCopy.js';
 	$scripts[] = 'stacktrace.js';
+	$scripts[] = 'md5_2.js';
 
 	return $scripts;
 }
