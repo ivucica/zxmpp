@@ -16,8 +16,10 @@ function zxmppGetZXMPPScripts()
 		'zxmpp_stanzaiq.js',
 		'zxmpp_stanzapresence.js',
 		'zxmpp_stanzastreamfeatures.js',
-		'zxmpp_stanzasaslresult.js',
-		'zxmpp_stanzamessage.js'
+		'zxmpp_stanzasasl.js',
+		'zxmpp_stanzamessage.js',
+
+		'zxmpp_authplain.js'
 		);
 }
 

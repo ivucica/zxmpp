@@ -10,8 +10,8 @@
  * international copyright laws.
  */
  
-// handling of "features" in namespace "http://etherx.jabber.org/streams"
-zxmppClass.prototype.stanzaSaslResult = function(zxmpp)
+// handling of stanzas in namespace "urn:ietf:params:xml:ns:xmpp-sasl"
+zxmppClass.prototype.stanzaSASL = function(zxmpp)
 {
 	this.zxmpp = zxmpp;
 	
