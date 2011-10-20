@@ -481,9 +481,16 @@ zxmppClass.prototype.stream = function (zxmpp)
 	this.handleConnection = function zxmppStream_handleConnection(conn)
 	{
 		var packet = new this.zxmpp.packet(this.zxmpp);
-		if(!packet.parseXML(conn.responseXML)) // packet not intended for further processing
+		try
 		{
-			return;
+			if(!packet.parseXML(conn.responseXML)) // packet not intended for further processing
+			{
+				return;
+			}
+		}
+		catch(e)
+		{
+			console.error(e);
 		}
 		
 		if(!this.hasSentAuth)
