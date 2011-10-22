@@ -23,8 +23,40 @@ Opera, Firefox.
 
 It is expected that the client will cover at least XEP-0242: XMPP Client
 Compliance 2009 Core Client profile. Of course, almost anything goes that
-doesn't require out of bound connections (since they're a bit... tricky to do
-in Javascript, you'll surely agree).
+doesn't require additional socket connections (since they're a bit... tricky
+to do in Javascript, you'll surely agree).
+
+Z-XMPP has been tested with the following BOSH connection managers:
+
+* [ejabberd](http://ejabberd.im/)'s connection manager
+* [Prosody](http://prosody.im/)'s connection manager
+* [Punjab](http://punjab.sourceforge.net/)
+
+Z-XMPP has been tested with the following XMPP server software:
+
+* [ejabberd](http://ejabberd.im/)
+* [Prosody](http://prosody.im/)
+* [Google Talk](http://talk.google.com/)
+* [Facebook Chat](http://www.facebook.com/help/?page=1164)
+
+### Version 1.0 ###
+
+Following SASL authentication methods are partially or fully supported:
+
+* PLAIN
+* DIGEST-MD5
+
+Following XEPs are partially or fully supported:
+
+* XEP-0030: Service Discovery
+* XEP-0054: vcard-temp
+* XEP-0085: Chat State Notifications
+* XEP-0092: Software Version
+* XEP-0115: Entity Capabilities
+* XEP-0124: Bidirectional-streams Over Synchronous HTTP (BOSH)
+* XEP-0206: XMPP Over BOSH
+
+There may be additional features supported, but not documented.
 
 ## License ##
 
@@ -45,5 +77,5 @@ Patches and good natured criticism can be directed to <zxmpp@vucica.net>.
 
 - - -
 
-Copyright 2010 Ivan Vučica
+Copyright 2010-2011 Ivan Vučica
 
