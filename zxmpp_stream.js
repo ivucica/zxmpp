@@ -628,7 +628,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		var packet = new this.zxmpp.packet(this.zxmpp);
 		var iq = new this.zxmpp.stanzaIq(this.zxmpp);
 		
-		iq.appendIqToPacket(packet, "bind", "set", this.zxmpp.cfg["domain"]);
+		iq.appendIqToPacket(packet, "bind", "set", false); // "to" is not set, since Prosody is strict. Not setting "to" makes iq relate to the account, setting "to" to the hostname makes iq relate to server.
 		iq.appendBindToPacket(packet, "Z-XMPP" + Math.floor(Math.random() * 1000));
 		
 		this.hasSentBind=true;
