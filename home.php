@@ -4,7 +4,7 @@
 
 This is the home page of Z-XMPP available on:
 http://ivan.vucica.net/zxmpp/
-I doubt you want to use it :)
+I doubt you want to use it for your installation of Z-XMPP :)
 
 -->
 <html>
@@ -14,7 +14,7 @@ I doubt you want to use it :)
 <body>
 
 <h1>Z-XMPP</h1>
-<h2>XMPP client/library written in Javascript</h2>
+<h2>XMPP client/library written in JavaScript</h2>
 <hr>
 
 <h3>What does it do?</h3>
@@ -22,7 +22,7 @@ I doubt you want to use it :)
 <p>
 It's an <a href="http://xmpp.org/about-xmpp/technology-overview/">XMPP</a>
 (also known as Jabber) client. 
-It's written in Javascript and it's able to serialize (most of) its 
+It's written in JavaScript and it's able to serialize (most of) its 
 state. This is done so that making use of the latest innovations in HTML5 such
 as <code>sessionStorage</code> is not only possible, but is recommended. By 
 serializing the state using <code>sessionStorage</code> and restoring it upon 
@@ -46,7 +46,7 @@ rudimentary and poorly written) UI. This means you can either use it as a
 client, or as a library, or even both.
 </p>
 
-<h3>How to get it? How to contribute?</h3>
+<h3>How to get it?</h3>
 <p>
 Client is currently hosted on 
 <a href="http://bitbucket.org/ivucica/zxmpp/">http://bitbucket.org/ivucica/zxmpp/</a>. See instructions on BitBucket to see how to get the code using Mercurial,
@@ -54,6 +54,11 @@ or just download an archive of the current snapshot of the code from
 BitBucket's web interface.
 </p>
 
+<ul>
+<li><a href="downloads/zxmpp-1.0.tar.gz">Version 1.0</a> - released on Oct/22/2011, 13:35 CET</li>
+</ul>
+
+<h3>How to contribute?</h3>
 <p>
 <b>To contribute</b> to the development effort:
 <ul>
@@ -75,7 +80,7 @@ most people; otherwise, the field is yours!
 
 <h3>How was it implemented?</h3>
 <p>
-This client is written in pure Javascript. It communicates with the server 
+This client is written in pure JavaScript. It communicates with the server 
 using two <code>XMLHTTPRequest</code>-based connections, in accordance to the 
 <a href="http://xmpp.org/about-xmpp/technology-overview/bosh/">BOSH</a> 
 specifications: <a href="http://xmpp.org/extensions/xep-0124.html">XEP-0124</a> 

@@ -3,11 +3,11 @@
 For more info, visit <http://ivan.vucica.net/zxmpp/>.
 
 ## What is it? ##
-This is an implementation of an XMPP client in Javascript. It uses BOSH concept 
+This is an implementation of an XMPP client in JavaScript. It uses BOSH concept 
 of HTTP binding as defined by XEP-0124 and XEP-0206. 
 
 It is a semi-structured hack, assembled not so much as a planned effort by 
-a Javascript expert; it's more of a thing that's here just to serve its purpose,
+a JavaScript expert; it's more of a thing that's here just to serve its purpose,
 and that purpose is luckily for its internals to be pretty. So hacker: beware!
 
 ## Goal ##
@@ -24,7 +24,7 @@ Opera, Firefox.
 It is expected that the client will cover at least XEP-0242: XMPP Client
 Compliance 2009 Core Client profile. Of course, almost anything goes that
 doesn't require additional socket connections (since they're a bit... tricky
-to do in Javascript, you'll surely agree).
+to do in JavaScript, you'll surely agree).
 
 Z-XMPP has been tested with the following BOSH connection managers:
 
@@ -74,6 +74,8 @@ XMPP server on your web site.
 ## Contributing ##
 
 Patches and good natured criticism can be directed to <zxmpp@vucica.net>.
+
+You can also contact me via <xmpp:ivucica@gmail.com>
 
 - - -
 
