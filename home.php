@@ -17,6 +17,14 @@ I doubt you want to use it for your installation of Z-XMPP :)
 <h2>XMPP client/library written in JavaScript</h2>
 <hr>
 
+<h3>Screenshot</h3>
+<img src="screenshot.png" alt="(A screenshot of ZXMPP)">
+<p>
+While primarily an XMPP library that preserves connection between page 
+switches, Z-XMPP also includes an ugly user interface component for
+instant messaging. It appears as a bar on the bottom of the screen.
+</p>
+
 <h3>What does it do?</h3>
 
 <p>
