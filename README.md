@@ -70,20 +70,33 @@ Please read the [LICENSE](LICENSE) to see current use terms.
 
 ## Installation ##
 
-To see how to set up `demo.php` to work, and to see how to add Z-XMPP to your
-web site, see [README](README.md).
+Here's how to set up `demo.php` to work.
+
+1. Start up a server such as ejabberd or Prosody. Enable BOSH in it by
+referring to the server's manual. Alternatively, set up a connection
+manager for BOSH (a BOSH service that acts as a proxy to the real XMPP
+server). A good connection manager is Punjab.
+2. Get your HTTP server to forward requests from a directory in the
+same domain and port that your site (or `demo.php`) is hosted on.
+If you use Apache, `.htaccess` shipping with Z-XMPP is a good starting 
+point. This is required due to Javascript cross-domain scripting
+access policies on modern browsers, which would prevent Z-XMPP
+and any other Javascript XMPP library from accessing the actual BOSH 
+server directly.
+3. Edit `demo.php` to point to the directory that now redirects to
+the proper path and port of your BOSH server.
 
 These instructions can, of course, be improved, and the author will be
 happy to answer your questions on how to get Z-XMPP to connect to your
-XMPP server on your web site.
+XMPP server on your web site (to the extent of his ability, of course).
 
 ## Contributing ##
 
 Patches and good natured criticism can be directed to <zxmpp@vucica.net>.
 
-You can also contact me via <xmpp:ivucica@gmail.com>
+You can also contact me via [xmpp:ivucica@gmail.com](xmpp:ivucica@gmail.com)
 
 - - -
 
-Copyright 2010-2011 Ivan Vučica
+Copyright 2010-2012 Ivan Vučica
 
