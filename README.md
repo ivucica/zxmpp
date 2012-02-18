@@ -23,7 +23,7 @@ Opera, Firefox.
 
 While primarily an XMPP library that preserves connection between page switches, Z-XMPP also includes an ugly user interface component for instant messaging. It appears as a bar on the bottom of the screen.
 
-![Screenshot of Z-XMPP UI](screenshot.png)
+![Screenshot of Z-XMPP UI](http://ivan.vucica.net/zxmpp/screenshot.png)
 
 ## Compatibility ##
 
