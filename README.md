@@ -19,6 +19,12 @@ reconnection upon unloading the page and reloading it.
 Another goal is to support major standards-based browsers: Safari, Chrome,
 Opera, Firefox.
 
+## User interface ##
+
+While primarily an XMPP library that preserves connection between page switches, Z-XMPP also includes an ugly user interface component for instant messaging. It appears as a bar on the bottom of the screen.
+
+![Screenshot of Z-XMPP UI](screenshot.png)
+
 ## Compatibility ##
 
 It is expected that the client will cover at least XEP-0242: XMPP Client
