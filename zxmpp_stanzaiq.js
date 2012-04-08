@@ -44,7 +44,8 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			var child = xml.childNodes[i];
 			if(!child.nodeName) continue;
 			
-			this.zxmpp.util.easierAttrs(child);
+			if(child.nodeName != "#text")
+				this.zxmpp.util.easierAttrs(child);
 				
 			switch(child.nodeName)
 			{
@@ -115,7 +116,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 					this.zxmpp.notifyRosterUpdate(rosteritem);
 				}
 				break;
-				
+
 				default:
 				console.warn("zxmpp::stanzaIq::parseXML(): Unknown child " + child.nodeName);
 				this.iqFail();
@@ -363,7 +364,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 						// remember in db:
 						askingIq.extDest[askingIq.inquiringExt] = child.attr["var"];
 				
-						if(!this.zxmpp.vCards[presence.bareJid])
+						if(this.zxmpp.vCards[presence.bareJid] == undefined)
 						{
 							console.warn("Now requesting vcard for " + presence.bareJid);
 							this.zxmpp.stream.sendIqVCardRequest(presence.bareJid);
