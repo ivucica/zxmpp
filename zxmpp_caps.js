@@ -166,9 +166,13 @@ zxmppClass.prototype.caps = function(zxmpp)
 				'http://jabber.org/protocol/chatstates'
 				];
 
+		this.featuresExt = {};
 		for(var ext in this.zxmpp.clientFeatureExtensions)
 		{
-			this.featuresExt[ext] = this.zxmpp.clientFeatureExtensions[ext];
+			if(!this.zxmpp.clientFeatureExtensionsDisabled[ext])
+			{
+				this.featuresExt[ext] = this.zxmpp.clientFeatureExtensions[ext];
+			}
 		}
 	}
 

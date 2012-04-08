@@ -49,6 +49,10 @@ foreach(zxmppGetAllScripts() as $fn)
 	echo '<script type="text/javascript" src="' . $zxp . $fn . '"></script>' . "\n";
 }
 
+foreach(zxmppGetScriptsForExtensions() as $fn)
+{
+	echo '<script type="text/javascript" src="' . $zxp . $fn . '"></script>' . "\n";
+}
 ?>
 </head>
 <body onunload="unloadhandler();" onload="loadhandler();">
@@ -98,7 +102,7 @@ function createzxmpp()
 	zxmpp.addIqParser("jingle#urn:xmpp:jingle:1", handler_jingle); // we could also register just "jingle", but this is more specific!
 	zxmpp.clientDebugMode = true; // currently only randomizes clientVersion to facilitate easier switching of caps
 
-	// register desired extensions
+	// we could register additions extensions this way
 	var fakeGingle=false;
 	var fakeJingle=false;
 	var fakeiChatAV=false;
@@ -144,6 +148,10 @@ function createzxmpp()
 		zxmpp.clientFeatureExtensions["avavail"] = ["apple:iq:vc:available"];
 		zxmpp.clientFeatureExtensions["video"] = ["apple:iq:vc:video"];
 	}
+
+	// setup Z-XMPP extensions
+	zxmpp_xep0166_init(zxmpp);
+
 	window.zxmppui = new zxmpp.ui;
 	window.zxmppui.backend = zxmpp;
 	window.zxmppui.inject('body');

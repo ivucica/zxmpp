@@ -50,6 +50,7 @@ function zxmppClass()
 
 	// registerable client feature extensions
 	this.clientFeatureExtensions = {}
+	this.clientFeatureExtensionsDisabled = {}
 }
 
 zxmppClass.prototype.init = function zxmppMain_init(configDict)
@@ -81,6 +82,19 @@ zxmppClass.prototype.main = function zxmppMain_main(configDict, username, passwo
 	this.stream.establish();	
 }
 
+zxmppClass.prototype.disableClientFeatureExtension = function zxmppMain_disableClientFeatureExtension(name)
+{
+	this.clientFeatureExtensionsDisabled[name] = true;
+	if(this.stream && this.stream.hasSentInitialPresence)
+		this.stream.sendCurrentPresence();
+}
+zxmppClass.prototype.enableClientFeatureExtension = function zxmppMain_enableClientFeatureExtension(name)
+{
+	delete this.clientFeatureExtensionsDisabled[name];
+	if(this.stream && this.stream.hasSentInitialPresence)
+		this.stream.sendCurrentPresence();
+}
+
 zxmppClass.prototype.addIqParser = function zxmppMain_addIqParser(key, parser)
 {
 	if(!this.iqParsers[key])
@@ -97,6 +111,9 @@ zxmppClass.prototype.getPresence = function zxmppMain_getPresence(fullJid)
 	var bareJid = jid[0];
 	var resource = jid[1];
 	
+	if(!resource)
+		console.error("DANGER: A bare jid passed to zxmppMain_getPresence()");
+
 	if(!this.presences[bareJid])
 		this.presences[bareJid] = {};
 	if(this.presences[bareJid][resource])

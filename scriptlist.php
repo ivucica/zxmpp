@@ -36,6 +36,13 @@ function zxmppGetAllScripts()
 	return $scripts;
 }
 
+function zxmppGetScriptsForExtensions()
+{
+	return array(
+		'extensions/xep-0166-jingle.js'
+	);
+}
+
 function zxmppGetStylesheets()
 {
 	return array("application.css");

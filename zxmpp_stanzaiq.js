@@ -37,8 +37,24 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		this.iqXML = xml;
 		
 		//var from_barejid = this.from.split("/")[0];
-		var presence = this.zxmpp.getPresence(this.from);
 		
+		var presence;
+		if(this.from && this.from.indexOf("@"))
+		{
+			// from a user
+			if(this.from.indexOf("/") >= 0)
+			{
+				// a full jid
+				presence = this.zxmpp.getPresence(this.from);
+			}
+			else
+			{
+				// a bare jid
+				presence = this.zxmpp.getTopPresenceForBareJid(this.from);
+				console.error("Iq from barejid");
+				console.log(xml);
+			}
+		}
 		for(var i in xml.childNodes)
 		{
 			var child = xml.childNodes[i];
@@ -164,14 +180,11 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				}
 			}
 		}
-		
-		switch(this.type)
-		{
-			case "result":
-			case "error":
+	
+		if(this.id && this.zxmpp.stream.iqsAwaitingReply[this.id])
+		{	
+			console.log("removing iqsawaitingreply " + this.id);
 			delete this.zxmpp.stream.iqsAwaitingReply[this.id];
-			break;
-			default:
 		}
 	}
 	
