@@ -97,6 +97,52 @@ function createzxmpp()
 	zxmpp.onPacket.push(handler_packet);
 	zxmpp.clientDebugMode = true; // currently only randomizes clientVersion to facilitate easier switching of caps
 
+	// register desired extensions
+	var fakeGingle=false;
+	var fakeJingle=false;
+	var fakeiChatAV=false;
+	if(fakeGingle)
+	{
+		// must be "voice-v1", "video-v1" and "camera-v1".
+		// allowed to mix these
+		zxmpp.clientFeatureExtensions["voice-v1"]=["http://www.google.com/xmpp/protocol/voice/v1"];
+		zxmpp.clientFeatureExtensions["video-v1"]=["http://www.google.com/xmpp/protocol/video/v1"];
+		zxmpp.clientFeatureExtensions["camera-v1"]=["http://www.google.com/xmpp/protocol/camera/v1"];
+	}
+	if(fakeJingle)
+	{
+		// commonly under "core client features"
+		zxmpp.clientFeatureExtensions["jingle"]=[
+			"urn:xmpp:jingle:1", 
+			"urn:xmpp:jingle:transports:ice-udp:1", 
+			"urn:xmpp:jingle:apps:rtp:1", 
+			"urn:xmpp:jingle:apps:rtp:audio", 
+			"urn:xmpp:jingle:apps:rtp:video"
+		];
+	}
+	if(fakeiChatAV)
+	{
+		// these are core iChat features, not extensions
+		zxmpp.clientFeatureExtensions["AppleiChatAV"] = [
+			"apple:profile:bundle-transfer",
+			"apple:profile:efh-transfer",
+			"apple:profile:transfer-extensions:rsrcfork",
+			"http://www.apple.com/xmpp/message-attachments"];;
+
+		// these are iChat extensions
+		zxmpp.clientFeatureExtensions["ice"] = ["apple:iq:vc:ice"];
+		zxmpp.clientFeatureExtensions["recauth"] = ["apple:iq:vc:recauth"];
+		zxmpp.clientFeatureExtensions["rdserver"] = ["apple:iq:rd:server"];
+		zxmpp.clientFeatureExtensions["maudio"] = ["apple:iq:vc:multiaudio"];
+		zxmpp.clientFeatureExtensions["audio"] = ["apple:iq:vc:audio"];
+		zxmpp.clientFeatureExtensions["rdclient"] = ["apple:iq:rd:client"];
+		zxmpp.clientFeatureExtensions["mvideo"] = ["apple:iq:vc:multivideo"];
+		zxmpp.clientFeatureExtensions["auxvideo"] = ["apple:iq:vc:auxvideo"];
+		zxmpp.clientFeatureExtensions["rdmuxing"] = ["apple:iq:rd:muxing"];
+		zxmpp.clientFeatureExtensions["avcap"] = ["apple:iq:vc:capable"];
+		zxmpp.clientFeatureExtensions["avavail"] = ["apple:iq:vc:available"];
+		zxmpp.clientFeatureExtensions["video"] = ["apple:iq:vc:video"];
+	}
 	window.zxmppui = new zxmpp.ui;
 	window.zxmppui.backend = zxmpp;
 	window.zxmppui.inject('body');

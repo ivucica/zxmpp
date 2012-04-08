@@ -44,6 +44,9 @@ function zxmppClass()
 	this.clientOS = navigator.userAgent;
 	this.clientURL = "http://ivan.vucica.net/zxmpp/";
 	this.clientDebugMode = false; // randomize version sent as part of caps
+
+	// registerable client feature extensions
+	this.clientFeatureExtensions = {}
 }
 
 zxmppClass.prototype.init = function zxmppMain_init(configDict)

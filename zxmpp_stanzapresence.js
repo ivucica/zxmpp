@@ -178,7 +178,7 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 		// finally, add our caps!
 		var presence = this.zxmpp.getPresence(this.from);
 		var caps = presence.caps;
-		//TODO: caps.usethisclientdefaults()
+		caps.applyThisClientsCaps();
 		caps.appendToXML(packet, presenceNode);
 		
 		packet.presenceXML = presenceNode;

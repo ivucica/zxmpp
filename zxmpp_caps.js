@@ -143,13 +143,12 @@ zxmppClass.prototype.caps = function(zxmpp)
 		}
 	}
 
-
-	this.appendToXML = function zxmppCaps_appendToXML(packet, xml)
+	this.applyThisClientsCaps = function zxmpp_applyThisClientsCaps()
 	{
 		// FIXME currently we add constant values.
 		// we should actually add values stored in this caps instance!
 		// idea: function "this.useThisClientDefaults" which'll set defaults
-	
+
 		if(!this.ver)
 		{
 			this.ver = this.zxmpp.clientVersion;
@@ -167,33 +166,15 @@ zxmppClass.prototype.caps = function(zxmpp)
 				'http://jabber.org/protocol/chatstates'
 				];
 
-/*
-		// FIXME we're faking jingle support
-		// the only one we truly support in this list is disco#info
-		this.features = ["urn:xmpp:jingle:1", "urn:xmpp:jingle:transports:ice-udp:1", "urn:xmpp:jingle:apps:rtp:1", "urn:xmpp:jingle:apps:rtp:audio", "http://jabber.org/protocol/disco#info"];
-		this.featuresExt["voice-v1"]=["http://www.google.com/xmpp/protocol/voice/v1"];
-		this.featuresExt["video-v1"]=["http://www.google.com/xmpp/protocol/video/v1"];
-		this.featuresExt["camera-v1"]=["http://www.google.com/xmpp/protocol/camera/v1"];
+		for(var ext in this.zxmpp.clientFeatureExtensions)
+		{
+			this.featuresExt[ext] = this.zxmpp.clientFeatureExtensions[ext];
+		}
+	}
 
-		// FIXME also faking ichat support
-		this.features.push("apple:profile:bundle-transfer");
-		this.features.push("apple:profile:efh-transfer");
-		this.features.push("apple:profile:transfer-extensions:rsrcfork");
-		this.features.push("http://www.apple.com/xmpp/message-attachments");
-		this.featuresExt["ice"] = ["apple:iq:vc:ice"];
-		this.featuresExt["recauth"] = ["apple:iq:vc:recauth"];
-		this.featuresExt["rdserver"] = ["apple:iq:rd:server"];
-		this.featuresExt["maudio"] = ["apple:iq:vc:multiaudio"];
-		this.featuresExt["audio"] = ["apple:iq:vc:audio"];
-		this.featuresExt["rdclient"] = ["apple:iq:rd:client"];
-		this.featuresExt["mvideo"] = ["apple:iq:vc:multivideo"];
-		this.featuresExt["auxvideo"] = ["apple:iq:vc:auxvideo"];
-		this.featuresExt["rdmuxing"] = ["apple:iq:rd:muxing"];
-		this.featuresExt["avcap"] = ["apple:iq:vc:capable"];
-		this.featuresExt["avavail"] = ["apple:iq:vc:available"];
-		this.featuresExt["video"] = ["apple:iq:vc:video"];
-*/		
-
+	this.appendToXML = function zxmppCaps_appendToXML(packet, xml)
+	{
+	
 		var extString = "";
 		for(var ftr in this.featuresExt)
 		{
