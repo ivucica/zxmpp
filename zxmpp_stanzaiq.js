@@ -162,20 +162,25 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 					return parsedOk;
 				}
 
-				var parserId = child.nodeName + "#" + child.attr["xmlns"];
+				// TODO
+				// Here, we replaced child.nodeName with child.localName,
+				// and child.attr["xmlns"] with child.namespaceURI.
+				// However, that's not all! We also need to do this
+				// all over the code.
+
+				var parserId = child.localName + "#" + child.namespaceURI;
 				var parsedOk = false;
 				parsedOk = __parseWithParserId(parserId);
 				if(!parsedOk)
 				{
-					parserId = child.nodeName;
+					parserId = child.localName;
 					parsedOk = __parseWithParserId(parserId);
 				}
 
 				
-
 				if(!parsedOk)
 				{
-					console.warn("zxmpp::stanzaIq::parseXML(): Unhandled child " + child.nodeName);
+					console.warn("zxmpp::stanzaIq::parseXML(): Unhandled child " + child.nodeName + " (" + child.nodeName + " in " + child.prefix + " / " + child.namespaceURI + ")");
 					this.iqFail();
 				}
 			}
