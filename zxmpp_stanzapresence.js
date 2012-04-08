@@ -34,10 +34,24 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 		this.to = xml.attr["to"];
 		this.type = xml.attr["type"];
 
-		if(this.from.indexOf("/") < 0)
-			console.error("DANGER! Presence arrived from " + this.from + ", a bare jid");
+		var presence;
+		if(this.from && this.from.indexOf("@"))
+		{
+			// from a user
+			if(this.from.indexOf("/") >= 0)
+			{
+				// a full jid
+				presence = this.zxmpp.getPresence(this.from);
+			}
+			else
+			{
+				// a bare jid
+				presence = this.zxmpp.getTopPresenceForBareJid(this.from);
+				console.warn("Presence from barejid");
+				console.log(xml);
+			}
+		}
 
-		var presence = this.zxmpp.getPresence(this.from);
 		presence.show = "avail";
 		if(this.type == "unavailable" || this.type == "error")
 		{

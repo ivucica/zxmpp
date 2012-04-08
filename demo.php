@@ -70,8 +70,12 @@ foreach(zxmppGetScriptsForExtensions() as $fn)
 <button onclick="reserialize();">reserialize</button>
 <button onclick="restore();">restore</button>
 <button onclick="terminate();">unclean terminate</button>
+<button onclick="enablevideo();">enable video</button>
+<button onclick="enableaudio();">enable audio</button>
 <button onclick="enablenotifications();" style="display: none;" id="notificationsbtn">enable webkit notifications</button>
+<br>
 <textarea cols="80" rows="15" id="serialized_output"></textarea>
+<video id="monitor"></video><audio id="player"></audio>
 <script defer="defer">
 var zxmpp;
 function createzxmpp()
@@ -211,6 +215,59 @@ function loadhandler_delayed()
 		console.log("No session storage");
 	}
 }
+
+
+function enablevideo()
+{
+	if(!navigator.webkitGetUserMedia)
+	{
+		alert("No WebRTC support");
+		return;
+	}
+	navigator.webkitGetUserMedia("video", videoGotStream, videoNoStream);
+}
+function enableaudio()
+{
+	if(!navigator.webkitGetUserMedia)
+	{
+		alert("No WebRTC support");
+		return;
+	}
+	navigator.webkitGetUserMedia("audio", audioGotStream, audioNoStream);
+}
+function videoGotStream(stream)
+{
+	var monitor = document.getElementById("monitor");
+	monitor.src = webkitURL.createObjectURL(stream);
+	monitor.onerror = function()
+	{
+		monitor.stop();
+		alert("Video error");
+	}
+
+	monitor.play();
+}
+function videoNoStream()
+{
+	alert("No video support");
+}
+function audioGotStream(stream)
+{
+	var player = document.getElementById("player");
+	player.src = webkitURL.createObjectURL(stream);
+	player.onerror = function()
+	{
+		player.stop();
+		alert("Audio error");
+	}
+
+	player.play();
+}
+function audioNoStream()
+{
+	alert("No audio support");
+}
+
 function terminate()
 {
 	zxmpp.stream.terminate();

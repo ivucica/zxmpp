@@ -51,7 +51,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			{
 				// a bare jid
 				presence = this.zxmpp.getTopPresenceForBareJid(this.from);
-				console.error("Iq from barejid");
+				console.warn("Iq from barejid");
 				console.log(xml);
 			}
 		}
@@ -183,7 +183,6 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 	
 		if(this.id && this.zxmpp.stream.iqsAwaitingReply[this.id])
 		{	
-			console.log("removing iqsawaitingreply " + this.id);
 			delete this.zxmpp.stream.iqsAwaitingReply[this.id];
 		}
 	}
