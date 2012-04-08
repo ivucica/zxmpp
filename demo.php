@@ -158,6 +158,19 @@ function createzxmpp()
 
 	// setup Z-XMPP extensions
 	zxmpp_xep0166_init(zxmpp);
+	zxmpp_gingle_init(zxmpp);
+
+	if(webrtc_audiostream)
+	{
+		zxmpp.enableClientFeatureExtension("jingle-audio");
+		zxmpp.enableClientFeatureExtension("voice-v1");
+	}
+	if(webrtc_videostream)
+	{
+		zxmpp.enableClientFeatureExtension("jingle-video");
+		zxmpp.enableClientFeatureExtension("video-v1");
+		zxmpp.enableClientFeatureExtension("camera-v1");
+	}
 
 	window.zxmppui = new zxmpp.ui;
 	window.zxmppui.backend = zxmpp;
@@ -253,28 +266,53 @@ function videoGotStream(stream)
 	monitor.src = webkitURL.createObjectURL(stream);
 	monitor.onerror = function()
 	{
+		webrtc_videostream = null;
 		monitor.stop();
 		alert("Video error");
+		if(zxmpp)
+		{
+			zxmpp.disableClientFeatureExtension("jingle-video");
+			zxmpp.disableClientFeatureExtension("video-v1");
+			zxmpp.disableClientFeatureExtension("camera-v1");
+		}
 	}
 
 	monitor.play();
-	zxmpp.enableClientFeatureExtension("jingle-video");
+	if(zxmpp)
+	{
+		zxmpp.enableClientFeatureExtension("jingle-video");
+		zxmpp.enableClientFeatureExtension("video-v1");
+		zxmpp.enableClientFeatureExtension("camera-v1");
+	}
 }
 function videoNoStream()
 {
 	alert("No video support");
-	zxmpp.disableClientFeatureExtension("jingle-video");
+	if(zxmpp)
+	{
+		zxmpp.disableClientFeatureExtension("jingle-video");
+		zxmpp.disableClientFeatureExtension("video-v1");
+		zxmpp.disableClientFeatureExtension("camera-v1");
+	}
 }
 function audioGotStream(stream)
 {
 	webrtc_audiostream = stream;
 
-	zxmpp.enableClientFeatureExtension("jingle-audio");
+	if(zxmpp)
+	{
+		zxmpp.enableClientFeatureExtension("jingle-audio");
+		zxmpp.enableClientFeatureExtension("voice-v1");
+	}
 }
 function audioNoStream()
 {
 	alert("No audio support");
-	zxmpp.disableClientFeatureExtension("jingle-audio");
+	if(zxmpp)
+	{
+		zxmpp.disableClientFeatureExtension("jingle-audio");
+		zxmpp.disableClientFeatureExtension("voice-v1");
+	}
 }
 
 function call()

@@ -39,7 +39,8 @@ function zxmppGetAllScripts()
 function zxmppGetScriptsForExtensions()
 {
 	return array(
-		'extensions/xep-0166-jingle.js'
+		'extensions/xep-0166-jingle.js',
+		'extensions/xep-xxxx-gingle.js'
 	);
 }
 
