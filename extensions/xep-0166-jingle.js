@@ -76,7 +76,7 @@ function zxmpp_xep0166_sessioninitiate(zxmpp, destination, sessionId, contentXML
 	var jingleNode = packet.xml.createElementNS("urn:xmpp:jingle:1", "jingle");
 	packet.iqXML.appendChild(jingleNode);
 	jingleNode.setAttribute("action", "session-initiate");
-	jingleNode.setAttribute("action", "initiator");
+	jingleNode.setAttribute("initiator", zxmpp.getOwnPresence().fullJid);
 	jingleNode.setAttribute("sid", sessionId);
 
 
