@@ -94,6 +94,8 @@ function createzxmpp()
 	zxmpp.onPresenceUpdate.push(handler_presenceupdate);
 	zxmpp.onRosterUpdate.push(handler_rosterupdate);
 	zxmpp.onMessage.push(handler_message);
+	zxmpp.onPacket.push(handler_packet);
+	zxmpp.clientDebugMode = true; // currently only randomizes clientVersion to facilitate easier switching of caps
 
 	window.zxmppui = new zxmpp.ui;
 	window.zxmppui.backend = zxmpp;
@@ -343,6 +345,29 @@ function handler_message(sender, messagestanza)
 	}
 
 	zxmppui.messageStanzaReceived(messagestanza);
+}
+function handler_packet(sender, packet)
+{	
+	if(packet && packet.incomingStanza && packet.incomingStanza.iqXML)
+	{
+		for(var childId in packet.incomingStanza.iqXML.childNodes)
+		{
+			var child = packet.incomingStanza.iqXML.childNodes[childId];
+
+			if(child.nodeName == "jingle")
+			{
+				// do whatever you want ;-)
+
+				// note that the iq may or may not be handled, and 
+				// the error may or may not be dispatched already.
+				// act accordingly. this mechanism is not really a
+				// good way to implement jingle, considering zxmpp
+				// has already dispatched an iq error message.
+
+			}
+		}
+	}
+
 }
 
 // for use in notifications:

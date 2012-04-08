@@ -327,7 +327,7 @@ zxmppClass.prototype.packet = function (zxmpp)
 				stanzaInstance.parseXML(child);
 			}
 			
-			
+			this.incomingStanza = stanzaInstance;
 		}
 		return true;
 	}

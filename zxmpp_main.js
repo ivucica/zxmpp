@@ -27,6 +27,7 @@ function zxmppClass()
 	this.onPresenceUpdate = [];
 	this.onRosterUpdate = [];
 	this.onMessage = [];
+	this.onPacket = [];
 	
 	/****************
 	 * client state *
@@ -231,6 +232,19 @@ zxmppClass.prototype.notifyMessage = function zxmppMain_notifyMessage(messageSta
 			messageHandler(this, messageStanza);
 	}
 }
+zxmppClass.prototype.notifyPacket = function zxmppMain_notifyPacket(thePacket)
+{
+	
+	for(var packetHandlerId in this.onPacket)
+	{
+		var packetHandler = this.onPacket[packetHandlerId];
+		if(packetHandler.func)
+			packetHandler.func(packetHandler.context, this, thePacket);
+		else
+			packetHandler(this, thePacket);
+	}
+}
+
 
 
 zxmppClass.prototype.sendMessage = function zxmppMain_sendMessage(to, body)

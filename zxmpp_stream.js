@@ -487,6 +487,9 @@ zxmppClass.prototype.stream = function (zxmpp)
 			{
 				return;
 			}
+
+			this.zxmpp.notifyPacket(packet);
+
 		}
 		catch(e)
 		{
