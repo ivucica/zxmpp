@@ -29,6 +29,9 @@ function zxmppClass()
 	this.onMessage = [];
 	this.onPacket = [];
 	
+	// additional iq parsers
+	this.iqParsers = {}
+
 	/****************
 	 * client state *
 	 ****************/
@@ -76,6 +79,14 @@ zxmppClass.prototype.main = function zxmppMain_main(configDict, username, passwo
 	this.setPassword(password);
 	
 	this.stream.establish();	
+}
+
+zxmppClass.prototype.addIqParser = function zxmppMain_addIqParser(key, parser)
+{
+	if(!this.iqParsers[key])
+		this.iqParsers[key] = [];
+
+	this.iqParsers[key].push(parser);
 }
 
 zxmppClass.prototype.getPresence = function zxmppMain_getPresence(fullJid)

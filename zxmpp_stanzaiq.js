@@ -118,8 +118,50 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				break;
 
 				default:
-				console.warn("zxmpp::stanzaIq::parseXML(): Unknown child " + child.nodeName);
-				this.iqFail();
+
+				var __parseWithParserId = function zxmpp_stanzaiq_parseWithParserId(parserId)
+				{
+					var parsedOk = false;
+					try
+					{
+						if(this.zxmpp.iqParsers && this.zxmpp.iqParsers[parserId] && this.zxmpp.iqParsers[parserId].length)
+						{
+							var parsers = this.zxmpp.iqParsers[parserId];
+							for(var i in parsers)
+							{
+								var parser = parsers[i];
+								if(parser.func)
+									parsedOk = parsedOk || parser.func(parser.context, this.zxmpp, this, child);
+								else
+									parsedOk = parsedOk || parser(this.zxmpp, this, child);
+								if(parsedOk)
+									break;
+							}
+						}
+					}
+					catch(e)
+					{
+						console.log(e);
+					}
+					return parsedOk;
+				}
+
+				var parserId = child.nodeName + "#" + child.attr["xmlns"];
+				var parsedOk = false;
+				parsedOk = __parseWithParserId(parserId);
+				if(!parsedOk)
+				{
+					parserId = child.nodeName;
+					parsedOk = __parseWithParserId(parserId);
+				}
+
+				
+
+				if(!parsedOk)
+				{
+					console.warn("zxmpp::stanzaIq::parseXML(): Unhandled child " + child.nodeName);
+					this.iqFail();
+				}
 			}
 		}
 		

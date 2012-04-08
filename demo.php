@@ -95,6 +95,7 @@ function createzxmpp()
 	zxmpp.onRosterUpdate.push(handler_rosterupdate);
 	zxmpp.onMessage.push(handler_message);
 	zxmpp.onPacket.push(handler_packet);
+	zxmpp.addIqParser("jingle#urn:xmpp:jingle:1", handler_jingle); // we could also register just "jingle", but this is more specific!
 	zxmpp.clientDebugMode = true; // currently only randomizes clientVersion to facilitate easier switching of caps
 
 	// register desired extensions
@@ -414,6 +415,13 @@ function handler_packet(sender, packet)
 		}
 	}
 
+}
+function handler_jingle(sender, iqStanza, xml)
+{	
+	// this might be a good place to implement jingle.
+	// however, instead, it's better to implement it as
+	// a plugin instead of in your own code.
+	return false;
 }
 
 // for use in notifications:
