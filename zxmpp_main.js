@@ -51,7 +51,7 @@ function zxmppClass()
 
 	// client info
 	this.clientName = "Z-XMPP";
-	this.clientVersion = "1.0";
+	this.clientVersion = "1.1";
 	this.clientOS = navigator.userAgent;
 	this.clientURL = "http://ivan.vucica.net/zxmpp/";
 	this.clientDebugMode = false; // randomize version sent as part of caps

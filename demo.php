@@ -86,22 +86,26 @@ function createzxmpp()
 	var zatecfg = {
 		"bind-url": "punjab-bind/", //"z-http-bind/",
 		"route": "xmpp:zatemas.zrs.hr:5222",
-		"domain": "zatemas.zrs.hr"
+		"domain": "zatemas.zrs.hr",
+		"boshwait": 15
 	};
 	var relativecfg = {
 		"bind-url": "http-bind/",
 		"route": "xmpp:" + window.location.hostname + ":5222",
-		"domain": window.location.hostname
+		"domain": window.location.hostname,
+		"boshwait": 15
 	};
 	var gtalkcfg = {
 		"bind-url": "punjab-bind/",
 		"route": "xmpp:talk.google.com:5222",
-		"domain": "gmail.com"
+		"domain": "gmail.com",
+		"boshwait": 15
 	}
 	var localpunjabcfg = {
 		"bind-url": "punjab-bind/",
 		"route": "xmpp:" + window.location.hostname + ":5222",
-		"domain": window.location.hostname
+		"domain": window.location.hostname,
+		"boshwait": 15
 	}
 	var cfg = relativecfg;
 	//cfg = localpunjabcfg;

@@ -81,7 +81,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		var body = packet.xml_body;
 		
 		body.setAttribute('ver','1.6');
-		body.setAttribute('wait','120');
+		body.setAttribute('wait',this.zxmpp.cfg['boshwait'] ? this.zxmpp.cfg['boshwait'] : 120);
 		body.setAttribute('xmpp:version','1.0');
 		body.setAttribute('hold','1');
 		body.setAttribute('secure','false');
