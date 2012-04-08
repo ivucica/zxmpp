@@ -60,10 +60,10 @@ function zxmpp_xep0166_iqhandler(zxmpp, iqstanza, xml)
 	return true;
 }
 
-function zxmpp_xep0166_sessioninitiate(zxmpp, destination)
+function zxmpp_xep0166_sessioninitiate(zxmpp, destination, sessionId, contentXMLGenerator)
 {
 	if(destination.indexOf("/") >= 0)
-		destination = destination.substr(destination.indexOf("/"));
+		destination = destination.substr(0,destination.indexOf("/"));
 	var topPresence = zxmpp.getTopPresenceForBareJid(destination);
 	if(topPresence && topPresence.fullJid)
 		destination = topPresence.fullJid;
@@ -77,7 +77,12 @@ function zxmpp_xep0166_sessioninitiate(zxmpp, destination)
 	packet.iqXML.appendChild(jingleNode);
 	jingleNode.setAttribute("action", "session-initiate");
 	jingleNode.setAttribute("action", "initiator");
-	jingleNode.setAttribute("sid", "13597159173951"); // TODO this supports only one session
+	jingleNode.setAttribute("sid", sessionId);
+
+
+	var contentXML = contentXMLGenerator(zxmpp, destination, sessionId, packet);
+	jingleNode.appendChild(contentXML);
+
 	packet.send("poll");
 }
 

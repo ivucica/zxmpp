@@ -34,7 +34,7 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 		this.to = xml.attr["to"];
 		this.type = xml.attr["type"];
 
-		var presence;
+		var presence = new Object(); // dummy object in case below fails
 		if(this.from && this.from.indexOf("@"))
 		{
 			// from a user
@@ -46,8 +46,8 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 			else
 			{
 				// a bare jid
-				presence = this.zxmpp.getTopPresenceForBareJid(this.from);
 				console.warn("Presence from barejid");
+				presence = this.zxmpp.getTopPresenceForBareJid(this.from);
 				console.log(xml);
 			}
 		}
@@ -59,15 +59,12 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 			this.zxmpp.notifyPresenceUpdate(presence);
 			this.zxmpp.removePresence(this.from);
 			
-			
 			return; // FIXME we should not return and should continue parsing; showing the <status> upon logout might be fun
 		}
-
 		this.presenceNode = presence;
 		this.show = presence.show = "avail";
 		this.status = presence.status = "";
 
-		//console.log("Got presence from " + this.from);
 		for(var i in xml.childNodes)
 		{
 			var child = xml.childNodes[i];

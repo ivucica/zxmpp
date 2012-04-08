@@ -23,6 +23,7 @@ function zxmppClass()
 	this.stream = new this.stream(this);
 	
 	// Event handlers
+	// this is not stored nor restored by design!
 	this.onConnectionTerminate = [];
 	this.onPresenceUpdate = [];
 	this.onRosterUpdate = [];
@@ -30,16 +31,23 @@ function zxmppClass()
 	this.onPacket = [];
 	
 	// additional iq parsers
+	// this is not stored nor restored by design!
 	this.iqParsers = {}
 
 	/****************
 	 * client state *
 	 ****************/
+	// these must be stored and restored!
 	this.presences = {}; // maps barejid => list of presences
 	this.capsNodes = {}; // maps fulljid => features
 	this.capsNodesExt = {}; // maps fulljid => extensions => features
 	this.roster = {}; // maps barejid => group => rosteritem 
 	this.vCards = []; // maps barejid => vcard
+	
+	// registerable client feature extensions
+	// these are not stored and restored by design!
+	this.clientFeatureExtensions = {}
+	this.clientFeatureExtensionsDisabled = {}
 
 	// client info
 	this.clientName = "Z-XMPP";
@@ -48,9 +56,6 @@ function zxmppClass()
 	this.clientURL = "http://ivan.vucica.net/zxmpp/";
 	this.clientDebugMode = false; // randomize version sent as part of caps
 
-	// registerable client feature extensions
-	this.clientFeatureExtensions = {}
-	this.clientFeatureExtensionsDisabled = {}
 }
 
 zxmppClass.prototype.init = function zxmppMain_init(configDict)
@@ -85,14 +90,12 @@ zxmppClass.prototype.main = function zxmppMain_main(configDict, username, passwo
 zxmppClass.prototype.disableClientFeatureExtension = function zxmppMain_disableClientFeatureExtension(name)
 {
 	this.clientFeatureExtensionsDisabled[name] = true;
-	if(this.stream && this.stream.hasSentInitialPresence)
-		this.stream.sendCurrentPresence();
+	this.transmitOwnPresence();
 }
 zxmppClass.prototype.enableClientFeatureExtension = function zxmppMain_enableClientFeatureExtension(name)
 {
 	delete this.clientFeatureExtensionsDisabled[name];
-	if(this.stream && this.stream.hasSentInitialPresence)
-		this.stream.sendCurrentPresence();
+	this.transmitOwnPresence();
 }
 
 zxmppClass.prototype.addIqParser = function zxmppMain_addIqParser(key, parser)
@@ -165,9 +168,9 @@ zxmppClass.prototype.removePresence = function zxmppMain_removePresence(fullJid)
 	var jid = fullJid.split("/");
 	var bareJid = jid[0];
 	var resource = jid[1];
-
-	delete this.presences[bareJid][resource];
-	if(this.presences[bareJid].length==0) // FIXME this doesnt seem to work
+	if(resource)
+		delete this.presences[bareJid][resource];
+	if(this.presences[bareJid] && this.presences[bareJid].length==0) // FIXME this doesnt seem to work
 		delete this.presences[bareJid];
 }
 
@@ -295,10 +298,14 @@ zxmppClass.prototype.setOwnPresence = function zxmppMain_setOwnPresence(show, st
 	presence.status = status;
 	presence.priority = priority;
 
+	this.transmitOwnPresence();
+}
+zxmppClass.prototype.transmitOwnPresence = function zxmppMain_transmitOwnPresence()
+{
 	if(this.stream && this.stream.hasSentInitialPresence)
 		this.stream.sendCurrentPresence();
 	else
-		console.log("Not sending pres");
+		console.log("Not sending presence since there is either no stream or initial presence wasn't already sent");
 }
 
 zxmppClass.prototype.serialized = function zxmppMain_serialized()

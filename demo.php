@@ -72,16 +72,19 @@ foreach(zxmppGetScriptsForExtensions() as $fn)
 <button onclick="terminate();">unclean terminate</button>
 <button onclick="enablevideo();">enable video</button>
 <button onclick="enableaudio();">enable audio</button>
-<button onclick="enablenotifications();" style="display: none;" id="notificationsbtn">enable webkit notifications</button>
+<button onclick="enablenotifications();" style="display: none;" id="notificationsbtn">enable webkit notifications</button><br>
+<input id="calldestination"><button onclick="call();">call</button>
 <br>
 <textarea cols="80" rows="15" id="serialized_output"></textarea>
 <video id="monitor"></video><audio id="player"></audio>
 <script defer="defer">
 var zxmpp;
+var webrtc_videostream;
+var webrtc_audiostream;
 function createzxmpp()
 {
 	var zatecfg = {
-		"bind-url": "punjab-bind", //"z-http-bind/",
+		"bind-url": "punjab-bind/", //"z-http-bind/",
 		"route": "xmpp:zatemas.zrs.hr:5222",
 		"domain": "zatemas.zrs.hr"
 	};
@@ -206,6 +209,13 @@ function loadhandler_delayed()
 		{
 			createzxmpp();
 			zxmpp.deserialize(window.sessionStorage["zxmpp"]);
+
+			// because features may have changed between loads,
+			// you may want to consider retransmitting presence
+			// even if no other property changed.
+
+			
+
 			return;
 		}
 		//go();
@@ -237,6 +247,8 @@ function enableaudio()
 }
 function videoGotStream(stream)
 {
+	webrtc_videostream = stream;
+
 	var monitor = document.getElementById("monitor");
 	monitor.src = webkitURL.createObjectURL(stream);
 	monitor.onerror = function()
@@ -246,27 +258,72 @@ function videoGotStream(stream)
 	}
 
 	monitor.play();
+	zxmpp.enableClientFeatureExtension("jingle-video");
 }
 function videoNoStream()
 {
 	alert("No video support");
+	zxmpp.disableClientFeatureExtension("jingle-video");
 }
 function audioGotStream(stream)
 {
-	var player = document.getElementById("player");
-	player.src = webkitURL.createObjectURL(stream);
-	player.onerror = function()
-	{
-		player.stop();
-		alert("Audio error");
-	}
+	webrtc_audiostream = stream;
 
-	player.play();
+	zxmpp.enableClientFeatureExtension("jingle-audio");
 }
 function audioNoStream()
 {
 	alert("No audio support");
+	zxmpp.disableClientFeatureExtension("jingle-audio");
 }
+
+function call()
+{
+	var contentGenerator = function demo_call_contentGen(zxmpp, destination, sessionId, packet)
+	{
+		console.log("content gen");
+		var contentNode = packet.xml.createElementNS("urn:xmpp:jingle:1", "content");
+		contentNode.setAttribute("name", "call");
+		contentNode.setAttribute("creator", "initiator");
+		contentNode.setAttribute("senders", "both");
+		
+		var descriptionNode = packet.xml.createElementNS("urn:xmpp:jingle:apps:rtp:1", "description");
+		contentNode.appendChild(descriptionNode);
+		descriptionNode.setAttribute("media", "audio");
+		var payloadNode = packet.xml.createElementNS("urn:xmpp:jingle:apps:rtp:1", "payload-type");
+		descriptionNode.appendChild(payloadNode);
+		payloadNode.setAttribute("id", "110");
+		payloadNode.setAttribute("name", "SPEEX");
+		payloadNode.setAttribute("clockrate", "16000");
+
+		var transportNode = packet.xml.createElementNS("urn:xmpp:jingle:transports:ice-udp:1", "transport");
+		contentNode.appendChild(transportNode);
+		transportNode.setAttribute("pwd", "iLJD6bqjXfrAq1N6ILEDxW"); // FIX THIS
+		transportNode.setAttribute("ufrag", "Zzk8"); // FIX THIS
+		var candidateNode = packet.xml.createElementNS("urn:xmpp:jingle:transports:ice-udp:1", "transport");
+		transportNode.appendChild(candidateNode);
+		candidateNode.setAttribute("component", "1");
+		candidateNode.setAttribute("foundation", "1");
+		candidateNode.setAttribute("generation", "0");
+		candidateNode.setAttribute("id", "daofaf"); // FIX THIS
+		candidateNode.setAttribute("ip", "127.0.0.1"); // FIX THIS
+		candidateNode.setAttribute("network", "1");
+		candidateNode.setAttribute("port", "4552");
+		candidateNode.setAttribute("priority", "4589572");
+		candidateNode.setAttribute("protocol", "udp");
+		candidateNode.setAttribute("type", "host");
+
+			
+		return contentNode;
+	}
+
+	zxmpp_xep0166_sessioninitiate(
+			zxmpp, 
+			document.getElementById("calldestination").value,
+			/* session id */ Math.round(Math.random()*10000),
+			contentGenerator);
+}
+
 
 function terminate()
 {
@@ -408,6 +465,14 @@ function handler_presenceupdate(sender, presence)
 	
 	if(presence.show == "avail")
 		shownotification(undefined, presence.fullJid + " is now online", presence.status);
+
+	/////////////////////
+	// development hack:
+
+	// to facilitate easier testing of call functionality,
+	// last presence to send presence update will be filled into
+	// the call destination inputbox.
+	document.getElementById("calldestination").value = presence.fullJid;
 }
 function handler_rosterupdate(sender, item)
 {
