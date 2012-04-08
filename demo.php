@@ -98,7 +98,13 @@ function createzxmpp()
 		"route": "xmpp:talk.google.com:5222",
 		"domain": "gmail.com"
 	}
+	var localpunjabcfg = {
+		"bind-url": "punjab-bind/",
+		"route": "xmpp:" + window.location.hostname + ":5222",
+		"domain": window.location.hostname
+	}
 	var cfg = relativecfg;
+	//cfg = localpunjabcfg;
 
 	zxmpp = new zxmppClass();
 	zxmpp.onConnectionTerminate.push(handler_connectionterminate);
@@ -139,7 +145,7 @@ function createzxmpp()
 			"apple:profile:bundle-transfer",
 			"apple:profile:efh-transfer",
 			"apple:profile:transfer-extensions:rsrcfork",
-			"http://www.apple.com/xmpp/message-attachments"];;
+			"http://www.apple.com/xmpp/message-attachments"];
 
 		// these are iChat extensions
 		zxmpp.clientFeatureExtensions["ice"] = ["apple:iq:vc:ice"];

@@ -825,12 +825,14 @@ zxmppClass.prototype.stream = function (zxmpp)
 	this.wakeUp = function zxmppStream_wakeUp()
 	{
 		this.reuseRIDs = this.sentUnrespondedRIDs;
-		if(0) 
+		if(1) 
 		{
+			// use this with punjab and prosody
 			this.reuseKeys = []; 
 		} 
 		else
 		{
+			// use this with ejabberd and prosody
 			this.reuseKeys = this.sentUnrespondedKeys; // <== Key reusing must be done with ejabberd, but not with punjab.
 			// perhaps punjab insists that the packets are completely the same, not just the key+rid, like it seems to be with ejabberd?
 		}
