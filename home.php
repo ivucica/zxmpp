@@ -199,15 +199,13 @@ My personal want-to-do minilist, in order of necessity:
 <ul>
 <li>serialize UI state, not just stream state</li>
 <li>create a Prosody-like plugin API, and rewrite existing code to use it</li>
-<li>support something else except <code>PLAIN</code> authentication</li>
 <li>add <code>ANONYMOUS</code> authentication</li>
 <li>rewrite UI (or accept a contribution of a rewritten UI)</li>
 <li>fix bugs in <code>BUGS</code> file :-)</li>
 </ul>
 
 <h3>Licensing</h3>
-<p>Currently a custom license is used, although a switch to AGPL will probably
-occur soon. See the LICENSE file in the repository.</p>
+<p>Currently LGPLv2. See LICENSE for details, and in case something changed.</p>
 
 <h3>Author &amp; contact</h3>
 <p>Ivan Vučica<br>
@@ -216,6 +214,6 @@ http://ivan.vucica.net/<br>
 http://blog.vucica.net/<br>
 http://twitter.com/ivucica</p>
 
-<h6>&copy; 2010 Ivan Vučica</h6>
+<h6>&copy; 2010-2012 Ivan Vučica</h6>
 </body>
 </html>
