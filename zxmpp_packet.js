@@ -55,11 +55,14 @@ zxmppClass.prototype.packet = function (zxmpp)
 		// assign cryptographic key(s) from 
 		// part 15 of XEP-0124
 		var keys = this.zxmpp.stream.assignKey();
+		console.warn("CURRENTLY DISABLED cryptographic key from part 15 of XEP-0124");
+		console.warn("This seems to solve misbehavior with punjab, but is incorrect!");
+		/*
 		if(keys.key)
 			body.setAttribute('key', keys.key);
 		if(keys.newKey)
 			body.setAttribute('newkey', keys.newKey);
-		
+		*/
 		console.log("(finalized: " + this.zxmpp.util.serializedXML(this.xml) + ")");	
 		return this.zxmpp.util.serializedXML(this.xml);
 		
@@ -76,10 +79,10 @@ zxmppClass.prototype.packet = function (zxmpp)
 		}
 		else
 		{
-			//setTimeout(function(){
+			setTimeout(function(){
 				tthis.zxmpp.stream.pollPacketQueue.push(tthis);
 				tthis.zxmpp.stream.tryEmptyingPollQueue();
-			//}, 400*(1+tthis.zxmpp.stream.pollPacketQueue.length));
+			}, 400*(1+tthis.zxmpp.stream.sentUnrespondedRIDs.length));
 		}
 	}
 	

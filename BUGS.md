@@ -17,3 +17,13 @@ with, but not limited to, jingle (prefix jin:), gingle (prefix ses:), etc.
 
 Result: some otherwise handleable traffic is not understood by the client
 
+## BOSH cryptographic key is disabled to placate Punjab ##
+
+Punjab tolerates rids coming out of order, but not keys coming out of order.
+This is why the key is temporarily disabled. Disabling it should be
+exposed via an API.
+
+Also, a report needs to be filed with author of Punjab.
+
+Result: MITM is possible.
+
