@@ -57,6 +57,20 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				console.log(xml);
 			}
 		}
+		
+		if(this.id && this.zxmpp.stream.iqsAwaitingReply[this.id])
+		{
+			var originalStanza = this.zxmpp.stream.iqsAwaitingReply[this.id];
+			if(originalStanza.onReply && originalStanza.onReply.length)
+			{
+				for(var i in originalStanza.onReply)
+				{
+					var callback = originalStanza.onReply[i];
+					callback(this.zxmpp, originalStanza, this);
+				}
+			}
+
+		}
 		for(var i in xml.childNodes)
 		{
 			var child = xml.childNodes[i];
@@ -159,7 +173,9 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 					}
 					catch(e)
 					{
-						console.log(e);
+						console.error(e);
+						console.error(e.message);
+						console.error(e.stack);
 					}
 					return parsedOk;
 				}
@@ -190,15 +206,6 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 	
 		if(this.id && this.zxmpp.stream.iqsAwaitingReply[this.id])
 		{
-			var originalStanza = this.zxmpp.stream.iqsAwaitingReply[this.id];
-			if(originalStanza.onReply && originalStanza.onReply.length)
-			{
-				for(var i in originalStanza.onReply)
-				{
-					var callback = originalStanza.onReply[i];
-					callback(this.zxmpp, originalStanza, this);
-				}
-			}
 
 			delete this.zxmpp.stream.iqsAwaitingReply[this.id];
 		}
