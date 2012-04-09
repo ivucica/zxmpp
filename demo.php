@@ -60,9 +60,9 @@ foreach(zxmppGetScriptsForExtensions() as $fn)
 <body onunload="unloadhandler();" onload="loadhandler();">
 <div id="zxmpp_root"></div>
 
-<a href="?a=<?=$_GET["a"] ? int($_GET["a"])+1 : ""?>">advance</a><br>
+<a href="?a=<?=isset($_GET["a"]) ? int($_GET["a"])+1 : "0"?>">advance</a><br>
 
-<input id="usr" value="perica"><input type="password" id="pwd" value="123">
+<input id="usr" value="<?=isset($_GET["usr"]) ? $_GET["usr"] : "perica"?>"><input type="password" id="pwd" value="<?=isset($_GET["pwd"]) ? $_GET["pwd"] : "123"?>">
 
 <button onclick="go();">go</button>
 <button onclick="dumppresences();">dump presences</button>
@@ -103,14 +103,13 @@ function createzxmpp()
 		"domain": "gmail.com",
 		"boshwait": 15
 	}
-	var localpunjabcfg = {
+	var punjabcfg = {
 		"bind-url": "punjab-bind/",
-		"route": "xmpp:" + window.location.hostname + ":5222",
-		"domain": window.location.hostname,
+		"route": "xmpp:" + <?=isset($_GET["route"]) ? '"' . $_GET["route"] . '"' : "window.location.hostname"?> + ":5222",
+		"domain": <?=isset($_GET["domain"]) ? '"' . $_GET["domain"] . '"' : "window.location.hostname"?>,
 		"boshwait": 15
 	}
-	var cfg = relativecfg;
-	//cfg = localpunjabcfg;
+	var cfg = <?=isset($_GET["cfg"]) ? $_GET["cfg"] : "relativecfg"?>;
 
 	zxmpp = new zxmppClass();
 	zxmpp.onConnectionTerminate.push(handler_connectionterminate);
@@ -350,13 +349,18 @@ function jingleSendSignaling(sdp)
 
 		audioContent.appendChild(transportNode);
 		*/
+		//audioContent.setAttribute("senders", "both");
 		return audioContent;
 	}
+
+
+	console.log("this: " + this);
 	zxmpp_xep0166_sessioninitiate(
 			zxmpp, 
 			document.getElementById("calldestination").value,
-			/* session id */ Math.round(Math.random()*10000),
-			contentGenerator);
+			/* session id */ "a" + Math.round(Math.random()*10000),
+			contentGenerator,
+			jingleCall);
 }
 var jingleCall;
 function call()

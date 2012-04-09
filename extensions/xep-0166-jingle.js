@@ -12,36 +12,13 @@
  * international copyright laws.
  */
 
-var zxmpp_xep0166_PeerConnection = false;
+var zxmpp_xep0166_webrtcPeerConnections = {};
 function zxmpp_xep0166_init(zxmpp)
 {
-	/*
-	try
-	{
-		new PeerConnection("", function(){});
-		zxmpp_xep0166_PeerConnection = PeerConnection;
-	}
-	catch (e)
-	{
-		zxmpp_xep0166_PeerConnection = webkitDeprecatedPeerConnection;
-	}
-
-	try
-	{
-		new zxmpp_xep0166_PeerConnection("", function(){});
-	}
-	catch (e)
-	{
-		zmpp_xep0166_PeerConnection = false;
-	}
-	*/
-
-
-
 	zxmpp.clientFeatureExtensions["jingle"]=[
 		"urn:xmpp:jingle:1", 
 	];
-	if(zxmpp_xep0166_PeerConnection)
+	if(navigator.webkitUserMedia)
 	{
 		zxmpp.clientFeatureExtensions["jingle-ice"] = ["urn:xmpp:jingle:transports:ice-udp:1"];
 		zxmpp.clientFeatureExtensions["jingle-rtp"] = ["urn:xmpp:jingle:apps:rtp:1"];
@@ -58,10 +35,30 @@ function zxmpp_xep0166_init(zxmpp)
 function zxmpp_xep0166_iqhandler(zxmpp, iqstanza, xml)
 {
 	console.log(xml);
-	return true;
+	var sessionId = xml.attr["sid"];
+	console.log(zxmpp_xep0166_webrtcPeerConnections);
+	var peerConnection = zxmpp_xep0166_webrtcPeerConnections[sessionId];
+	console.log("Action " + xml.attr["action"] + ", pc: " + peerConnection + " sid " + sessionId);
+	if(	(xml.attr["action"] == "session-initiate" && peerConnection) ||// if initiating, this block handles only if connection already exists
+		xml.attr["action"] == "session-accept" || 
+		xml.attr["action"] == "transport-info")
+	{
+		var packet = new zxmpp.packet(zxmpp);
+		var iq = new zxmpp.stanzaIq(zxmpp);
+		iq.appendIqToPacket(packet, "jingle", "result", iqstanza.from);
+		packet.send();
+
+		
+		var sdp = SDPToJingle.parseJingleStanza(zxmpp.util.serializedXML(xml));
+		peerConnection.processSignalingMessage(sdp);
+		return true;
+	}
+	
+	console.error("XEP-0166: DID NOT PARSE " + xml.attr["action"]);
+	return false;
 }
 
-function zxmpp_xep0166_sessioninitiate(zxmpp, destination, sessionId, contentXMLGenerator)
+function zxmpp_xep0166_sessioninitiate(zxmpp, destination, sessionId, contentXMLGenerator, webrtcPeerConnection)
 {
 	if(destination.indexOf("/") >= 0)
 		destination = destination.substr(0,destination.indexOf("/"));
@@ -70,13 +67,22 @@ function zxmpp_xep0166_sessioninitiate(zxmpp, destination, sessionId, contentXML
 		destination = topPresence.fullJid;
 	console.log(topPresence);
 	console.log(destination);
-	var packet = new this.zxmpp.packet(this.zxmpp);
-	var iq = new this.zxmpp.stanzaIq(this.zxmpp);
+	var packet = new zxmpp.packet(zxmpp);
+	var iq = new zxmpp.stanzaIq(zxmpp);
 	iq.appendIqToPacket(packet, "jingle", "set", destination);
 	iq.onReply.push(function(zxmpp, original, response)
+	{
+		if(response.type == "error")
 		{
-			console.error("////////////////// Call being negotiated");
+			console.log("Error in making a call");
+			webrtcPeerConnection.close();
 		}
+		else
+		{
+			console.log("REMEMBERING " + sessionId);
+			zxmpp_xep0166_webrtcPeerConnections[sessionId.toString()] = webrtcPeerConnection;
+		}
+	}
 	);
 
 	var jingleNode = packet.xml.createElementNS("urn:xmpp:jingle:1", "jingle");
