@@ -3,3 +3,4 @@ syntax: glob
 *.smultronProject
 jquery.min.js
 trackme.php
+sdpToJingle/*

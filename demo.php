@@ -23,7 +23,9 @@ I suggest you start looking at the onload handler, the function 'loadhandler()'.
 <title>Z-XMPP</title>
 
 <link href="application.css" rel="stylesheet" type="text/css">
-
+<script>
+var module;
+</script>
 <!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>-->
 
 <?php
@@ -325,8 +327,35 @@ function audioNoStream()
 	}
 }
 
+function jingleSendSignaling(sdp)
+{
+	if(!zxmpp) zxmpp = new zxmppClass();
+	console.log("SHOULD SEND SIGNALIN");
+	console.log(sdp);
+	translation = SDPToJingle.createJingleStanza(sdp);
+	var audioDoc = zxmpp.util.parsedXMLDocument(translation.audio);
+	var audioContent = audioDoc.firstChild;
+	audioDoc.removeChild(audioContent);
+	
+	var contentGenerator = function demo_call_contentGen(zxmpp, destination, sessionId, packet)
+	{
+		return audioContent;
+	}
+	zxmpp_xep0166_sessioninitiate(
+			zxmpp, 
+			document.getElementById("calldestination").value,
+			/* session id */ Math.round(Math.random()*10000),
+			contentGenerator);
+}
+
 function call()
 {
+	var jingleCall = new /*zmpp_xep0166_PeerConnection*/ webkitDeprecatedPeerConnection("STUN stun.l.google.com:19302", jingleSendSignaling);
+	if(webrtc_videostream) jingleCall.addStream(webrtc_videostream);
+	if(webrtc_audiostream) jingleCall.addStream(webrtc_audiostream);
+	console.log("made jingle call");
+
+	return;
 	var contentGenerator = function demo_call_contentGen(zxmpp, destination, sessionId, packet)
 	{
 		console.log("content gen");

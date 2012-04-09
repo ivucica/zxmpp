@@ -15,6 +15,7 @@
 var zxmpp_gingle_PeerConnection = false;
 function zxmpp_gingle_init(zxmpp)
 {
+	/*
 	try
 	{
 		new PeerConnection("", function(){});
@@ -33,7 +34,7 @@ function zxmpp_gingle_init(zxmpp)
 	{
 		zmpp_gingle_PeerConnection = false;
 	}
-
+	*/
 
 
 	zxmpp.clientFeatureExtensions["voice-v1"]=["http://www.google.com/xmpp/protocol/voice/v1"];

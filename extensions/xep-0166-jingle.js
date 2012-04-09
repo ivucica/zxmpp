@@ -15,6 +15,7 @@
 var zxmpp_xep0166_PeerConnection = false;
 function zxmpp_xep0166_init(zxmpp)
 {
+	/*
 	try
 	{
 		new PeerConnection("", function(){});
@@ -33,7 +34,7 @@ function zxmpp_xep0166_init(zxmpp)
 	{
 		zmpp_xep0166_PeerConnection = false;
 	}
-
+	*/
 
 
 

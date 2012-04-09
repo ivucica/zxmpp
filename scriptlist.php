@@ -32,6 +32,7 @@ function zxmppGetAllScripts()
 	$scripts[] = 'deepCopy.js';
 	$scripts[] = 'stacktrace.js';
 	$scripts[] = 'md5_2.js';
+	$scripts[] = 'sdptojingle.js';
 
 	return $scripts;
 }
