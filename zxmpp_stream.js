@@ -259,10 +259,14 @@ zxmppClass.prototype.stream = function (zxmpp)
 		
 		if(conn) console.log("Sending " + send_style + " with pollqueue " + this.pollPacketQueue.length + ": " + this.zxmpp.util.serializedXML(packet.xml));
 
-		var ridTooFarApart = this.sentUnrespondedRIDs.length && this.assignRID(true)-this.sentUnrespondedRIDs[0]>1;
+		var punjabHackDiff = this.hasSentInitialPresence ? 1 : 0;
+
+		var assignedRid = this.assignRID(true);
+		var ridTooFarApart = this.sentUnrespondedRIDs.length && assignedRid-this.sentUnrespondedRIDs[0]>punjabHackDiff;
 		if(ridTooFarApart)
 		{
-			console.log("Would send for RID " + this.assignRID(true) + "; but last received is too far apart: " + (this.sentUnrespondedRIDs[0] ? this.sentUnrespondedRIDs[0] : "nil"));
+			console.log("Would send for RID " + assignedRid + "; but last received is too far apart: " + (this.sentUnrespondedRIDs[0] ? this.sentUnrespondedRIDs[0] : "nil") + " - diff " + (assignedRid-this.sentUnrespondedRIDs[0]));
+			return false;
 		}
 		if(conn && !ridTooFarApart && (send_style=="hold" || (send_style == "poll" && (this.pollPacketQueue.length == 0 ||sending_from_queue) )))
 		{

@@ -66,18 +66,20 @@ zxmppClass.prototype.packet = function (zxmpp)
 	}
 	
 	this.send = function zxmppPacket_send(send_style)
-	{	
-		
+	{
+		tthis = this;
 		// queue for wire
 		// FIXME ignores send_style!
 		if(send_style=="hold")
 		{
-			this.zxmpp.stream.transmitPacket(this, send_style);
+			tthis.zxmpp.stream.transmitPacket(tthis, send_style);
 		}
 		else
 		{
-			this.zxmpp.stream.pollPacketQueue.push(this);
-			this.zxmpp.stream.tryEmptyingPollQueue();
+			//setTimeout(function(){
+				tthis.zxmpp.stream.pollPacketQueue.push(tthis);
+				tthis.zxmpp.stream.tryEmptyingPollQueue();
+			//}, 500);
 		}
 	}
 	
@@ -210,7 +212,6 @@ zxmppClass.prototype.packet = function (zxmpp)
 						break;
 					}
 					this.zxmpp.notifyConnectionTerminate(code, humanreadable);
-					
 					
 				}
 				return false;
