@@ -39,9 +39,12 @@ function zxmpp_xep0166_iqhandler(zxmpp, iqstanza, xml)
 	console.log(zxmpp_xep0166_webrtcPeerConnections);
 	var peerConnection = zxmpp_xep0166_webrtcPeerConnections[sessionId];
 	console.log("Action " + xml.attr["action"] + ", pc: " + peerConnection + " sid " + sessionId);
-	if(	(xml.attr["action"] == "session-initiate" && peerConnection) ||// if initiating, this block handles only if connection already exists
+	if(	peerConnection && (
+		xml.attr["action"] == "session-initiate" || // this block handles only if connection already exists
 		xml.attr["action"] == "session-accept" || 
-		xml.attr["action"] == "transport-info")
+		xml.attr["action"] == "transport-info"
+		)
+	  )
 	{
 		var packet = new zxmpp.packet(zxmpp);
 		var iq = new zxmpp.stanzaIq(zxmpp);
@@ -50,6 +53,7 @@ function zxmpp_xep0166_iqhandler(zxmpp, iqstanza, xml)
 
 		
 		var sdp = SDPToJingle.parseJingleStanza(zxmpp.util.serializedXML(xml));
+		console.log("SDP: " + sdp);
 		peerConnection.processSignalingMessage(sdp);
 		return true;
 	}
@@ -81,6 +85,7 @@ function zxmpp_xep0166_sessioninitiate(zxmpp, destination, sessionId, contentXML
 		{
 			console.log("REMEMBERING " + sessionId);
 			zxmpp_xep0166_webrtcPeerConnections[sessionId.toString()] = webrtcPeerConnection;
+			webrtcPeerConnection.onaddstream = zxmpp_xep0166_addstream;
 		}
 	}
 	);
@@ -98,3 +103,8 @@ function zxmpp_xep0166_sessioninitiate(zxmpp, destination, sessionId, contentXML
 	packet.send("poll");
 }
 
+function zxmpp_xep0166_addstream(stream)
+{
+	console.error("STREAM ADDED");
+	console.log(stream);
+}
