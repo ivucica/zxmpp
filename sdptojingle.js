@@ -231,7 +231,7 @@ var SDPToJingle = (function() {
 		_getXmlDoc = function(text) {
 			var parser;
 			if (typeof window !== 'undefined' && window.DOMParser) {
-				parser = new DOMParser();
+				parser = new window.DOMParser();
 				return parser.parseFromString(text,"text/xml");
 			} else if(typeof window !== 'undefined' && window.ActiveXObject) { // Internet Explorer
 				parser = new ActiveXObject("Microsoft.XMLDOM");
@@ -394,7 +394,7 @@ var SDPToJingle = (function() {
 				media = null,
 				description = _generateEmptyDescription(),
 				hasSdpMessage = false;
-			for(var y = 0, len = children.length; y < len; y++) {
+			for(var y in children) {
 				if (children[y].tagName === 'content') {
 					hasSdpMessage = true;
 					var content = children[y];
