@@ -268,7 +268,7 @@ var SDPToJingle = (function() {
 			for(var i = 0, len = stanza.childNodes.length; i < len; i++) {
 				if (stanza.childNodes.hasOwnProperty(i)) {
 					child = stanza.childNodes[i];
-					switch(child.tagName) {
+					switch(child.localName) {
 						case 'payload-type':
 							description.rtpmap.push(_unserializeAttributes(child));
 							break;
@@ -347,7 +347,7 @@ var SDPToJingle = (function() {
 				var crypto = description.crypto[i];
 				cryptoStr += "\\r\\na=crypto:" + crypto.tag + " " + crypto['crypto-suite'] +
 					" " + crypto['key-params'] + " ";
-				if(crypto['session-params'].length) {
+				if(crypto['session-params'] && crypto['session-params'].length) {
 					cryptoStr += crypto['session-params'];
 				}
 			}
@@ -395,17 +395,27 @@ var SDPToJingle = (function() {
 				description = _generateEmptyDescription(),
 				hasSdpMessage = false;
 			for(var y in children) {
-				if (children[y].tagName === 'content') {
+				if (children[y].localName === 'content') {
 					hasSdpMessage = true;
+
+
+					// Problem:
+					// media is null when getting 'transport-info', since
+					// 'transport-info' doesn't receive <description>..
+					// Solution:
+					// based on content name="" and a dictionary we'll pass inside,
+				       	// we will determine what is the correct name for the description.
+
 					var content = children[y];
 					for(var i = 0, len = content.childNodes.length; i < len; i++) {
 						child = content.childNodes[i];
-						switch(child.tagName) {
+						switch(child.localName) {
 							case 'description':
 								media = child.getAttribute('media');
 								description[media].profile = child.getAttribute('profile');
 								// fall through, parseStanza needs to be done for both tags
 							case 'transport':
+								console.log("_parseStanza description[" + media + "]");
 								_parseStanza(description[media], child);
 								break;
 						}
