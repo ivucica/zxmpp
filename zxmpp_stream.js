@@ -53,6 +53,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 	this.hasSentRestart = false;
 	this.hasSentBind = false;
 	this.hasSentSessionRequest = false;
+	this.hasSentRosterRequest = false;
 	this.hasSentInitialPresence = false;
 	this.sentUnrespondedRIDs = [];
 	this.sentUnrespondedKeys = [];
@@ -84,7 +85,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		body.setAttribute('wait',this.zxmpp.cfg['boshwait'] ? this.zxmpp.cfg['boshwait'] : 120);
 		body.setAttribute('xmpp:version','1.0');
 		body.setAttribute('hold','1');
-		body.setAttribute('secure','false');
+		body.setAttribute('secure','true');
 		body.setAttribute('to',this.zxmpp.cfg['domain']);
 		body.setAttribute('route',this.zxmpp.cfg['route']);
 
@@ -259,13 +260,11 @@ zxmppClass.prototype.stream = function (zxmpp)
 		
 		if(conn) console.log("Sending " + send_style + " with pollqueue " + this.pollPacketQueue.length + ": " + this.zxmpp.util.serializedXML(packet.xml));
 
-		var punjabHackDiff = this.hasSentInitialPresence ? 1 : 0;
-
 		var assignedRid = this.assignRID(true);
-		var ridTooFarApart = this.sentUnrespondedRIDs.length && assignedRid-this.sentUnrespondedRIDs[0]>punjabHackDiff;
+		var ridTooFarApart = this.sentUnrespondedRIDs.length && assignedRid-this.sentUnrespondedRIDs[0]>1;
 		if(ridTooFarApart)
 		{
-			console.log("Would send for RID " + assignedRid + "; but last received is too far apart: " + (this.sentUnrespondedRIDs[0] ? this.sentUnrespondedRIDs[0] : "nil") + " - diff " + (assignedRid-this.sentUnrespondedRIDs[0]));
+			console.log("Would send for RID " + assignedRid + "; but last unresponded is too far apart: " + (this.sentUnrespondedRIDs[0] ? this.sentUnrespondedRIDs[0] : "nil") + " - diff " + (assignedRid-this.sentUnrespondedRIDs[0]));
 			return false;
 		}
 		if(conn && !ridTooFarApart && (send_style=="hold" || (send_style == "poll" && (this.pollPacketQueue.length == 0 ||sending_from_queue) )))
@@ -273,16 +272,16 @@ zxmppClass.prototype.stream = function (zxmpp)
 			// there is an available hold or poll connection slot
 			// and, our rid is not too different from the last one we received
 
-			console.log("Sending for RID " + this.assignRID(true) + "; last received is " + this.sentUnrespondedRIDs[0] + " -- toofarapart: " + ridTooFarApart + " for " + (this.assignRID(true)-this.sentUnrespondedRIDs[0]));
+			console.log("Sending for RID " + assignedRid + "; last unresponded is " + this.sentUnrespondedRIDs[0] + " -- toofarapart: " + ridTooFarApart + " for " + (assignedRid-this.sentUnrespondedRIDs[0]));
 
 			conn.open("POST", this.zxmpp.cfg["bind-url"]);
  			conn.setRequestHeader("Content-type","text/xml; charset=utf-8");
 			conn.setRequestHeader("X-ZXMPPType",send_style);
 			conn.setRequestHeader("X-ZXMPPOldestRid", this.sentUnrespondedRIDs[0]);
-			conn.setRequestHeader("X-ZXMPPMyRid", this.assignRID(true));
+			conn.setRequestHeader("X-ZXMPPMyRid", assignedRid);
 			conn.setRequestHeader("X-ZXMPPReuseRids", JSON.stringify(this.reuseRIDs));
 			conn.onreadystatechange = this.zxmpp.stream.handleConnectionStateChange;
-			conn.connrid = this.assignRID(true);
+			conn.connrid = assignedRid;
 			conn.connkey = this.assignKey(true); if(conn.connkey) conn.connkey = conn.connkey.key;
 			if(!conn.connoutgoing)
 				conn.connoutgoing = packet.finalized();
@@ -394,6 +393,21 @@ zxmppClass.prototype.stream = function (zxmpp)
 			return;
 		}
 		
+	
+		if(conn.status == 200)
+		{
+			// we need to dig deeper to see if this is a terminate packet
+			var bodyNode = conn.responseXML.firstChild;
+			conn.connzxmpp.util.easierAttrs(bodyNode);
+				
+			if(bodyNode.attr["type"] == "terminate" && bodyNode.attr["condition"] == "item-not-found")
+			{
+				// treat as if it was a 404!
+				conn.status = 499;
+				console.warn("A terminate/item-not-found event");
+			}
+		}
+
 		// the connection failed?
 		if(conn.status != 200)
 		{
@@ -407,7 +421,9 @@ zxmppClass.prototype.stream = function (zxmpp)
 				case 502:
 				// probably proxy timeout!
 				console.log("Disconnect (HTTP status " + conn.status + ") - retrying");
-				
+				case 499:
+				// our internal status to denote a terminate+item-not-found
+
 				// retry as with 404!
 				
 				case 404:
@@ -453,6 +469,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 				
 			}
 		}
+		
 
 		// success? reset 404 count
 		conn.connzxmpp.stream.retriesUpon404 = 5;
@@ -498,6 +515,8 @@ zxmppClass.prototype.stream = function (zxmpp)
 		catch(e)
 		{
 			console.error(e);
+			console.error(e.message);
+			console.error(e.stack);
 		}
 		
 		if(!this.auth)
@@ -557,7 +576,15 @@ zxmppClass.prototype.stream = function (zxmpp)
 		{
 			this.sendSessionRequest();
 		}
-		else if(this.hasSentSessionRequest && this.zxmpp.fullJid && !this.hasSentInitialPresence)
+		else if(this.hasSentSessionRequest && this.zxmpp.fullJid && !this.hasSentRosterRequest)
+		{
+			// also request roster
+			// TODO check if server supports roster!
+			// we need to add caps parsing for that first, though
+			this.sendIqQuery("jabber:iq:roster", "get");//, this.zxmpp.bareJid);
+			this.hasSentRosterRequest = true;
+			console.log("ROSTER REQUEST SENT");
+		} else if (this.hasSentRosterRequest && !this.hasSentInitialPresence)
 		{
 			// set up initial presence
 			var ownPresence = this.zxmpp.getPresence(this.zxmpp.fullJid);
@@ -573,13 +600,8 @@ zxmppClass.prototype.stream = function (zxmpp)
 			// send initial presence
 			this.sendCurrentPresence();
 			
-			// also request roster
-			// TODO check if server supports roster!
-			// we need to add caps parsing for that first, though
-			this.sendIqQuery("jabber:iq:roster", "get");//, this.zxmpp.bareJid);
-			
 			this.hasSentInitialPresence = true;
-			this.hasFullConnection = true; // FIXME not exactly right. we need to receive a bit of roster first.
+			this.hasFullConnection = true; 
 		}
 		else if(this.hasSentInitialPresence && this.findFreeConnection("poll")/* && !this.pollPacketQueue.length*/) // if we haven't held yet, and we have a free holding slot, and nothing is waiting to poll...
 		{

@@ -79,7 +79,7 @@ zxmppClass.prototype.packet = function (zxmpp)
 			//setTimeout(function(){
 				tthis.zxmpp.stream.pollPacketQueue.push(tthis);
 				tthis.zxmpp.stream.tryEmptyingPollQueue();
-			//}, 500);
+			//}, 400*(1+tthis.zxmpp.stream.pollPacketQueue.length));
 		}
 	}
 	
