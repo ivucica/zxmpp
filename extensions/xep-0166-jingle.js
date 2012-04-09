@@ -73,6 +73,11 @@ function zxmpp_xep0166_sessioninitiate(zxmpp, destination, sessionId, contentXML
 	var packet = new this.zxmpp.packet(this.zxmpp);
 	var iq = new this.zxmpp.stanzaIq(this.zxmpp);
 	iq.appendIqToPacket(packet, "jingle", "set", destination);
+	iq.onReply.push(function(zxmpp, original, response)
+		{
+			console.error("////////////////// Call being negotiated");
+		}
+	);
 
 	var jingleNode = packet.xml.createElementNS("urn:xmpp:jingle:1", "jingle");
 	packet.iqXML.appendChild(jingleNode);

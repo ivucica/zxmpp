@@ -75,7 +75,7 @@ foreach(zxmppGetScriptsForExtensions() as $fn)
 <button onclick="enablevideo();">enable video</button>
 <button onclick="enableaudio();">enable audio</button>
 <button onclick="enablenotifications();" style="display: none;" id="notificationsbtn">enable webkit notifications</button><br>
-<input id="calldestination"><button onclick="call();">call</button>
+<input id="calldestination"><button onclick="call();">call</button><button onclick="if(jingleCall) jingleCall.close(); jingleCall = undefined;">hang up</button>
 <br>
 <textarea cols="80" rows="15" id="serialized_output"></textarea>
 <video id="monitor"></video><audio id="player"></audio>
@@ -339,6 +339,17 @@ function jingleSendSignaling(sdp)
 	
 	var contentGenerator = function demo_call_contentGen(zxmpp, destination, sessionId, packet)
 	{
+		/*
+		for(var i in audioContent.childNodes)
+		{
+			if(audioContent.childNodes[i].localName == "transport")
+				audioContent.removeChild(audioContent.childNodes[i]);
+		}
+
+		var transportNode = packet.xml.createElementNS("http://www.google.com/transport/p2p", "transport");
+
+		audioContent.appendChild(transportNode);
+		*/
 		return audioContent;
 	}
 	zxmpp_xep0166_sessioninitiate(
@@ -347,10 +358,10 @@ function jingleSendSignaling(sdp)
 			/* session id */ Math.round(Math.random()*10000),
 			contentGenerator);
 }
-
+var jingleCall;
 function call()
 {
-	var jingleCall = new /*zmpp_xep0166_PeerConnection*/ webkitDeprecatedPeerConnection("STUN stun.l.google.com:19302", jingleSendSignaling);
+	jingleCall = new /*zmpp_xep0166_PeerConnection*/ webkitDeprecatedPeerConnection("STUN stun.l.google.com:19302", jingleSendSignaling);
 	if(webrtc_videostream) jingleCall.addStream(webrtc_videostream);
 	if(webrtc_audiostream) jingleCall.addStream(webrtc_audiostream);
 	console.log("made jingle call");

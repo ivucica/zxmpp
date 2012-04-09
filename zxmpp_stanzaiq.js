@@ -25,6 +25,8 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 	this.type = false,
 	this.id = false;
 
+	this.onReply = [];
+
 	this.parseXML = function(xml)
 	{
 		this.zxmpp.util.easierAttrs(xml);
@@ -187,7 +189,17 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		}
 	
 		if(this.id && this.zxmpp.stream.iqsAwaitingReply[this.id])
-		{	
+		{
+			var originalStanza = this.zxmpp.stream.iqsAwaitingReply[this.id];
+			if(originalStanza.onReply && originalStanza.onReply.length)
+			{
+				for(var i in originalStanza.onReply)
+				{
+					var callback = originalStanza.onReply[i];
+					callback(this.zxmpp, originalStanza, this);
+				}
+			}
+
 			delete this.zxmpp.stream.iqsAwaitingReply[this.id];
 		}
 	}
