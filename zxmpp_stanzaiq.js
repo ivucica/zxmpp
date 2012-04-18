@@ -432,7 +432,10 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 						// we're asking for description of an ext
 						// remember in db, and add to "extended" feature list
 						
-						caps.featuresExt[child.attr["var"]] = true;
+						if(!caps.featuresExt[askingIq.inquiringExt])
+							caps.featuresExt[askingIq.inquiringExt] = [];
+
+						caps.featuresExt[askingIq.inquiringExt].push(child.attr["var"]);
 						
 						if(!askingIq.extDest)
 						{

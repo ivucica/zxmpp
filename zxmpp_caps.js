@@ -274,7 +274,7 @@ zxmppClass.prototype.caps = function(zxmpp)
 			if(extdest[ext])
 			{
 				var feature = extdest[ext];
-				this.featuresExt[feature] = true;
+				this.featuresExt[ext] = feature;
 				continue; // no need to request, we fetched from cache
 			}
 			
