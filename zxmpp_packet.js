@@ -79,10 +79,10 @@ zxmppClass.prototype.packet = function (zxmpp)
 		}
 		else
 		{
-			setTimeout(function(){
+			//setTimeout(function(){
 				tthis.zxmpp.stream.pollPacketQueue.push(tthis);
 				tthis.zxmpp.stream.tryEmptyingPollQueue();
-			}, 400*(1+tthis.zxmpp.stream.sentUnrespondedRIDs.length));
+			//}, 400*(1+tthis.zxmpp.stream.sentUnrespondedRIDs.length));
 		}
 	}
 	
