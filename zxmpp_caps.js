@@ -22,7 +22,7 @@ zxmppClass.prototype.caps = function(zxmpp)
 	this.ext = false;
 	this.hash = false;
 	
-	this.features = {};
+	this.features = [];
 	this.featuresExt = {};
 	this.ownerJid = false;
 	this.ownerNode = false;
@@ -193,6 +193,18 @@ zxmppClass.prototype.caps = function(zxmpp)
 		cnode.setAttribute("ext", extString); // TODO Avoid 'ext'
 		// TODO calculate hash, use the hash under "ver", and set "hash" to "sha-1"
 		xml.appendChild(cnode);
+	}
+
+	this.supports = function zxmppCaps_supports(namespace)
+	{
+		if(this.features.indexOf(namespace) >= 0)
+			return true;
+
+		for(var ext in this.featuresExt)
+			if(this.featuresExt[ext].indexOf(namespace) >= 0)
+				return true;
+		
+		return false;
 	}
 
 	this.appendFeaturesToXML = function zxmppCaps_(packet, xml, ext)
