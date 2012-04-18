@@ -68,9 +68,9 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 		for(var i in xml.childNodes)
 		{
 			var child = xml.childNodes[i];
-			if(!child.nodeName) continue;
+			if(!child.localName) continue;
 			
-			switch(child.nodeName)
+			switch(child.localName)
 			{
 				case "show":
 				if(child.firstChild)
@@ -122,7 +122,7 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 				break;
 				
 				default:
-				console.log("zxmpp::stanzapresence::parseXML(): Unhandled child node " + child.nodeName);	
+				console.log("zxmpp::stanzapresence::parseXML(): Unhandled child node " + child.localName);	
 			}
 			
 		}
