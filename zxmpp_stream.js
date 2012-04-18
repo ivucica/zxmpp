@@ -592,9 +592,12 @@ zxmppClass.prototype.stream = function (zxmpp)
 			{
 				// if set to unavail, let's presume
 				// the presence was not set up until now
-				ownPresence.show = "avail";
-				ownPresence.status = "Using Z-XMPP";
-				ownPresence.priority = 1;
+
+				var initialPresence = this.zxmpp.cfg["initialPresence"];
+
+				ownPresence.show = initialPresence["show"] ? initialPresence["show"] : "avail";
+				ownPresence.status = (typeof initialPresence["status"] != 'undefined') ? initialPresence["status"] : "Using Z-XMPP";
+				ownPresence.priority = (typeof initialPresence["priority"] != 'undefined') ? initialPresence["priority"] : 1;
 			}
 
 			// send initial presence

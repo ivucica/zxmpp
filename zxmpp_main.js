@@ -43,9 +43,9 @@ function zxmppClass()
 	this.capsNodesExt = {}; // maps fulljid => extensions => features
 	this.roster = {}; // maps barejid => group => rosteritem 
 	this.vCards = []; // maps barejid => vcard
-	
+
+	// the following ones are not stored and restored by design!
 	// registerable client feature extensions
-	// these are not stored and restored by design!
 	this.clientFeatureExtensions = {}
 	this.clientFeatureExtensionsDisabled = {}
 
@@ -293,7 +293,14 @@ zxmppClass.prototype.setOwnPresence = function zxmppMain_setOwnPresence(show, st
 {
 	var presence = this.getPresence(this.fullJid);
 	if(!presence)
+	{
+		this.cfg["initialPresence"] = {
+			'show': show,
+			'status': status,
+			'priority': priority
+		};
 		return;
+	}
 	presence.show = show;
 	presence.status = status;
 	presence.priority = priority;
