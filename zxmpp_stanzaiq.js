@@ -204,9 +204,8 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			}
 		}
 	
-		if(this.id && this.zxmpp.stream.iqsAwaitingReply[this.id])
+		if(this.id && this.zxmpp.stream.iqsAwaitingReply[this.id] && (this.type == "result" || this.type == "error"))
 		{
-
 			delete this.zxmpp.stream.iqsAwaitingReply[this.id];
 		}
 	}
@@ -396,6 +395,8 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			if(!askingIq)
 			{
 				console.error("No asking iq for id " + this.id);
+				console.log(xml);
+				console.log(this.zxmpp.stream.iqsAwaitingReply);
 				this.iqFail();
 				return; // FIXME make sure that, after failing, we give up on processing <iq> completely
 			}
@@ -444,7 +445,8 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 						}
 						// remember in db:
 						askingIq.extDest[askingIq.inquiringExt] = child.attr["var"];
-				
+						
+						// FIXME: DONT ASK ABOUT VCARD HERE
 						if(this.zxmpp.vCards[presence.bareJid] == undefined)
 						{
 							console.warn("Now requesting vcard for " + presence.bareJid);
@@ -577,9 +579,10 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		packet.iqStanza = this;
 			
 		// remember we wait for a result or error <iq> stanza
+		console.log("appended " + this.type);
 		if(this.type == "set" || this.type == "get")
 		{
-			//console.log("remembering " + this.iqStanza.id);
+			//console.log("remembering " + this.id);
 			this.zxmpp.stream.iqsAwaitingReply[this.id] = this;
 		}
 	}
