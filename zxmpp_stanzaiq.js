@@ -53,8 +53,8 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			{
 				// a bare jid
 				presence = this.zxmpp.getTopPresenceForBareJid(this.from);
-				console.warn("Iq from barejid");
-				console.log(xml);
+				zxmppConsole.warn("Iq from barejid");
+				zxmppConsole.log(xml);
 			}
 		}
 		
@@ -99,15 +99,15 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				break;
 				
 				case "error":
-				console.error("zxmpp::stanzaIq::parseXML(): error node received: " + this.zxmpp.util.serializedXML(child));
+				zxmppConsole.error("zxmpp::stanzaIq::parseXML(): error node received: " + this.zxmpp.util.serializedXML(child));
 				if(this.zxmpp.stream.iqsAwaitingReply[this.id])
 				{
 					var orig = this.zxmpp.stream.iqsAwaitingReply[this.id];
-					console.error("zxmpp::stanzaIq::parseXML(): original stanza: " + this.zxmpp.util.serializedXML(orig.iqXML));					
+					zxmppConsole.error("zxmpp::stanzaIq::parseXML(): original stanza: " + this.zxmpp.util.serializedXML(orig.iqXML));					
 				}
 				else
 				{
-					console.error("zxmpp::stanzaIq::parseXML(): original stanza with id " + this.id + " not found");
+					zxmppConsole.error("zxmpp::stanzaIq::parseXML(): original stanza with id " + this.id + " not found");
 				}
 				
 				break;
@@ -124,7 +124,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 
 				case "vCard":
 				// TODO implement
-				//console.error("***** VCARD PARSING NOT IMPLEMENTED");
+				//zxmppConsole.error("***** VCARD PARSING NOT IMPLEMENTED");
 				//this.iqFail();
 				
 							// TODO handle error vCard responses
@@ -139,8 +139,8 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				vcard.parseXML(child);
 				if(!this.from)
 					presence = this.zxmpp.getOwnPresence();
-				console.warn("Now receiving vcard for " + presence.bareJid);
-				console.warn(vcard);
+				zxmppConsole.warn("Now receiving vcard for " + presence.bareJid);
+				zxmppConsole.warn(vcard);
 				this.zxmpp.vCards[presence.bareJid] = vcard;
 				var rosteritem = this.zxmpp.roster[presence.bareJid];
 				if(rosteritem)
@@ -173,9 +173,9 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 					}
 					catch(e)
 					{
-						console.error(e);
-						console.error(e.message);
-						console.error(e.stack);
+						zxmppConsole.error(e);
+						zxmppConsole.error(e.message);
+						zxmppConsole.error(e.stack);
 					}
 					return parsedOk;
 				}
@@ -198,7 +198,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				
 				if(!parsedOk)
 				{
-					console.warn("zxmpp::stanzaIq::parseXML(): Unhandled child " + child.nodeName + " (" + child.nodeName + " in " + child.prefix + " / " + child.namespaceURI + ")");
+					zxmppConsole.warn("zxmpp::stanzaIq::parseXML(): Unhandled child " + child.nodeName + " (" + child.nodeName + " in " + child.prefix + " / " + child.namespaceURI + ")");
 					this.iqFail();
 				}
 			}
@@ -242,7 +242,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			break;
 			
 			default:
-			console.warn("zxmpp::stanzaIq::parseBindXML(): cannot handle iq's of type " + this.type);
+			zxmppConsole.warn("zxmpp::stanzaIq::parseBindXML(): cannot handle iq's of type " + this.type);
 			this.iqFail();
 		}
 	}
@@ -268,7 +268,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				break;
 				
 				default:
-				console.warn("zxmpp::stanzaIq::parseQueryXML(): Unknown namespace " + xml.attr["xmlns"] + " (iqtype=result)");
+				zxmppConsole.warn("zxmpp::stanzaIq::parseQueryXML(): Unknown namespace " + xml.attr["xmlns"] + " (iqtype=result)");
 				this.iqFail();
 			}
 			
@@ -287,7 +287,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				break;
 
 				default:
-				console.warn("zxmpp::stanzaIq::parseQueryXML(): Unknown namespace " + xml.attr["xmlns"] + " (iqtype=set)");
+				zxmppConsole.warn("zxmpp::stanzaIq::parseQueryXML(): Unknown namespace " + xml.attr["xmlns"] + " (iqtype=set)");
 				this.iqFail();
 
 			}
@@ -334,13 +334,13 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			
 				break;
 				default:
-				console.warn("zxmpp::stanzaIq::parseQueryXML(): Unknown namespace " + xml.attr["xmlns"] + " (iqtype=get)");
+				zxmppConsole.warn("zxmpp::stanzaIq::parseQueryXML(): Unknown namespace " + xml.attr["xmlns"] + " (iqtype=get)");
 				this.iqFail();
 			}	
 			break;
 
 			default:
-			console.warn("zxmpp::stanzaIq::parseQueryXML(): unhandled iq type " + this.type);
+			zxmppConsole.warn("zxmpp::stanzaIq::parseQueryXML(): unhandled iq type " + this.type);
 			this.iqFail();
 		}
 	}
@@ -365,7 +365,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				break;
 
 				default:
-				console.warn("zxmpp::stanzaIq::parseQueryRosterXML(): Unknown namespace " + xml.attr["xmlns"]);
+				zxmppConsole.warn("zxmpp::stanzaIq::parseQueryRosterXML(): Unknown namespace " + xml.attr["xmlns"]);
 				this.iqFail();
 			}
 		}
@@ -378,7 +378,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 	
 	this.parseQueryDiscoInfoXML = function(xml)
 	{
-		//console.log("disco info: " + this.zxmpp.util.serializedXML(xml));
+		//zxmppConsole.log("disco info: " + this.zxmpp.util.serializedXML(xml));
 		
 		
 		var node = xml.attr["node"];
@@ -394,9 +394,9 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			var askingIq = (this.zxmpp.stream.iqsAwaitingReply[this.id]);
 			if(!askingIq)
 			{
-				console.error("No asking iq for id " + this.id);
-				console.log(xml);
-				console.log(this.zxmpp.stream.iqsAwaitingReply);
+				zxmppConsole.error("No asking iq for id " + this.id);
+				zxmppConsole.log(xml);
+				zxmppConsole.log(this.zxmpp.stream.iqsAwaitingReply);
 				this.iqFail();
 				return; // FIXME make sure that, after failing, we give up on processing <iq> completely
 			}
@@ -440,7 +440,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 						
 						if(!askingIq.extDest)
 						{
-							console.warn("zxmpp::stanzaIq::parseQueryDiscoInfoXML(): unspecified extDest, cannot store ext info");
+							zxmppConsole.warn("zxmpp::stanzaIq::parseQueryDiscoInfoXML(): unspecified extDest, cannot store ext info");
 							continue;
 						}
 						// remember in db:
@@ -449,7 +449,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 						// FIXME: DONT ASK ABOUT VCARD HERE
 						if(this.zxmpp.vCards[presence.bareJid] == undefined)
 						{
-							console.warn("Now requesting vcard for " + presence.bareJid);
+							zxmppConsole.warn("Now requesting vcard for " + presence.bareJid);
 							this.zxmpp.stream.sendIqVCardRequest(presence.bareJid);
 							this.zxmpp.vCards[presence.bareJid] = false; // record that a request was made. don't ask again
 						}
@@ -470,7 +470,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			var ownpresence = this.zxmpp.getPresence(this.zxmpp.fullJid);
 			if(!ownpresence)
 			{
-				console.warn("zxmpp::stanzaIq::parseQueryDiscoInfoXML(): cant get own presence");
+				zxmppConsole.warn("zxmpp::stanzaIq::parseQueryDiscoInfoXML(): cant get own presence");
 				this.iqFail();
 				return;
 			}
@@ -478,7 +478,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			var owncaps = ownpresence.caps;
 			if(!owncaps)
 			{
-				console.warn("zxmpp::stanzaIq::parseQueryDiscoInfoXML(): own presence does not have caps");
+				zxmppConsole.warn("zxmpp::stanzaIq::parseQueryDiscoInfoXML(): own presence does not have caps");
 				this.iqFail();
 				return;
 			}
@@ -513,7 +513,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			break;
 
 			default:
-			console.warn("zxmpp::stanzaIq::parseQueryDiscoInfoXML(): unimplemented response to iq's of type " + this.type);
+			zxmppConsole.warn("zxmpp::stanzaIq::parseQueryDiscoInfoXML(): unimplemented response to iq's of type " + this.type);
 			this.iqFail();
 		}
 	}
@@ -529,7 +529,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 	
 	this.iqFail = function()
 	{
-		console.warn("zxmpp::stanzaIq::iqFail(): a failure parsing IQ stanza has occured: " + this.zxmpp.util.serializedXML(this.iqXML));
+		zxmppConsole.warn("zxmpp::stanzaIq::iqFail(): a failure parsing IQ stanza has occured: " + this.zxmpp.util.serializedXML(this.iqXML));
 			
 		switch(this.type)
 		{
@@ -541,7 +541,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			default:
 			case "get":
 			case "set":
-			console.warn("zxmpp::stanzaIq::iqFail(): responding to " + this.type + "-type iq failure ");
+			zxmppConsole.warn("zxmpp::stanzaIq::iqFail(): responding to " + this.type + "-type iq failure ");
 			
 			// FIXME perhaps we MUST include failure reason?
 			// because currently we don't do that.
@@ -579,10 +579,10 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		packet.iqStanza = this;
 			
 		// remember we wait for a result or error <iq> stanza
-		console.log("appended " + this.type);
+		zxmppConsole.log("appended " + this.type);
 		if(this.type == "set" || this.type == "get")
 		{
-			//console.log("remembering " + this.id);
+			//zxmppConsole.log("remembering " + this.id);
 			this.zxmpp.stream.iqsAwaitingReply[this.id] = this;
 		}
 	}
@@ -686,7 +686,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		
 		if(!this.iqXML)
 		{
-			console.error("zxmpp::stanzaIq::setType(): iq not set");
+			zxmppConsole.error("zxmpp::stanzaIq::setType(): iq not set");
 			return;
 		}
 		switch(aType)
@@ -697,7 +697,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			break;
 			
 			default:
-			console.error("zxmpp::stanzaIq::setType(): invalid type " + aType);
+			zxmppConsole.error("zxmpp::stanzaIq::setType(): invalid type " + aType);
 			return;
 		}
 		
@@ -711,13 +711,13 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		
 		if(!this.iqXML)
 		{
-			console.error("zxmpp::stanzaIq::setFrom(): iq not set");
+			zxmppConsole.error("zxmpp::stanzaIq::setFrom(): iq not set");
 			return;
 		}
 		
 		if(from && from != zxmpp.fullJid)
 		{
-			console.warn("zxmpp::stanzaIq::setFrom(): setting from to non-own jid");
+			zxmppConsole.warn("zxmpp::stanzaIq::setFrom(): setting from to non-own jid");
 			this.iqXML.setAttribute("from", from);
 			this.from = from;
 			return;
@@ -734,7 +734,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		
 		if(!this.iqXML)
 		{
-			console.error("zxmpp::stanzaIq::setTo(): iq not set");
+			zxmppConsole.error("zxmpp::stanzaIq::setTo(): iq not set");
 			return;
 		}
 		this.to = to;
@@ -745,7 +745,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 	this.toJSON = function()
 	{
 		// TODO
-		console.warn("skipping encoding of stanzaIq");
+		zxmppConsole.warn("skipping encoding of stanzaIq");
 		return "< not encoding stanzaIq >";
 	}
 }

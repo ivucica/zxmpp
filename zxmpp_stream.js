@@ -149,7 +149,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 				this.genKeys();
 				ret.newKey = this.keys.pop();
 			} else {
-				console.log("would generate newkey but just peeking");
+				zxmppConsole.log("would generate newkey but just peeking");
 			}
 		}
 		return ret;
@@ -203,7 +203,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 			var conn = connection_pool[i];
 			if(conn.readyState == 0)
 			{
-				//console.log("free slot found at: " + i);
+				//zxmppConsole.log("free slot found at: " + i);
 				availableConn = conn;
 				availableConn.connindex = i;
 				availableConn.conntype = send_style;
@@ -211,9 +211,9 @@ zxmppClass.prototype.stream = function (zxmpp)
 				return availableConn;
 				break;
 			}
-			//console.log("searching passed: " + i);
+			//zxmppConsole.log("searching passed: " + i);
 		}
-		//console.log("...but did not find empty slot");
+		//zxmppConsole.log("...but did not find empty slot");
 		return false;
 		
 	}
@@ -232,25 +232,25 @@ zxmppClass.prototype.stream = function (zxmpp)
 		
 		
 		/*
-		console.log("============ TRANSMIT (" + send_style + ") ============");
-		console.log("(not finalized packet)");
-		console.log(this.zxmpp.util.serializedXML(packet.xml));
-		console.log("=======================================");		
+		zxmppConsole.log("============ TRANSMIT (" + send_style + ") ============");
+		zxmppConsole.log("(not finalized packet)");
+		zxmppConsole.log(this.zxmpp.util.serializedXML(packet.xml));
+		zxmppConsole.log("=======================================");		
 		*/
 		
 		if(!packet)
 		{
 			if(packet == "")
 			
-				console.error("A packet passed into transmitPacket is an empty string!");
+				zxmppConsole.error("A packet passed into transmitPacket is an empty string!");
 			else
-				console.error("A packet passed into transmitPacket is null, false or zero!");
+				zxmppConsole.error("A packet passed into transmitPacket is null, false or zero!");
 			if(printStackTrace)
 			{
 				var st = printStackTrace();
 				for(var frame in st)
 				{
-					console.error(st[frame]);
+					zxmppConsole.error(st[frame]);
 				}
 			}
 			return;
@@ -258,13 +258,13 @@ zxmppClass.prototype.stream = function (zxmpp)
 
 		var conn = this.findFreeConnection(send_style);
 		
-		if(conn) console.log("Sending " + send_style + " with pollqueue " + this.pollPacketQueue.length + ": " + this.zxmpp.util.serializedXML(packet.xml));
+		if(conn) zxmppConsole.log("Sending " + send_style + " with pollqueue " + this.pollPacketQueue.length + ": " + this.zxmpp.util.serializedXML(packet.xml));
 
 		var assignedRid = this.assignRID(true);
 		var ridTooFarApart = this.sentUnrespondedRIDs.length && assignedRid-this.sentUnrespondedRIDs[0]>1;
 		if(ridTooFarApart)
 		{
-			console.log("Would send for RID " + assignedRid + "; but last unresponded is too far apart: " + (this.sentUnrespondedRIDs[0] ? this.sentUnrespondedRIDs[0] : "nil") + " - diff " + (assignedRid-this.sentUnrespondedRIDs[0]));
+			zxmppConsole.log("Would send for RID " + assignedRid + "; but last unresponded is too far apart: " + (this.sentUnrespondedRIDs[0] ? this.sentUnrespondedRIDs[0] : "nil") + " - diff " + (assignedRid-this.sentUnrespondedRIDs[0]));
 			return false;
 		}
 		if(conn && !ridTooFarApart && (send_style=="hold" || (send_style == "poll" && (this.pollPacketQueue.length == 0 ||sending_from_queue) )))
@@ -272,7 +272,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 			// there is an available hold or poll connection slot
 			// and, our rid is not too different from the last one we received
 
-			console.log("Sending for RID " + assignedRid + "; last unresponded is " + this.sentUnrespondedRIDs[0] + " -- toofarapart: " + ridTooFarApart + " for " + (assignedRid-this.sentUnrespondedRIDs[0]));
+			zxmppConsole.log("Sending for RID " + assignedRid + "; last unresponded is " + this.sentUnrespondedRIDs[0] + " -- toofarapart: " + ridTooFarApart + " for " + (assignedRid-this.sentUnrespondedRIDs[0]));
 
 			conn.open("POST", this.zxmpp.cfg["bind-url"]);
  			conn.setRequestHeader("Content-type","text/xml; charset=utf-8");
@@ -309,7 +309,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 			var packet = this.pollPacketQueue.shift();
 			if(!packet)
 			{
-				console.warn("zxmppStream tryEmptyingPollQueue(): Invalid packet found in poll queue has been skipped and is not sent: " + packet);
+				zxmppConsole.warn("zxmppStream tryEmptyingPollQueue(): Invalid packet found in poll queue has been skipped and is not sent: " + packet);
 				continue;
 			}
 			
@@ -343,15 +343,15 @@ zxmppClass.prototype.stream = function (zxmpp)
 		// retry sending after timeout
 		// also, only if poll queue is completely free.
 		// otherwise, delay more
-		console.log("this.retryConn");	
+		zxmppConsole.log("this.retryConn");	
 		/*if(conn.connzxmpp.stream.pollPacketQueue.length)
 		{
-			console.log("zxmpp retryConn delaying more");
+			zxmppConsole.log("zxmpp retryConn delaying more");
 			conn.connzxmpp.stream.tryEmptyingPollQueue();
 			setTimeout(conn.connzxmpp.stream.retryConn, 1000, conn);
 			return;
 		}
-		console.log("Yay");
+		zxmppConsole.log("Yay");
 */
 		conn2 = new XMLHttpRequest();
 		conn2.open("POST", conn.connzxmpp.cfg["bind-url"]);
@@ -378,7 +378,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		
 		if(typeof this.readyState == "undefined")
 		{
-			console.error("zxmppClass::Stream::handleConnectionStateChange(): 'this' is not XMLHttpRequest: " + typeof(this));
+			zxmppConsole.error("zxmppClass::Stream::handleConnectionStateChange(): 'this' is not XMLHttpRequest: " + typeof(this));
 			return;
 		}
 		
@@ -404,7 +404,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 			{
 				// treat as if it was a 404!
 				conn.status = 499;
-				console.warn("A terminate/item-not-found event");
+				zxmppConsole.warn("A terminate/item-not-found event");
 			}
 		}
 
@@ -420,7 +420,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 				// connection)
 				case 502:
 				// probably proxy timeout!
-				console.log("Disconnect (HTTP status " + conn.status + ") - retrying");
+				zxmppConsole.log("Disconnect (HTTP status " + conn.status + ") - retrying");
 				case 499:
 				// our internal status to denote a terminate+item-not-found
 
@@ -430,7 +430,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 				// TODO check if BOSH really specifies 404 upon out of order packet, or is this ejabberd specific behavior?		
 				if(conn.connzxmpp.stream.retriesUpon404<0)
 				{
-					console.error("zxmppClass::Stream::handleConnectionStateChange(): Too many " + conn.status + " failures, giving up and terminating");
+					zxmppConsole.error("zxmppClass::Stream::handleConnectionStateChange(): Too many " + conn.status + " failures, giving up and terminating");
 					conn.connzxmpp.stream.terminate();
 	
 					var code = "terminate/http-" + conn.status;
@@ -440,7 +440,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 				}
 				
 				conn.connzxmpp.stream.retriesUpon404--;
-				console.warn("zxmppClass::Stream::handeConnectionStateChange(): http " + conn.status + " - out of order request? http abort? retrying");
+				zxmppConsole.warn("zxmppClass::Stream::handeConnectionStateChange(): http " + conn.status + " - out of order request? http abort? retrying");
 				
 //				conn.send(conn.connoutgoing);
 
@@ -448,7 +448,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 				return;
 				
 				case 503:
-				console.error("zxmppClass::Stream::handleConnectionStateChange(): service not running or overloaded: http " + conn.status + ", terminating connection");
+				zxmppConsole.error("zxmppClass::Stream::handleConnectionStateChange(): service not running or overloaded: http " + conn.status + ", terminating connection");
 				conn.connzxmpp.stream.terminate();
 
 				var code = "terminate/http-" + conn.status;
@@ -459,7 +459,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 				case 500:
 				window.open("data:text/html," + conn.responseText, "Name");
 				default:
-				console.error("zxmppClass::Stream::handleConnectionStateChange(): invalid http status " + conn.status + ", terminating connection");
+				zxmppConsole.error("zxmppClass::Stream::handleConnectionStateChange(): invalid http status " + conn.status + ", terminating connection");
 				conn.connzxmpp.stream.terminate();
 
 				var code = "terminate/http-" + conn.status;
@@ -486,7 +486,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 			conn.connzxmpp.stream.handleConnection(conn);
 			conn.connzxmpp.stream.tryEmptyingPollQueue();
 		}
-		console.log("That was received rid " + conn.connrid);
+		zxmppConsole.log("That was received rid " + conn.connrid);
 		var idx = conn.connzxmpp.stream.sentUnrespondedRIDs.indexOf(conn.connrid);
 		if(idx!=-1)
 		{
@@ -514,9 +514,9 @@ zxmppClass.prototype.stream = function (zxmpp)
 		}
 		catch(e)
 		{
-			console.error(e);
-			console.error(e.message);
-			console.error(e.stack);
+			zxmppConsole.error(e);
+			zxmppConsole.error(e.message);
+			zxmppConsole.error(e.stack);
 		}
 		
 		if(!this.auth)
@@ -549,13 +549,13 @@ zxmppClass.prototype.stream = function (zxmpp)
 				var pickedMechanismName = pickedMechanism[0];
 				var pickedMechanismClass = pickedMechanism[1];
 
-				console.log("Picked authentication mechanism " + pickedMechanismName);
+				zxmppConsole.log("Picked authentication mechanism " + pickedMechanismName);
 				this.auth = new pickedMechanismClass(this.zxmpp);
 				this.auth.startAuth();
 			}
 			else
 			{
-				console.error("zxmpp::stream::handleConnection(): no authentication mechanism supported. giving up");
+				zxmppConsole.error("zxmpp::stream::handleConnection(): no authentication mechanism supported. giving up");
 
 				this.zxmpp.stream.terminate();
 	
@@ -583,7 +583,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 			// we need to add caps parsing for that first, though
 			this.sendIqQuery("jabber:iq:roster", "get");//, this.zxmpp.bareJid);
 			this.hasSentRosterRequest = true;
-			console.log("ROSTER REQUEST SENT");
+			zxmppConsole.log("ROSTER REQUEST SENT");
 		} else if (this.hasSentRosterRequest && !this.hasSentInitialPresence)
 		{
 			// set up initial presence
@@ -615,8 +615,8 @@ zxmppClass.prototype.stream = function (zxmpp)
 		}
 		else
 		{
-			console.error("Something broke down");
-			console.log("Fulljid: " + this.zxmpp.fullJid);
+			zxmppConsole.error("Something broke down");
+			zxmppConsole.log("Fulljid: " + this.zxmpp.fullJid);
 		}
 	}
 	this.fillPollConnection = function zxmppStream_findPollConnection()
@@ -654,7 +654,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		// form: <iq type="set"><bind><resource>name</resource></bind></iq>
 		if(!(this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-bind"]))
 		{
-			console.error("zxmpp::stream::sendBindRequest(): Server does not support binding. Aborting");
+			zxmppConsole.error("zxmpp::stream::sendBindRequest(): Server does not support binding. Aborting");
 			return;
 		}
 		var packet = new this.zxmpp.packet(this.zxmpp);
@@ -676,7 +676,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 		// form: <iq type="set"><session/></iq>
 		if(!(this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-session"]))
 		{
-			console.error("zxmpp::stream::sendSessionRequest(): Server does not support session. Aborting");
+			zxmppConsole.error("zxmpp::stream::sendSessionRequest(): Server does not support session. Aborting");
 			return;
 		}
 
@@ -783,7 +783,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 	
 	this.terminate = function zxmppStream_terminate(dont_reset_state)
 	{
-		console.log("Finishing stream termination");
+		zxmppConsole.log("Finishing stream termination");
 		for(var conn in this.connectionsHold)
 		{
 			conn.onreadystatechange = false;
@@ -873,14 +873,14 @@ zxmppClass.prototype.stream = function (zxmpp)
 			{
 				if(typeof this.pollPacketQueue[i] == "function")
 					continue;
-				console.log("Unpacking " + i);
+				zxmppConsole.log("Unpacking " + i);
 				this.pollPacketQueue[i].wakeUp(this.zxmpp);
 			}
 		}
 		catch(e)
 		{
-			console.error(e);
-			console.log(this.zxmpp.util.prettyJson(window.sessionStorage.zxmpp));
+			zxmppConsole.error(e);
+			zxmppConsole.log(this.zxmpp.util.prettyJson(window.sessionStorage.zxmpp));
 			this.pollPacketQueue = [];
 		}
 		this.fillPollConnection();

@@ -55,15 +55,15 @@ zxmppClass.prototype.packet = function (zxmpp)
 		// assign cryptographic key(s) from 
 		// part 15 of XEP-0124
 		var keys = this.zxmpp.stream.assignKey();
-		console.warn("CURRENTLY DISABLED cryptographic key from part 15 of XEP-0124");
-		console.warn("This seems to solve misbehavior with punjab, but is incorrect!");
+		zxmppConsole.warn("CURRENTLY DISABLED cryptographic key from part 15 of XEP-0124");
+		zxmppConsole.warn("This seems to solve misbehavior with punjab, but is incorrect!");
 		/*
 		if(keys.key)
 			body.setAttribute('key', keys.key);
 		if(keys.newKey)
 			body.setAttribute('newkey', keys.newKey);
 		*/
-		console.log("(finalized: " + this.zxmpp.util.serializedXML(this.xml) + ")");	
+		zxmppConsole.log("(finalized: " + this.zxmpp.util.serializedXML(this.xml) + ")");	
 		return this.zxmpp.util.serializedXML(this.xml);
 		
 	}
@@ -235,7 +235,7 @@ zxmppClass.prototype.packet = function (zxmpp)
 			if(colonsplit[0]=="xmlns" && colonsplit[1])
 			{
 				this.namespaces[colonsplit[1]] = attrs[attr];
-				//console.log("namespace '" + colonsplit[1] + "': " + attrs[attr]);
+				//zxmppConsole.log("namespace '" + colonsplit[1] + "': " + attrs[attr]);
 			}
 		}
 		
@@ -274,13 +274,13 @@ zxmppClass.prototype.packet = function (zxmpp)
 			
 			if(!nsurl)
 			{
-				console.warn("zxmpp::packet::parseXML(): Stanza " + child.nodeName + " in unknown namespace. Stanza dropped");
+				zxmppConsole.warn("zxmpp::packet::parseXML(): Stanza " + child.nodeName + " in unknown namespace. Stanza dropped");
 				continue;
 			}
 			
 			// now we have enough data about stanza to start parsing it
 			// let's iterate through supported stanzas!
-			console.log("zxmpp::packet::parseXML(): Stanza " + stanza + " in namespace " + nsurl);
+			zxmppConsole.log("zxmpp::packet::parseXML(): Stanza " + stanza + " in namespace " + nsurl);
 			var stanzaInstance = false;
 			switch(nsurl)
 			{
@@ -324,7 +324,7 @@ zxmppClass.prototype.packet = function (zxmpp)
 			
 			if(!stanzaInstance)
 			{
-				console.warn("zxmpp::packet::parseXML(): Stanza \'" + stanza + "\' in namespace \'" + nsurl + "\' is unknown. Stanza dropped");
+				zxmppConsole.warn("zxmpp::packet::parseXML(): Stanza \'" + stanza + "\' in namespace \'" + nsurl + "\' is unknown. Stanza dropped");
 			}
 			else
 			{
@@ -337,7 +337,7 @@ zxmppClass.prototype.packet = function (zxmpp)
 	}
 	this.toJSON = function zxmppPacket_toJSON(key)
 	{
-		console.log("zxmppPacket_toJSON()");
+		zxmppConsole.log("zxmppPacket_toJSON()");
 		var oldzxmpp = this.zxmpp;
 		var oldtojson = this.toJSON; // firefox4 beta7; when we return cloned, cleaned copy of this object, it attempts to stringify once again using this same function, causing this.zxmpp to be undefined. we need to remove the function too
 		var oldiqstanza = this.iqStanza;

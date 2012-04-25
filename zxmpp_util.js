@@ -10,6 +10,23 @@
  * international copyright laws.
  */
 
+
+var zxmppConsole = function()
+{
+}
+zxmppConsole.log = function(message)
+{
+	console.log(message);
+}
+zxmppConsole.warn = function(message)
+{
+	console.warn(message);
+}
+zxmppConsole.error = function(message)
+{
+	console.error(message);
+}
+
 zxmppClass.prototype.util = function (zxmpp)
 {
 	this.zxmpp = zxmpp;
@@ -109,7 +126,6 @@ zxmppClass.prototype.util = function (zxmpp)
 			if(colonsplit[0]=="xmlns" && colonsplit[1])
 			{
 				xml.namespaces[colonsplit[1]] = xml.attributes[attribute].nodeValue;
-				console.log("NAMESPACE " + colonsplit[1]);
 			}
 		}
 

@@ -31,7 +31,7 @@ zxmppClass.prototype.authDigestMD5 = function (zxmpp)
 			}
 			else
 			{
-				console.error("zxmpp::authDigestMD5::doStep(): plain authentication mechanism unsupported. giving up");
+				zxmppConsole.error("zxmpp::authDigestMD5::doStep(): plain authentication mechanism unsupported. giving up");
 
 				this.zxmpp.stream.terminate();
 	
@@ -48,7 +48,7 @@ zxmppClass.prototype.authDigestMD5 = function (zxmpp)
 	{
 		if(!xml || !xml.firstChild)
 		{
-			console.error("zxmpp::authDigestMD5::handleChallenge: no challenge content");
+			zxmppConsole.error("zxmpp::authDigestMD5::handleChallenge: no challenge content");
 			this.zxmpp.stream.terminate();
 			this.zxmpp.notifyConnectionTerminate("terminate/invalid-sasl-challenge", "Server has sent an invalid SASL challenge.");
 			return;
@@ -57,7 +57,7 @@ zxmppClass.prototype.authDigestMD5 = function (zxmpp)
 		var content = xml.firstChild;
 		if(!content.nodeValue)
 		{
-			console.error("zxmpp::authDigestMD5::handleChallenge: no challenge content nodevalue");
+			zxmppConsole.error("zxmpp::authDigestMD5::handleChallenge: no challenge content nodevalue");
 			this.zxmpp.stream.terminate();
 			this.zxmpp.notifyConnectionTerminate("terminate/invalid-sasl-challenge", "Server has sent an invalid SASL challenge.");
 			return;
@@ -68,7 +68,7 @@ zxmppClass.prototype.authDigestMD5 = function (zxmpp)
 		if(!content)
 		{
 			// TODO copypaste code from above for throwing error
-			console.error("zxmpp::authDigestMD5::handleChallenge: could not base64decode challenge content");
+			zxmppConsole.error("zxmpp::authDigestMD5::handleChallenge: could not base64decode challenge content");
 			this.zxmpp.stream.terminate();
 			this.zxmpp.notifyConnectionTerminate("terminate/invalid-sasl-challenge", "Server has sent an invalid SASL challenge.");
 			return;
@@ -84,7 +84,7 @@ zxmppClass.prototype.authDigestMD5 = function (zxmpp)
 			var entry = content[entryKey].split('=');
 			if(entry.length != 2)
 			{
-				console.error("zxmpp::authDigestMD5::handleChallenge: cannot split challenge content entry; count " + entry.length + " in " + entryStr);
+				zxmppConsole.error("zxmpp::authDigestMD5::handleChallenge: cannot split challenge content entry; count " + entry.length + " in " + entryStr);
 				this.zxmpp.stream.terminate();
 				this.zxmpp.notifyConnectionTerminate("terminate/invalid-sasl-challenge", "Server has sent an invalid SASL challenge.");
 				return;
@@ -99,7 +99,7 @@ zxmppClass.prototype.authDigestMD5 = function (zxmpp)
 
 			if(!contentDict[key])
 				contentDict[key] = new Array();
-			console.log("Setting " + key + " to " + value);
+			zxmppConsole.log("Setting " + key + " to " + value);
 			contentDict[key].push(value);
 		}
 		return contentDict;
@@ -133,10 +133,10 @@ zxmppClass.prototype.authDigestMD5 = function (zxmpp)
 			// note: there may be more than one realm, but we don't have a
 			// nice way to provide a GUI for picking a new realm.
 		{
-			console.error("zxmpp::authDigestMD5::handleChallenge: no realm or multiple realms");
+			zxmppConsole.error("zxmpp::authDigestMD5::handleChallenge: no realm or multiple realms");
 			for(var i in contentDict["realm"])
 			{
-				console.log(contentDict["realm"][i]);
+				zxmppConsole.log(contentDict["realm"][i]);
 			}
 			this.zxmpp.stream.terminate();
 			this.zxmpp.notifyConnectionTerminate("terminate/invalid-sasl-challenge", "Server has sent an invalid SASL challenge.");
@@ -145,7 +145,7 @@ zxmppClass.prototype.authDigestMD5 = function (zxmpp)
 		if(!contentDict["nonce"] || contentDict["nonce"].length > 1)
 			// none must, by definition, appear once and once only
 		{
-			console.error("zxmpp::authDigestMD5::handleChallenge: no nonce or multiple nonces");
+			zxmppConsole.error("zxmpp::authDigestMD5::handleChallenge: no nonce or multiple nonces");
 			this.zxmpp.stream.terminate();
 			this.zxmpp.notifyConnectionTerminate("terminate/invalid-sasl-challenge", "Server has sent an invalid SASL challenge.");
 			return;
@@ -185,21 +185,21 @@ zxmppClass.prototype.authDigestMD5 = function (zxmpp)
 		var response = '';
 		{
 			var x = username + ':' + realm + ':' + password;
-			console.log(x);
+			zxmppConsole.log(x);
 			var y = this.zxmpp.util.md5(x, true);
-			console.log(y);
+			zxmppConsole.log(y);
 			var a1 = y + ":" + nonce + ":" + cnonce; // + ":" + authzid; // removed for RFC 3920 (6.1 pt 7)
-			console.log(a1 + " . " + a1.length + " . " + nonce.length + " . " + cnonce.length + " . " + y.length);
+			zxmppConsole.log(a1 + " . " + a1.length + " . " + nonce.length + " . " + cnonce.length + " . " + y.length);
 			var a2 = "AUTHENTICATE:" + digesturi;
-			console.log(a2);
+			zxmppConsole.log(a2);
 			var ha1 = this.zxmpp.util.md5(a1);
-			console.log(ha1);
+			zxmppConsole.log(ha1);
 			var ha2 = this.zxmpp.util.md5(a2);
-			console.log(ha2);
+			zxmppConsole.log(ha2);
 			var kd = ha1 + ":" + nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + ha2;
-			console.log(kd);
+			zxmppConsole.log(kd);
 			var z = this.zxmpp.util.md5(kd);
-			console.log(z);
+			zxmppConsole.log(z);
 
 			response = z;
 		}

@@ -66,7 +66,7 @@ zxmppClass.prototype.stanzaMessage = function(zxmpp)
 				// ignore some:
 				if(child.nodeName == "#text")
 					continue;
-				console.log("zxmpp::stanzaMessage::parseXML(): Unhandled child node " + child.nodeName + " (" + child.extendedNodeName + ")");	
+				zxmppConsole.log("zxmpp::stanzaMessage::parseXML(): Unhandled child node " + child.nodeName + " (" + child.extendedNodeName + ")");	
 			}
 			
 		}
@@ -106,7 +106,7 @@ zxmppClass.prototype.stanzaMessage = function(zxmpp)
 	this.toJSON = function()
 	{
 		// TODO
-		console.warn("skipping encoding of stanzaMessage");
+		zxmppConsole.warn("skipping encoding of stanzaMessage");
 		return "< not encoding stanzaMessage >";
 	}
 	

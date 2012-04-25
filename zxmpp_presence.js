@@ -38,7 +38,7 @@ zxmppClass.prototype.presence = function (zxmpp)
 
 	this.toJSON = function zxmppPresence_toJSON(key)
 	{
-		console.log("zxmppPresence_toJSON()");
+		zxmppConsole.log("zxmppPresence_toJSON()");
 		var oldzxmpp = this.zxmpp;
 		var oldtojson = this.toJSON; // firefox4 beta7; when we return cloned, cleaned copy of this object, it attempts to stringify once again using this same function, causing this.zxmpp to be undefined. we need to remove the function too
 		delete this.zxmpp;

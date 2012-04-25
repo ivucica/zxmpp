@@ -115,7 +115,7 @@ zxmppClass.prototype.getPresence = function zxmppMain_getPresence(fullJid)
 	var resource = jid[1];
 	
 	if(!resource)
-		console.error("DANGER: A bare jid passed to zxmppMain_getPresence()");
+		zxmppConsole.error("DANGER: A bare jid passed to zxmppMain_getPresence()");
 
 	if(!this.presences[bareJid])
 		this.presences[bareJid] = {};
@@ -176,11 +176,11 @@ zxmppClass.prototype.removePresence = function zxmppMain_removePresence(fullJid)
 
 zxmppClass.prototype._debugDumpPresences = function zxmppMain__debugDumpPresences()
 {
-	console.log(" ");
-	console.log("======= PRESENCES ======== ");
+	zxmppConsole.log(" ");
+	zxmppConsole.log("======= PRESENCES ======== ");
 	for(var bareJid in this.presences)
 	{
-		console.log(bareJid);
+		zxmppConsole.log(bareJid);
 		var resources = this.presences[bareJid];
 		for(var resource in resources)
 		{
@@ -196,26 +196,26 @@ zxmppClass.prototype._debugDumpPresences = function zxmppMain__debugDumpPresence
 			
 			
 			
-			console.log(" " + resource + " - " + info);
+			zxmppConsole.log(" " + resource + " - " + info);
 		}
 	} 
-	console.log(" ");
+	zxmppConsole.log(" ");
 }
 
 zxmppClass.prototype._debugDumpStreamFeatures = function zxmppMain__debugDumpStreamFeatures()
 {
-	console.log(" ");
-	console.log("======= STREAM:FEATURES ======== ");
+	zxmppConsole.log(" ");
+	zxmppConsole.log("======= STREAM:FEATURES ======== ");
 	for(var xmlns in this.stream.features)
 	{
-		console.log(xmlns);
+		zxmppConsole.log(xmlns);
 		var nodes = this.stream.features[xmlns];
 		for(var node in nodes)
 		{
-			console.log(" " + node);
+			zxmppConsole.log(" " + node);
 		}
 	} 
-	console.log(" ");
+	zxmppConsole.log(" ");
 }
 
 zxmppClass.prototype.notifyConnectionTerminate = function zxmppMain_notifyConnectionTerminate(code,humanreadable)
@@ -312,7 +312,7 @@ zxmppClass.prototype.transmitOwnPresence = function zxmppMain_transmitOwnPresenc
 	if(this.stream && this.stream.hasSentInitialPresence)
 		this.stream.sendCurrentPresence();
 	else
-		console.log("Not sending presence since there is either no stream or initial presence wasn't already sent");
+		zxmppConsole.log("Not sending presence since there is either no stream or initial presence wasn't already sent");
 }
 
 zxmppClass.prototype.serialized = function zxmppMain_serialized()
@@ -347,7 +347,7 @@ zxmppClass.prototype.deserializeInternal = function zxmppMain_deserializeInterna
         // "reviver" function
         
         var type;
-	//console.log("restoring " + key + " (a " + (typeof value) + ", classtype " + (value.type) + "): " + value);
+	//zxmppConsole.log("restoring " + key + " (a " + (typeof value) + ", classtype " + (value.type) + "): " + value);
         if(value && typeof value === "object")
         {
             type = value.type;

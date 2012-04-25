@@ -41,8 +41,8 @@ also:
 subscription "remove" is sent and received when we're supposed to REMOVE a contact from our roster
 */
 
-		console.log("Roster: " + this.bareJid);
-		console.log(" " + this.zxmpp.util.serializedXML(xml));
+		zxmppConsole.log("Roster: " + this.bareJid);
+		zxmppConsole.log(" " + this.zxmpp.util.serializedXML(xml));
 		
 		for(var i in xml.childNodes)
 		{
@@ -59,19 +59,19 @@ subscription "remove" is sent and received when we're supposed to REMOVE a conta
 				else
 				{
 					this.groups.push(child.firstChild.nodeValue);
-					console.log(" group: " + child.firstChild.nodeValue);
+					zxmppConsole.log(" group: " + child.firstChild.nodeValue);
 				}
 				break;
 
 				default:
-				console.warn("zxmpp::itemRoster::parseXML(): unknown child " + child.nodeName);
+				zxmppConsole.warn("zxmpp::itemRoster::parseXML(): unknown child " + child.nodeName);
 				break;
 			}
 		}
 	}
 	this.toJSON = function zxmppItemRoster_toJSON(key)
 	{
-		console.log("zxmppItemRoster_toJSON()");
+		zxmppConsole.log("zxmppItemRoster_toJSON()");
 		var oldzxmpp = this.zxmpp;
 		var oldtojson = this.toJSON; // firefox4 beta7; when we return cloned, cleaned copy of this object, it attempts to stringify once again using this same function, causing this.zxmpp to be undefined. we need to remove the function too
 		delete this.zxmpp;

@@ -31,7 +31,7 @@ zxmppClass.prototype.authPlain = function (zxmpp)
 			}
 			else
 			{
-				console.error("zxmpp::authPlain::doStep(): plain authentication mechanism unsupported. giving up");
+				zxmppConsole.error("zxmpp::authPlain::doStep(): plain authentication mechanism unsupported. giving up");
 
 				this.zxmpp.stream.terminate();
 	
@@ -47,7 +47,7 @@ zxmppClass.prototype.authPlain = function (zxmpp)
 	{
 		// PLAIN should never have to handle a challenge.
 		// For now, we just won't respond to the challenge.
-		console.log("zxmpp::authPlain::handleChallenge: ignoring challenge!");
+		zxmppConsole.log("zxmpp::authPlain::handleChallenge: ignoring challenge!");
 	}
 	this.handleSuccess = function zxmppAuthPlain_handleSuccess(xml)
 	{

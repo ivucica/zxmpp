@@ -27,7 +27,7 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 	this.parseXML = function (xml)
 	{
 		
-		//console.log("Presence parsing: " + this.zxmpp.util.serializedXML(xml));
+		//zxmppConsole.log("Presence parsing: " + this.zxmpp.util.serializedXML(xml));
 		this.zxmpp.util.easierAttrs(xml);
 		
 		this.from = xml.attr["from"];
@@ -46,9 +46,9 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 			else
 			{
 				// a bare jid
-				console.warn("Presence from barejid");
+				zxmppConsole.warn("Presence from barejid");
 				presence = this.zxmpp.getTopPresenceForBareJid(this.from);
-				console.log(xml);
+				zxmppConsole.log(xml);
 			}
 		}
 
@@ -122,7 +122,7 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 				break;
 				
 				default:
-				console.log("zxmpp::stanzapresence::parseXML(): Unhandled child node " + child.localName);	
+				zxmppConsole.log("zxmpp::stanzapresence::parseXML(): Unhandled child node " + child.localName);	
 			}
 			
 		}
@@ -201,7 +201,7 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 	this.toJSON = function()
 	{
 		// TODO
-		console.warn("skipping encoding of stanzaPresence");
+		zxmppConsole.warn("skipping encoding of stanzaPresence");
 		return "< not encoding stanzaPresence >";
 	}	
 	
