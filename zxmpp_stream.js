@@ -595,9 +595,9 @@ zxmppClass.prototype.stream = function (zxmpp)
 
 				var initialPresence = this.zxmpp.cfg["initialPresence"];
 
-				ownPresence.show = initialPresence["show"] ? initialPresence["show"] : "avail";
-				ownPresence.status = (typeof initialPresence["status"] != 'undefined') ? initialPresence["status"] : "Using Z-XMPP";
-				ownPresence.priority = (typeof initialPresence["priority"] != 'undefined') ? initialPresence["priority"] : 1;
+				ownPresence.show = (initialPresence && initialPresence["show"]) ? initialPresence["show"] : "avail";
+				ownPresence.status = (initialPresence && typeof initialPresence["status"] != 'undefined') ? initialPresence["status"] : "Using Z-XMPP";
+				ownPresence.priority = (initialPresence && typeof initialPresence["priority"] != 'undefined') ? initialPresence["priority"] : 1;
 			}
 
 			// send initial presence
