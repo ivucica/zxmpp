@@ -426,7 +426,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 					if(!askingIq.inquiringExt)
 					{
 						// generic feature list asking
-						caps.features[child.attr["var"]] = true;
+						caps.features.push(child.attr["var"]);
 					} 
 					else
 					{
