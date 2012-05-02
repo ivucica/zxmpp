@@ -48,14 +48,24 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 				// a bare jid
 				zxmppConsole.warn("Presence from barejid");
 				presence = this.zxmpp.getTopPresenceForBareJid(this.from);
+				if(!presence)
+				{
+					// dummy object ; above failed, possibly because user never logged in
+					// if 'unavailable', we'll delete the presence anyway
+					// so there's no need about creating it
+
+
+					// we may also get bare jid presences from components
+					presence = this.zxmpp.getPresence(this.from);
+				}
 				zxmppConsole.log(xml);
 			}
 		}
-
 		presence.show = "avail";
 		if(this.type == "unavailable" || this.type == "error")
 		{
 			presence.show = "unavailable";
+			zxmppConsole.log(presence);
 			this.zxmpp.notifyPresenceUpdate(presence);
 			this.zxmpp.removePresence(this.from);
 			
