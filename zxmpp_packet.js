@@ -241,6 +241,7 @@ zxmppClass.prototype.packet = function (zxmpp)
 		
 		
 		// now find the stanzas in the body, and parse them
+        // FIXME instead of this loop, use .localName and .nodeNamespace when parsing XML!
 		for(var i in this.xml_body.childNodes)
 		{
 			var child = this.xml_body.childNodes[i];

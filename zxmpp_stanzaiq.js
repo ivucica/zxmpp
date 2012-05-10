@@ -151,21 +151,22 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 
 				default:
 
-				var __parseWithParserId = function zxmpp_stanzaiq_parseWithParserId(parserId)
+				var __parseWithParserId = function zxmpp_stanzaiq_parseWithParserId(ownerStanza, parserId)
 				{
 					var parsedOk = false;
 					try
 					{
-						if(this.zxmpp.iqParsers && this.zxmpp.iqParsers[parserId] && this.zxmpp.iqParsers[parserId].length)
+						if(ownerStanza.zxmpp.iqParsers && ownerStanza.zxmpp.iqParsers[parserId] && ownerStanza.zxmpp.iqParsers[parserId].length)
 						{
-							var parsers = this.zxmpp.iqParsers[parserId];
+							var parsers = ownerStanza.zxmpp.iqParsers[parserId];
 							for(var i in parsers)
 							{
 								var parser = parsers[i];
 								if(parser.func)
-									parsedOk = parsedOk || parser.func(parser.context, this.zxmpp, this, child);
+									parsedOk = parser.func(parser.context, ownerStanza.zxmpp, ownerStanza, child) || parsedOk;
 								else
-									parsedOk = parsedOk || parser(this.zxmpp, this, child);
+									parsedOk = parser(ownerStanza.zxmpp, ownerStanza, child) || parsedOk;
+                                
 								if(parsedOk)
 									break;
 							}
@@ -188,17 +189,17 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 
 				var parserId = child.localName + "#" + child.namespaceURI;
 				var parsedOk = false;
-				parsedOk = __parseWithParserId(parserId);
+				parsedOk = __parseWithParserId(this, parserId);
 				if(!parsedOk)
 				{
 					parserId = child.localName;
-					parsedOk = __parseWithParserId(parserId);
+					parsedOk = __parseWithParserId(this, parserId);
 				}
 
 				
 				if(!parsedOk)
 				{
-					zxmppConsole.warn("zxmpp::stanzaIq::parseXML(): Unhandled child " + child.nodeName + " (" + child.nodeName + " in " + child.prefix + " / " + child.namespaceURI + ")");
+					zxmppConsole.warn("zxmpp::stanzaIq::parseXML(): Unhandled child " + child.nodeName + " (" + child.nodeName + " in " + child.prefix + " / " + child.namespaceURI + " - parserId " + parserId + ")");
 					this.iqFail();
 				}
 			}
@@ -562,7 +563,6 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		// generate an iq in this packet
 		
 		var iq = packet.xml.createElementNS("jabber:client", "iq");
-		
 		if(!forced_id)
 			iq.setAttribute("id", this.id=this.zxmpp.stream.uniqueId(idtype));
 		else

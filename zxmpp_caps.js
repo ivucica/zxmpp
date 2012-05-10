@@ -117,7 +117,7 @@ zxmppClass.prototype.caps = function(zxmpp)
 			return; 
 		}
 		
-		console.log("Asking " + this.ownerJid + " about caps");
+		zxmppConsole.log("Asking " + this.ownerJid + " about caps");
 		this.zxmpp.stream.sendIqQuery("http://jabber.org/protocol/disco#info", "get", this.ownerJid, false, {"node": this.node + "#" + this.ver});
 		
 		
@@ -245,7 +245,7 @@ zxmppClass.prototype.caps = function(zxmpp)
 			}
 			
 
-			console.log("SENDING for EXT: " + ext);
+			zxmppConsole.log("SENDING for EXT: " + ext);
 			return true;
 		}
 		else
@@ -295,7 +295,7 @@ zxmppClass.prototype.caps = function(zxmpp)
 
 	this.toJSON = function zxmppCaps_toJSON(key)
 	{
-		console.log("zxmppCaps_toJSON()");
+		zxmppConsole.log("zxmppCaps_toJSON()");
 		var oldzxmpp = this.zxmpp;
 		var oldtojson = this.toJSON; // firefox4 beta7; when we return cloned, cleaned copy of this object, it attempts to stringify once again using this same function, causing this.zxmpp to be undefined. we need to remove the function too
 		delete this.zxmpp;

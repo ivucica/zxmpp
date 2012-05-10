@@ -153,7 +153,7 @@ zxmppClass.prototype.getTopPresenceForBareJid = function zxmppMain_getTopPresenc
 			continue;
 		}
 		
-		if(presence.priority > topPresence.priority)
+		if(presence.priority > topPresence.priority && presence.show != "unavailable")
 		{
 			topPresence = presence;
 		}
