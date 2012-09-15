@@ -32,8 +32,8 @@ var SDPToJingle = (function() {
 			GROUP: "group",
 			MID: "mid",
 			MID_AUDIO: "mid:audio",
-			MID_VIDEO: "mid:audio",
-			RTCP_MUX: "rtcp-muc",
+			MID_VIDEO: "mid:video",
+			RTCP_MUX: "rtcp-mux",
 			SSRC: "ssrc",
 			CNAME: "cname",
 			MSLABEL: "mslabel",
@@ -46,7 +46,9 @@ var SDPToJingle = (function() {
 			CANDIDATE_USERNAME: "username",
 			CANDIDATE_PASSWORD: "password",
 			CANDIDATE_GENERATION: "generation",
-			RTPMAP: "rtpmap"
+			RTPMAP: "rtpmap",
+			ICE_UFRAG: "ice-ufrag",
+			ICE_PWD: "ice-pwd"
 		},
 		CANDIDATES = {
 			HOST: "host",
@@ -69,12 +71,9 @@ var SDPToJingle = (function() {
 			}
 		},
 		// TODO: Remove hardcoding. This is copied from libjingle webrtcsdp.cc
-		HARDCODED_SDP = "v=0\\r\\no=- 0 0 IN IP4 127.0.0.1\\r\\ns=\\r\\nc=IN IP4 0.0.0.0\\r\\nt=0 0",
+		HARDCODED_SDP_P1 = "v=0\r\no=- ",
+		HARDCODED_SDP_P2 = " 1 IN IP4 127.0.0.1\r\ns=\r\nt=0 0",
 
-		_parseMessageInJSON = function(msg) {
-			// Strip SDP-prefix and parse it as JSON
-			return JSON.parse(msg.substring(SDP_PREFIX_LEN));
-		},
 		_splitSdpMessage = function(msg) {
 			return msg.split(LINE_BREAK);
 		},
@@ -92,6 +91,9 @@ var SDPToJingle = (function() {
 			var keyAndParams = _splitLine(line);
 
 			switch(keyAndParams.key) {
+				case LINE_PREFIXES.ORIGIN:
+					_parseOrigin(description, keyAndParams.params);
+					break;
 				case LINE_PREFIXES.ATTRIBUTES:
 					_parseAttributes(description[state], keyAndParams.params);
 					break;
@@ -99,20 +101,26 @@ var SDPToJingle = (function() {
 					state = _parseStateFromMedia(keyAndParams.params);
 					_parseMedia(description[state], keyAndParams.params);
 					break;
+				case LINE_PREFIXES.SESSION_CONNECTION:
+					_parseSessionConnection(description[state], keyAndParams.params);
 			}
 			return state;
 		},
 		_parseStateFromMedia = function(params) {
 			return params[0];
 		},
+		_parseOrigin = function(description, params) {
+			description.sid = params[1];
+		},
 		_parseMedia = function(media, params) {
 			media.profile = params[2];
+			media.port = params[1];
 		},
 		_parseAttributes = function(attrs, params) {
 			var key = params[0].split(KEY_DELIMITER);
 			switch(key[0]) {
 				case ATTRIBUTES.CANDIDATE:
-					_parseCandidates(attrs.candidates, key, params);
+					_parseCandidates(attrs['ice-candidates'], key, params);
 					break;
 				case ATTRIBUTES.CRYPTO:
 					_parseCrypto(attrs['crypto'], key, params);
@@ -124,12 +132,28 @@ var SDPToJingle = (function() {
 					// ssrc is only a string, but split ssrc: first
 					_parseSsrc(attrs.ssrc, key, params);
 					break;
+				case ATTRIBUTES.ICE_UFRAG:
+					_parseIceParams(attrs, key);
+					break;
+				case ATTRIBUTES.ICE_PWD:
+					_parseIceParams(attrs, key);
+					break;
 			}
 
 			return attrs;
 		},
+		_parseSessionConnection = function(attrs, params) {
+			attrs['udp-candidates'].push({
+				ip: params[2],
+				port: attrs['port'],
+				generation: 0
+			});
+		},
+		_parseIceParams = function(attrs, key) {
+			attrs[key[0]] = key[1];
+		},
 		_parseCandidates = function(candidates, key, params) {
-			candidates.push({
+			var candidate = {
 				component: params[1],
 				foundation: key[1],
 				protocol: params[2],
@@ -137,12 +161,15 @@ var SDPToJingle = (function() {
 				ip: params[4],
 				port: params[5],
 				type: params[7],
-				name: params[9],
-				network: params[11],
-				ufrag: params[13],
-				pwd: params[15],
-				generation: params[17]
-			});
+				generation: params[9]
+			};
+			/*
+			name: params[9],
+			network: params[11],
+			ufrag: params[13],
+			pwd: params[15],*/
+
+			candidates.push(candidate);
 		},
 		_parseCrypto = function(crypto, key, params) {
 			crypto.push({
@@ -165,12 +192,22 @@ var SDPToJingle = (function() {
 			if (ssrc[key[1]] === undefined) {
 				ssrc[key[1]] = {};
 			}
+			if (nameValue[0] == 'label') {
+				// ugly hack to circumvent the fact that DELIMITER splitting is not the best way to parse SDP.
+				// Otherwise, the label for certain cameras would be incomplete.
+				// TODO: Fix this ugly piece of code
+				var paramLength = params.length;
+				for(var i = 2; i < paramLength; i++) {
+					nameValue[1] += " " + params[i];
+				}
+			}
 			ssrc[key[1]][nameValue[0]] = nameValue[1];
 		},
 		_generateJingleFromDescription = function(description) {
 			return {
 				video: _generateMediaContent("video", description.video),
-				audio: _generateMediaContent("audio", description.audio)
+				audio: _generateMediaContent("audio", description.audio),
+				sid: description.sid
 			};
 		},
 		_generateMediaContent = function(name, media) {
@@ -204,12 +241,26 @@ var SDPToJingle = (function() {
 
 			str += "</description>";
 
-			str += "<transport xmlns='" + XMLNS.TRANSPORT.ICE_UDP + "'";
-			str += media.candidates.length ? '>' : '/>';
-			if (media.candidates.length) {
-				str += _serializeProperties('candidate', media.candidates);
+			if(media['udp-candidates'].length) {
+				str += "<transport xmlns='" + XMLNS.TRANSPORT.RAW_UDP + "'>";
+				str += _serializeProperties('candidate', media['udp-candidates']);
+				str += '</transport>';
 			}
-			str += media.candidates.length ? '</transport>' : '';
+
+			str += "<transport xmlns='" + XMLNS.TRANSPORT.ICE_UDP + "'";
+
+			if (media['ice-pwd'] !== "") {
+				str += ' pwd="' + media['ice-pwd'] + '"';
+			}
+			if (media['ice-ufrag'] !== "") {
+				str += ' ufrag="' + media['ice-ufrag'] + '"';
+			}
+
+			str += media['ice-candidates'].length ? '>' : '/>';
+			if (media['ice-candidates'].length) {
+				str += _serializeProperties('candidate', media['ice-candidates']);
+			}
+			str += media['ice-candidates'].length ? '</transport>' : '';
 
 			str += "</content>";
 			return str;
@@ -248,27 +299,44 @@ var SDPToJingle = (function() {
 		_generateEmptyDescription = function() {
 			return {
 				"audio": {
-					candidates: [],
+					"udp-candidates": [],
+					"ice-candidates": [],
 					crypto: [],
 					rtpmap: [],
 					ssrc: {},
-					profile: ""
+					profile: "",
+					"ice-ufrag": "",
+					"ice-pwd": ""
 				},
 				"video": {
-					candidates: [],
+					"udp-candidates": [],
+					"ice-candidates": [],
 					crypto: [],
 					rtpmap: [],
 					ssrc: {},
-					profile: ""
-				}
+					profile: "",
+					"ice-ufrag": "",
+					"ice-pwd": ""
+				},
+				"sid": ""
 			};
 		},
 		_parseStanza = function(description, stanza) {
-			var child;
+			var child,
+				pwd = stanza.getAttribute('pwd'),
+				ufrag = stanza.getAttribute('ufrag'),
+				xmlns = stanza.getAttribute('xmlns');
+			if (pwd) {
+				description['ice-pwd'] = pwd;
+			}
+			if (ufrag) {
+				description['ice-ufrag'] = ufrag;
+			}
+
 			for(var i = 0, len = stanza.childNodes.length; i < len; i++) {
 				if (stanza.childNodes.hasOwnProperty(i)) {
 					child = stanza.childNodes[i];
-					switch(child.localName) {
+					switch(child.tagName) {
 						case 'payload-type':
 							description.rtpmap.push(_unserializeAttributes(child));
 							break;
@@ -278,7 +346,12 @@ var SDPToJingle = (function() {
 							}
 							break;
 						case 'candidate':
-							description.candidates.push(_unserializeAttributes(child));
+							if (xmlns == XMLNS.TRANSPORT.RAW_UDP) {
+								description['udp-candidates'].push(_unserializeAttributes(child));
+								description['port'] = child.getAttribute('port');
+							} else if (xmlns == XMLNS.TRANSPORT.ICE_UDP) {
+								description["ice-candidates"].push(_unserializeAttributes(child));
+							}
 							break;
 						case 'streams':
 							for(var c = 0, clen = child.childNodes.length; c < clen; c++) {
@@ -303,23 +376,45 @@ var SDPToJingle = (function() {
 			return res;
 		},
 		_generateSdpFromDescription = function(description) {
-			var sdp = HARDCODED_SDP;
+			var baseSdp = HARDCODED_SDP_P1 + description.sid + HARDCODED_SDP_P2,
+				sdp = "",
+				bundleSdp = "\r\na=group:BUNDLE";
+			delete description.sid;
+
+
 			for(var media in description) {
 				if(description.hasOwnProperty(media)) {
 					sdp += _generateMediaSdp(media, description[media]);
 				}
+				bundleSdp += " " + media;
 			}
-			return sdp + "\\r\\n";
+			return baseSdp + bundleSdp + sdp + "\r\n";
 		},
 		_generateMediaSdp = function(media, description) {
 			// TODO: Remove hardcoded values like "1" which is the mediaport placeholder
-			var m = "\\r\\nm=" + media + " 1 " + description.profile,
-				rtpmapStr = "a=mid:" + media + "\\r\\na=rtcp-mux",
+			var m = "\r\nm=" + media + " " + description.port + " " + description.profile,
+				rtpmapStr = "a=mid:" + media + "\r\na=rtcp-mux",
+				rtcpStr = "a=rtcp:" + description.port + " IN IP4 " + description['udp-candidates'][0].ip + "\r\n",
 				cryptoStr = "",
-				candidateStr = "",
-				ssrcStr = "";
-			for (var i = 0, len = description.candidates.length; i < len; i++) {
-				var candidate = description.candidates[i],
+				udpCandidateStr = "",
+				iceCandidateStr = "",
+				ssrcStr = "",
+				iceStr = "";
+
+			for (var i = 0, len = (description['udp-candidates'] ? description['udp-candidates'].length : 0); i < len; i++) {
+				var candidate = description['udp-candidates'][i];
+				udpCandidateStr += "c=IN IP4 " + candidate.ip + "\r\n";
+			}
+
+			if (description['ice-ufrag']) {
+				iceStr += "a=ice-ufrag:" + description['ice-ufrag'] + "\r\n";
+			}
+			if (description['ice-pwd']) {
+				iceStr += "a=ice-pwd:" + description['ice-pwd'] + "\r\n";
+			}
+
+			for (var i = 0, len = (description['ice-candidates'] ? description['ice-candidates'].length : 0); i < len; i++) {
+				var candidate = description['ice-candidates'][i],
 					attrs = [
 						candidate.component,
 						candidate.protocol,
@@ -329,39 +424,39 @@ var SDPToJingle = (function() {
 						// TODO: Remove hardcoded values
 						"typ",
 						candidate.type,
-						"name",
+						/*"name",
 						candidate.name,
 						"network_name",
 						candidate.network,
 						"username",
 						candidate.ufrag,
 						"password",
-						candidate.pwd,
+						candidate.pwd,*/
 						"generation",
 						candidate.generation
 					];
-				candidateStr += "a=candidate:" + candidate.foundation
-					+ " " + attrs.join(" ") + "\\r\\n";
+				iceCandidateStr += "a=candidate:" + candidate.foundation
+					+ " " + attrs.join(" ") + "\r\n";
 			}
-			for (var i = 0, len = description.crypto.length; i < len; i++) {
+			for (var i = 0, len = (description.crypto ? description.crypto.length : 0); i < len; i++) {
 				var crypto = description.crypto[i];
-				cryptoStr += "\\r\\na=crypto:" + crypto.tag + " " + crypto['crypto-suite'] +
+				cryptoStr += "\r\na=crypto:" + crypto.tag + " " + crypto['crypto-suite'] +
 					" " + crypto['key-params'] + " ";
-				if(crypto['session-params'] && crypto['session-params'].length) {
+				if(crypto['session-params'].length) {
 					cryptoStr += crypto['session-params'];
 				}
 			}
 			rtpmapStr += cryptoStr;
-			for (var i = 0, len = description.rtpmap.length; i < len; i++) {
+			for (var i = 0, len = (description.rtpmap ? description.rtpmap.length : 0); i < len; i++) {
 				var type = description.rtpmap[i];
 				m += " " + type.id;
-				rtpmapStr += "\\r\\na=rtpmap:" + type.id + " " + type.name + "/" + type.clockrate;
+				rtpmapStr += "\r\na=rtpmap:" + type.id + " " + type.name + "/" + type.clockrate;
 			}
 			for (var key in description.ssrc) {
 				if (description.ssrc.hasOwnProperty(key)) {
 					var ssrc = description.ssrc[key];
 					for (var subkey in ssrc) {
-						ssrcStr += "\\r\\na=ssrc:" + key;
+						ssrcStr += "\r\na=ssrc:" + key;
 						if (ssrc.hasOwnProperty(subkey)) {
 							ssrcStr += " " + subkey + ":" + ssrc[subkey];
 						}
@@ -369,19 +464,14 @@ var SDPToJingle = (function() {
 				}
 			}
 
-			return m + "\\r\\n" + candidateStr + rtpmapStr + ssrcStr;
+			return m + "\r\n" + udpCandidateStr + rtcpStr + iceCandidateStr + iceStr + rtpmapStr + ssrcStr;
 		};
 
 	return {
-		createJingleStanza: function(sdpMsg) {
-			sdpMsg = _parseMessageInJSON(sdpMsg);
-
+		createJingleStanza: function(sdp) {
 			var description = _generateEmptyDescription(),
 				state = null,
-				sdp = _splitSdpMessage(sdpMsg.sdp),
-				sessionId = sdpMsg.offererSessionId,
-				seq = sdpMsg.seq,
-				tieBreaker = sdpMsg.tieBreaker;
+				sdp = _splitSdpMessage(sdp);
 			for(var i = 0, len = sdp.length; i < len; i++) {
 				state = _parseLine(description, state, sdp[i]);
 			}
@@ -389,33 +479,34 @@ var SDPToJingle = (function() {
 		},
 		parseJingleStanza: function(stanza) {
 			var doc = _getXmlDoc(stanza),
-				children = doc.childNodes[0].childNodes,
+				jingle = doc.childNodes.length ? doc.childNodes[0] : undefined,
+				children = jingle ? jingle.childNodes : undefined,
 				child,
 				media = null,
 				description = _generateEmptyDescription(),
 				hasSdpMessage = false;
-			for(var y in children) {
-				if (children[y].localName === 'content') {
+
+			if (!children) {
+				throw "Error: Invalid Stanza given";
+			}
+
+			description.sid = jingle.getAttribute('sid');
+
+			for(var y = 0, len = children.length; y < len; y++) {
+				if (!children[y]) {
+					continue;
+				}
+				if (children[y].tagName === 'content') {
 					hasSdpMessage = true;
-
-
-					// Problem:
-					// media is null when getting 'transport-info', since
-					// 'transport-info' doesn't receive <description>..
-					// Solution:
-					// based on content name="" and a dictionary we'll pass inside,
-				       	// we will determine what is the correct name for the description.
-
 					var content = children[y];
 					for(var i = 0, len = content.childNodes.length; i < len; i++) {
 						child = content.childNodes[i];
-						switch(child.localName) {
+						switch(child.tagName) {
 							case 'description':
 								media = child.getAttribute('media');
 								description[media].profile = child.getAttribute('profile');
 								// fall through, parseStanza needs to be done for both tags
 							case 'transport':
-								console.log("_parseStanza description[" + media + "]");
 								_parseStanza(description[media], child);
 								break;
 						}
@@ -431,6 +522,8 @@ var SDPToJingle = (function() {
 }());
 
 // for node.js
-if (module !== undefined && module.exports !== undefined) {
-	module.exports = SDPToJingle;
-}
+try {
+	if (module !== undefined && module.exports !== undefined) {
+		module.exports = SDPToJingle;
+	}
+} catch(e) {}
