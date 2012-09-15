@@ -60,7 +60,7 @@ foreach(zxmppGetScriptsForExtensions() as $fn)
 <body onunload="unloadhandler();" onload="loadhandler();">
 <div id="zxmpp_root"></div>
 
-<a href="?a=<?=isset($_GET["a"]) ? int($_GET["a"])+1 : "0"?>">advance</a><br>
+<a href="?a=<?=isset($_GET["a"]) ? intval($_GET["a"])+1 : "0"?>">advance</a><br>
 
 <input id="usr" value="<?=isset($_GET["usr"]) ? $_GET["usr"] : "perica"?>"><input type="password" id="pwd" value="<?=isset($_GET["pwd"]) ? $_GET["pwd"] : "123"?>">
 
