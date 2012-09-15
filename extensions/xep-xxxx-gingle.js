@@ -23,7 +23,7 @@ function zxmpp_gingle_init(zxmpp)
 	}
 	catch (e)
 	{
-		zxmpp_gingle_PeerConnection = webkitDeprecatedPeerConnection;
+		zxmpp_gingle_PeerConnection = webkitPeerConnection00;
 	}
 
 	try

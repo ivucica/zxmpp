@@ -25,6 +25,12 @@ I suggest you start looking at the onload handler, the function 'loadhandler()'.
 <link href="application.css" rel="stylesheet" type="text/css">
 <script>
 var module;
+
+navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
+    navigator.mozGetUserMedia || navigator.msGetUserMedia;
+window.URL = window.URL || window.webkitURL;
+
+
 </script>
 <!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>-->
 
@@ -79,6 +85,7 @@ foreach(zxmppGetScriptsForExtensions() as $fn)
 <br>
 <textarea cols="80" rows="15" id="serialized_output"></textarea>
 <video id="monitor"></video><audio id="player"></audio>
+<video id="remotemonitor"></video><audio id="remoteplayer"></audio>
 <script defer="defer">
 var zxmpp;
 var webrtc_videostream;
@@ -253,21 +260,21 @@ function loadhandler_delayed()
 
 function enablevideo()
 {
-	if(!navigator.webkitGetUserMedia)
+	if(!navigator.getUserMedia)
 	{
 		alert("No WebRTC support");
 		return;
 	}
-	navigator.webkitGetUserMedia("video", videoGotStream, videoNoStream);
+	navigator.getUserMedia({video: true}, videoGotStream, videoNoStream);
 }
 function enableaudio()
 {
-	if(!navigator.webkitGetUserMedia)
+	if(!navigator.getUserMedia)
 	{
 		alert("No WebRTC support");
 		return;
 	}
-	navigator.webkitGetUserMedia("audio", audioGotStream, audioNoStream);
+	navigator.getUserMedia({audio: true}, audioGotStream, audioNoStream);
 }
 function videoGotStream(stream)
 {
@@ -326,10 +333,33 @@ function audioNoStream()
 	}
 }
 
+function jingleGotIceCandidate(candidate, moreToFollow)
+{
+	if (candidate) {
+		console.log("candidate with label " + candidate.label + " and SDP " + candidate.toSdp());
+		console.log(candidate);
+	
+		var translation = SDPToJingle.createJingleStanza(offer.toSdp());
+		var audioDoc = zxmpp.util.parsedXMLDocument(translation.audio);
+		var videoDoc = zxmpp.util.parsedXMLDocument(translation.video);
+		console.log(translation);
+		console.log(audioDoc);
+		console.log(videoDoc);
+
+		//sendMessage({type: 'candidate', 
+		//		label: candidate.label, candidate: candidate.toSdp()});
+	}
+	if (!moreToFollow) {
+		console.log("End of candidates.");
+		//jingleCall.stopIce();	
+	}
+
+}
 function jingleSendSignaling(sdp)
 {
+	// old webkitDeprecatedPeerConnection()-based code
 	if(!zxmpp) zxmpp = new zxmppClass();
-	console.log("SHOULD SEND SIGNALIN");
+	console.log("SHOULD SEND SIGNALING");
 	console.log(sdp);
 	translation = SDPToJingle.createJingleStanza(sdp);
 	var audioDoc = zxmpp.util.parsedXMLDocument(translation.audio);
@@ -365,11 +395,44 @@ function jingleSendSignaling(sdp)
 var jingleCall;
 function call()
 {
-	jingleCall = new /*zmpp_xep0166_PeerConnection*/ webkitDeprecatedPeerConnection("STUN stun.l.google.com:19302", jingleSendSignaling);
+	// creating a peer connection:
+	jingleCall = new /*zmpp_xep0166_PeerConnection*/ webkitPeerConnection00("STUN stun.l.google.com:19302", jingleGotIceCandidate);
+	jingleCall.onconnecting = function(event) { console.log("onSessionConnecting"); };
+	jingleCall.onopen = function(event) { console.log("onSessionOpened"); };
+	jingleCall.onaddstream = function(event)
+	{
+		console.log("Added remote stream");
+		var url = webkitURL.createObjectURL(event.stream);
+		var remoteMonitor = document.getElementById("remotemonitor");
+		remoteMonitor.src = url;
+		waitForRemoteVideo();  
+
+	};
+	jingleCall.onremovestream = function(event) { console.log("onRemoteStreamRemoved"); };
+
+
+	// add stream
 	if(webrtc_videostream) jingleCall.addStream(webrtc_videostream);
 	if(webrtc_audiostream) jingleCall.addStream(webrtc_audiostream);
-	console.log("made jingle call");
 
+	// create offer -- done only when sending.
+	var offer = jingleCall.createOffer({ video: webrtc_videostream ? true : false, audio: webrtc_audiostream ? true : false });
+	jingleCall.setLocalDescription(jingleCall.SDP_OFFER, offer);
+
+	// 	
+	// TODO: now, we should send what we have in offer.
+	// something like "sendMessage(offer)"
+
+	jingleCall.startIce();
+
+	console.log("making jingle call with offer: " + offer.toSdp());
+	
+	var translation = SDPToJingle.createJingleStanza(offer.toSdp());
+	var audioDoc = zxmpp.util.parsedXMLDocument(translation.audio);
+	var videoDoc = zxmpp.util.parsedXMLDocument(translation.video);
+	console.log(translation);
+	console.log(audioDoc);
+	console.log(videoDoc);
 	return;
 	var contentGenerator = function demo_call_contentGen(zxmpp, destination, sessionId, packet)
 	{
