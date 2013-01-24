@@ -80,6 +80,7 @@ foreach(zxmppGetScriptsForExtensions() as $fn)
 <button onclick="terminate();">unclean terminate</button>
 <button onclick="enablevideo();">enable video</button>
 <button onclick="enableaudio();">enable audio</button>
+<button onclick="enablevideo(); enableaudio();">enable both</button>
 <button onclick="enablenotifications();" style="display: none;" id="notificationsbtn">enable webkit notifications</button><br>
 <input id="calldestination"><button onclick="call();">call</button><button onclick="if(jingleCall) jingleCall.close(); jingleCall = undefined;">hang up</button>
 <br>
@@ -333,13 +334,17 @@ function audioNoStream()
 	}
 }
 
-function jingleGotIceCandidate(candidate, moreToFollow)
+function jingleGotIceCandidate(iceEvent)
 {
-	if (candidate) {
-		console.log("candidate with label " + candidate.label + " and SDP " + candidate.toSdp());
+	console.log("jingleGotIceCandidate");
+	console.log(iceEvent);
+	if (iceEvent.candidate) {
+		var candidate = iceEvent.candidate;
+		console.log("candidate with label " + candidate.sdpMLineIndex + ", id " + event.candidate.sdpMid);
 		console.log(candidate);
-	
-		var translation = SDPToJingle.createJingleStanza(offer.toSdp());
+		
+		return;
+		var translation = SDPToJingle.createJingleStanza(candidate.candidate);
 		var audioDoc = zxmpp.util.parsedXMLDocument(translation.audio);
 		var videoDoc = zxmpp.util.parsedXMLDocument(translation.video);
 		console.log(translation);
@@ -349,7 +354,8 @@ function jingleGotIceCandidate(candidate, moreToFollow)
 		//sendMessage({type: 'candidate', 
 		//		label: candidate.label, candidate: candidate.toSdp()});
 	}
-	if (!moreToFollow) {
+	else
+	{
 		console.log("End of candidates.");
 		//jingleCall.stopIce();	
 	}
@@ -396,7 +402,22 @@ var jingleCall;
 function call()
 {
 	// creating a peer connection:
-	jingleCall = new /*zmpp_xep0166_PeerConnection*/ webkitPeerConnection00("STUN stun.l.google.com:19302", jingleGotIceCandidate);
+	var connection_config = {
+		'iceServers': [
+		{'url': 'stun:stun.l.google.com:19302'}
+		//{'url': 'turn:server.here:1337', 'credential': 'apassword'}
+		]
+	}
+	var pcConstraints = {
+		'optional': [
+			// Firefox interop stuff from AppRtc sample
+			{'DtlsSrtpKeyAgreement': 'true'},
+			{'MozDontOfferDataChannel': 'true'}
+				// NOTE: unused
+		]
+	};
+	jingleCall = new /*zmpp_xep0166_PeerConnection*/ webkitRTCPeerConnection(connection_config, pcConstraints);
+	jingleCall.onicecandidate = jingleGotIceCandidate;
 	jingleCall.onconnecting = function(event) { console.log("onSessionConnecting"); };
 	jingleCall.onopen = function(event) { console.log("onSessionOpened"); };
 	jingleCall.onaddstream = function(event)
@@ -416,23 +437,43 @@ function call()
 	if(webrtc_audiostream) jingleCall.addStream(webrtc_audiostream);
 
 	// create offer -- done only when sending.
-	var offer = jingleCall.createOffer({ video: webrtc_videostream ? true : false, audio: webrtc_audiostream ? true : false });
-	jingleCall.setLocalDescription(jingleCall.SDP_OFFER, offer);
-
-	// 	
-	// TODO: now, we should send what we have in offer.
-	// something like "sendMessage(offer)"
-
-	jingleCall.startIce();
-
-	console.log("making jingle call with offer: " + offer.toSdp());
+	//var offer = jingleCall.createOffer({ video: webrtc_videostream ? true : false, audio: webrtc_audiostream ? true : false });
+	var setLocalAndSendMessage = function slasm(sessionDescription)
+	{
+		var sdp = sessionDescription.sdp;
+		jingleCall.setLocalDescription(sessionDescription);
 	
-	var translation = SDPToJingle.createJingleStanza(offer.toSdp());
-	var audioDoc = zxmpp.util.parsedXMLDocument(translation.audio);
-	var videoDoc = zxmpp.util.parsedXMLDocument(translation.video);
-	console.log(translation);
-	console.log(audioDoc);
-	console.log(videoDoc);
+		console.log("making jingle call with offer: " + sdp);
+	
+		var translation = SDPToJingle.createJingleStanza(sdp);
+		var audioDoc = zxmpp.util.parsedXMLDocument(translation.audio);
+		var videoDoc = zxmpp.util.parsedXMLDocument(translation.video);
+		console.log(translation);
+		console.log(audioDoc);
+		console.log(videoDoc);
+
+		// 	
+		// TODO: now, we should send what we have in offer.
+		// something like "sendMessage(offer)"
+	};
+	var mediaConstraints = {
+		'mandatory': {
+			//'minWidth': 1280,
+			//'minHeight': 720,
+			// OR:
+			//'minAspectRatio': 1.777,
+			//'maxAspectRatio': 1.778,
+			'OfferToReceiveVideo': true,
+			'OfferToReceiveAudio': true,
+		},
+		//'optional': [
+		//]
+	};
+	var offer = jingleCall.createOffer(setLocalAndSendMessage, null, mediaConstraints);
+	
+
+	console.log("Starting call...");
+	
 	return;
 	var contentGenerator = function demo_call_contentGen(zxmpp, destination, sessionId, packet)
 	{
