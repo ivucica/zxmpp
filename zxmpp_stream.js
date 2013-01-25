@@ -280,6 +280,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 			conn.setRequestHeader("X-ZXMPPOldestRid", this.sentUnrespondedRIDs[0]);
 			conn.setRequestHeader("X-ZXMPPMyRid", assignedRid);
 			conn.setRequestHeader("X-ZXMPPReuseRids", JSON.stringify(this.reuseRIDs));
+			conn.setRequestHeader("Accept", "text/xml,application/xml");
 			conn.onreadystatechange = this.zxmpp.stream.handleConnectionStateChange;
 			conn.connrid = assignedRid;
 			conn.connkey = this.assignKey(true); if(conn.connkey) conn.connkey = conn.connkey.key;
@@ -397,7 +398,20 @@ zxmppClass.prototype.stream = function (zxmpp)
 		if(conn.status == 200)
 		{
 			// we need to dig deeper to see if this is a terminate packet
-			var bodyNode = conn.responseXML.firstChild;
+			var responseXML = conn.connzxmpp.util.xmlHttpRequestResponseXML(conn);
+			if(!responseXML)
+			{
+				console.error("Response is not valid XML");
+				console.log(conn.responseText);
+				
+				conn.connzxmpp.stream.terminate();
+
+				var code = "terminate/invalid-xml";
+				var humanreadable = "Did not receive valid XML as the response. Breaking connection.";
+				conn.connzxmpp.notifyConnectionTerminate(code, humanreadable);
+				return;
+			}
+			var bodyNode = responseXML.firstChild;
 			conn.connzxmpp.util.easierAttrs(bodyNode);
 				
 			if(bodyNode.attr["type"] == "terminate" && bodyNode.attr["condition"] == "item-not-found")
@@ -504,7 +518,8 @@ zxmppClass.prototype.stream = function (zxmpp)
 		var packet = new this.zxmpp.packet(this.zxmpp);
 		try
 		{
-			if(!packet.parseXML(conn.responseXML)) // packet not intended for further processing
+			var responseXML = this.zxmpp.util.xmlHttpRequestResponseXML(conn);
+			if(!packet.parseXML(responseXML)) // packet not intended for further processing
 			{
 				return;
 			}

@@ -168,7 +168,34 @@ zxmppClass.prototype.util = function (zxmpp)
 		return xml.attr;
 	}
 	
-	
+	// by Ivan Vucica
+	this.xmlHttpRequestResponseXML = function zxmpp_util_xmlHttpRequestResponseXML(xhr)
+	{
+		var conn = xhr;
+		var responseXML = xhr.responseXML;
+		if(!responseXML)
+		{
+			responseXML = conn.connzxmpp.util.parsedXMLDocument(conn.responseText);
+			if(responseXML && responseXML.firstChild)
+			{
+				if(!conn.connzxmpp.stream._didWarnAboutXMLContentType)
+					console.warn("Server response was not tagged as XML content-type despite being XML. This is a one time warning.");
+				conn.connzxmpp.stream._didWarnAboutXMLContentType = true;
+			}
+			else
+			{
+				responseXML = conn.connzxmpp.util.parsedXMLDocument('<?xml version="1.0"?>' + conn.responseText);
+			}
+			if(responseXML && responseXML.firstChild)
+			{
+				if(!conn.connzxmpp.stream._didWarnAboutXMLHavingToBePrefixed)
+					console.warn("Server response had to be prefixed with <?xml?> header. This is a one time warning.");
+				conn.connzxmpp.stream._didWarnAboutXMLHavingToBePrefixed = true;
+			}
+		}
+
+		return responseXML;
+	} 
 	
 	/****** base64 code **********/
 	
