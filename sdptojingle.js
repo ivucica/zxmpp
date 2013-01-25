@@ -175,7 +175,7 @@ var SDPToJingle = (function() {
 			crypto.push({
 				'crypto-suite': params[1],
 				'key-params': params[2],
-				'session-params': params[3],
+				'session-params': (params[3] ? params[3] : ""),
 				'tag': key[1]
 			});
 		},
