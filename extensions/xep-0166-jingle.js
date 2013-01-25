@@ -34,6 +34,9 @@ function zxmpp_xep0166_init(zxmpp)
 
 function zxmpp_xep0166_iqhandler(zxmpp, iqstanza, xml)
 {
+	if(iqstanza.xep0166_abort_processing)
+		return false;
+
 	console.log(xml);
 	var sessionId = xml.attr["sid"];
 	console.log(zxmpp_xep0166_webrtcPeerConnections);
@@ -59,6 +62,7 @@ function zxmpp_xep0166_iqhandler(zxmpp, iqstanza, xml)
 	}
 	
 	console.error("XEP-0166: DID NOT PARSE " + xml.attr["action"]);
+	console.log(xml);
 	return false;
 }
 
@@ -78,8 +82,11 @@ function zxmpp_xep0166_sessioninitiate(zxmpp, destination, sessionId, contentXML
 	{
 		if(response.type == "error")
 		{
-			console.log("Error in making a call");
+			console.error("Error in making a call");
+			console.log(iq);
+			iq.xep0166_abort_processing = true;
 			webrtcPeerConnection.close();
+			return true;
 		}
 		else
 		{

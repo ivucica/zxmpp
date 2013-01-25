@@ -333,23 +333,76 @@ function audioNoStream()
 		zxmpp.disableClientFeatureExtension("voice-v1");
 	}
 }
-
+function sdpCleanDuplicateLines(sdp)
+{
+	var lines = sdp.split("\r\n");
+	var lines2 = [];
+	var wasAdded = {};
+	for(var lineId in lines)
+	{
+		var line = lines[lineId];
+		if(line.substr(0,2)!="a=" || !wasAdded[line])
+		{
+			lines2.push(line);
+			wasAdded[line] = true;
+		}
+	}
+	if(lines.length != lines2.length)
+	{
+		console.log("Note: cleaned up " + (lines.length - lines2.length) + " duplicate candidate lines");
+	}	
+	return lines2.join("\r\n");
+}
+function sdpRemoveCandidateLines(sdp)
+{
+	var lines = sdp.split("\r\n");
+	var lines2 = [];
+	for(var lineId in lines)
+	{
+		var line = lines[lineId];
+		if(line.substr(0,"a=candidate:".length) != "a=candidate:")
+		{
+			lines2.push(line);
+		}
+	}
+	return lines2.join("\r\n");
+}
+function jingleKeepTransportOnly(xmldoc)
+{
+	var contentNode = xmldoc.firstChild;
+	for(var i = 0; i < contentNode.childNodes.length;)
+	{
+		var child = contentNode.childNodes[i];
+		if(child.localName == "transport")
+		{
+			i++;
+			continue;
+		}
+		contentNode.removeChild(child);
+	}
+}
 function jingleGotIceCandidate(iceEvent)
 {
 	console.log("jingleGotIceCandidate");
-	console.log(iceEvent);
+	var jingleCall = iceEvent.target;
 	if (iceEvent.candidate) {
 		var candidate = iceEvent.candidate;
-		console.log("candidate with label " + candidate.sdpMLineIndex + ", id " + event.candidate.sdpMid);
-		console.log(candidate);
-		
-		return;
-		var translation = SDPToJingle.createJingleStanza(candidate.candidate);
+		//console.log("candidate with label " + candidate.sdpMLineIndex + ", id " + event.candidate.sdpMid);
+
+		iceEvent.target.zxmppSdp += candidate.candidate; // add the a=candidate: line
+		iceEvent.target.zxmppSdp = sdpCleanDuplicateLines(iceEvent.target.zxmppSdp);
+
+		var sdp = sdpRemoveCandidateLines(iceEvent.target.zxmppSdp);
+		sdp += candidate.candidate; // add the a=candidate: line
+
+		var translation = SDPToJingle.createJingleStanza(sdp);
 		var audioDoc = zxmpp.util.parsedXMLDocument(translation.audio);
 		var videoDoc = zxmpp.util.parsedXMLDocument(translation.video);
-		console.log(translation);
-		console.log(audioDoc);
-		console.log(videoDoc);
+		jingleKeepTransportOnly(audioDoc);
+		jingleKeepTransportOnly(videoDoc);
+		//console.log(translation);
+		//console.log(audioDoc);
+		//console.log(videoDoc);
 
 		//sendMessage({type: 'candidate', 
 		//		label: candidate.label, candidate: candidate.toSdp()});
@@ -443,8 +496,11 @@ function call()
 		var sdp = sessionDescription.sdp;
 		jingleCall.setLocalDescription(sessionDescription);
 	
-		console.log("making jingle call with offer: " + sdp);
-	
+		console.log("making jingle call with offer");
+		console.log(sessionDescription);
+		jingleCall.zxmppSdp = sdp;
+		jingleCall.zxmpp = zxmpp;
+		jingleCall.zxmppSessionIdentifier = "a" + Math.round(Math.random()*10000)
 		var translation = SDPToJingle.createJingleStanza(sdp);
 		var audioDoc = zxmpp.util.parsedXMLDocument(translation.audio);
 		var videoDoc = zxmpp.util.parsedXMLDocument(translation.video);
@@ -452,9 +508,29 @@ function call()
 		console.log(audioDoc);
 		console.log(videoDoc);
 
-		// 	
-		// TODO: now, we should send what we have in offer.
+
+
+
+		// now, we should send what we have in offer.
 		// something like "sendMessage(offer)"
+		/////////////////
+		var audioDoc = zxmpp.util.parsedXMLDocument(translation.audio);
+		var audioContent = audioDoc.firstChild;
+		audioDoc.removeChild(audioContent);
+	
+		var contentGenerator = function demo_call_contentGen(zxmpp, destination, sessionId, packet)
+		{
+			return audioContent;
+		}
+
+
+		zxmpp_xep0166_sessioninitiate(
+				zxmpp, 
+				document.getElementById("calldestination").value,
+				jingleCall.zxmppSessionIdentifier,
+				contentGenerator,
+				jingleCall);
+
 	};
 	var mediaConstraints = {
 		'mandatory': {
