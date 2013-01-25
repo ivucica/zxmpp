@@ -55,8 +55,12 @@ zxmppClass.prototype.packet = function (zxmpp)
 		// assign cryptographic key(s) from 
 		// part 15 of XEP-0124
 		var keys = this.zxmpp.stream.assignKey();
-		zxmppConsole.warn("CURRENTLY DISABLED cryptographic key from part 15 of XEP-0124");
-		zxmppConsole.warn("This seems to solve misbehavior with punjab, but is incorrect!");
+		if(this.zxmpp.stream._didWarnAboutCryptoBeingDisabled)
+		{
+			zxmppConsole.warn("CURRENTLY DISABLED: cryptographic key from part 15 of XEP-0124");
+			zxmppConsole.warn("This seems to solve misbehavior with punjab, but is incorrect!");
+			this.zxmpp.stream._didWarnAboutCryptoBeingDisabled = true;
+		}
 		/*
 		if(keys.key)
 			body.setAttribute('key', keys.key);
