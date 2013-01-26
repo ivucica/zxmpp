@@ -383,18 +383,34 @@ var SDPToJingle = (function() {
 
 
 			for(var media in description) {
+				var mediaSdp = "";
 				if(description.hasOwnProperty(media)) {
-					sdp += _generateMediaSdp(media, description[media]);
+					mediaSdp = _generateMediaSdp(media, description[media]);
 				}
-				bundleSdp += " " + media;
+				if(mediaSdp.length)
+				{
+					sdp += mediaSdp;
+					bundleSdp += " " + media;
+				}
 			}
 			return baseSdp + bundleSdp + sdp + "\r\n";
 		},
 		_generateMediaSdp = function(media, description) {
 			// TODO: Remove hardcoded values like "1" which is the mediaport placeholder
+
+			if(!description.port || !description.profile)
+			{
+				console.warn("For some reason, description contained media '" + media + "' without specifying its details. SDPToJingle's _generateMediaSdp will skip this.");
+				console.log(description);
+				return "";
+			}
 			var m = "\r\nm=" + media + " " + description.port + " " + description.profile,
 				rtpmapStr = "a=mid:" + media + "\r\na=rtcp-mux",
-				rtcpStr = "a=rtcp:" + description.port + " IN IP4 " + description['udp-candidates'][0].ip + "\r\n",
+				rtcpStr = "a=rtcp:" + description.port + " IN IP4";
+				if(description['udp-candidates'] && description['udp-candidates'][0])
+					rtcpStr += " " + description['udp-candidates'][0].ip;
+				rtcpStr += "\r\n";
+			var
 				cryptoStr = "",
 				udpCandidateStr = "",
 				iceCandidateStr = "",
@@ -478,6 +494,8 @@ var SDPToJingle = (function() {
 			return _generateJingleFromDescription(description);
 		},
 		parseJingleStanza: function(stanza) {
+                        console.log("*** PARSING INCOMING JINGLE STANZA");
+                        console.log(stanza);
 			var doc = _getXmlDoc(stanza),
 				jingle = doc.childNodes.length ? doc.childNodes[0] : undefined,
 				children = jingle ? jingle.childNodes : undefined,

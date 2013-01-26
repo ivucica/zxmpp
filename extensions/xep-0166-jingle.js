@@ -57,7 +57,11 @@ function zxmpp_xep0166_iqhandler(zxmpp, iqstanza, xml)
 		
 		var sdp = SDPToJingle.parseJingleStanza(zxmpp.util.serializedXML(xml));
 		console.log("SDP: " + sdp);
-		peerConnection.processSignalingMessage(sdp);
+		//peerConnection.processSignalingMessage(sdp);
+		var type;
+		if(xml.attr["action"] == "session-accept")
+			type = "answer";
+		peerConnection.setRemoteDescription(new RTCSessionDescription({sdp:sdp, type:type}));
 		return true;
 	}
 	
