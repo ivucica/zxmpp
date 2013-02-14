@@ -26,10 +26,9 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 	
 	this.parseXML = function (xml)
 	{
-		
 		//zxmppConsole.log("Presence parsing: " + this.zxmpp.util.serializedXML(xml));
-		this.zxmpp.util.easierAttrs(xml);
-		
+		this.zxmpp.util.easierAttrs(xml)
+
 		this.from = xml.attr["from"];
 		this.to = xml.attr["to"];
 		this.type = xml.attr["type"];
@@ -66,7 +65,7 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 		{
 			presence.show = "unavailable";
 			zxmppConsole.log(presence);
-			this.zxmpp.notifyPresenceUpdate(presence);
+			this.zxmpp.notifyPresenceUpdate(presence, this);
 			this.zxmpp.removePresence(this.from);
 			
 			return; // FIXME we should not return and should continue parsing; showing the <status> upon logout might be fun
@@ -136,12 +135,12 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 			}
 			
 		}
-		this.zxmpp.notifyPresenceUpdate(presence);
+		this.zxmpp.notifyPresenceUpdate(presence, this);
 
 	}
 	
 	
-	this.appendToPacket = function(packet, from, to, type, status, priority)
+	this.appendToPacket = function(packet, from, to, show, status, priority, type)
 	{
 		if(!status) 
 			status = "";
@@ -149,21 +148,26 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 		this.from = from;
 		this.to = to;
 		this.status = status;
-		if(type == "unavailable")
+		if(show == "unavailable")
 		{
-			this.type = "unavailable";
+			this.show = "unavailable";
 		}
-		else if(type == "avail")
+		else if(show == "avail")
 		{
 			// both show and type are empty!
+			delete this.show;
 		}
 		else
 		{
-			this.show = type;
+			this.show = show;
 		}
 		if(typeof priority != "undefined")
 		{
 			this.priority = priority;
+		}
+		if(typeof type != "undefined")
+		{
+			this.type = type;
 		}
 		
 		
@@ -200,9 +204,14 @@ zxmppClass.prototype.stanzaPresence = function(zxmpp)
 		
 		// finally, add our caps!
 		var presence = this.zxmpp.getPresence(this.from);
-		var caps = presence.caps;
-		caps.applyThisClientsCaps();
-		caps.appendToXML(packet, presenceNode);
+		if(presence)
+		{
+			//... but only if this.from actually exists
+			// (it might not in case we're sending <presence type='subscribe'>)
+			var caps = presence.caps;
+			caps.applyThisClientsCaps();
+			caps.appendToXML(packet, presenceNode);
+		}
 		
 		packet.presenceXML = presenceNode;
 		packet.presenceStanza = this;

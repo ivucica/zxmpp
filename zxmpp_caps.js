@@ -262,6 +262,7 @@ zxmppClass.prototype.caps = function(zxmpp)
 	this.unpackExt = function zxmppCaps_unpackExt(extdest)
 	{
 		if(!this.ext) return;
+                if(!this.ext.length) return;
 		var exts = this.ext.split(" ");
 		
 		var packet = new this.zxmpp.packet(this.zxmpp);
@@ -291,6 +292,7 @@ zxmppClass.prototype.caps = function(zxmpp)
 		
 		if(needsSending)
 			packet.send("poll");
+                delete packet;
 	}
 
 	this.toJSON = function zxmppCaps_toJSON(key)

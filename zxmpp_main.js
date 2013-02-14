@@ -230,15 +230,15 @@ zxmppClass.prototype.notifyConnectionTerminate = function zxmppMain_notifyConnec
 	}
 }
 
-zxmppClass.prototype.notifyPresenceUpdate = function zxmppMain_notifyPresenceUpdate(presence)
+zxmppClass.prototype.notifyPresenceUpdate = function zxmppMain_notifyPresenceUpdate(presence, stanza)
 {
 	for(var presenceHandlerId in this.onPresenceUpdate)
 	{
 		var presenceHandler = this.onPresenceUpdate[presenceHandlerId];
 		if(presenceHandler.func)
-			presenceHandler.func(presenceHandler.context, this, presence);
+			presenceHandler.func(presenceHandler.context, this, presence, stanza);
 		else
-			presenceHandler(this, presence);
+			presenceHandler(this, presence, stanza);
 	}
 }
 zxmppClass.prototype.notifyRosterUpdate = function zxmppMain_notifyRosterUpdate(rosteritem)
