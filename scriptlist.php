@@ -20,7 +20,8 @@ function zxmppGetZXMPPScripts()
 		'zxmpp_stanzamessage.js',
 
 		'zxmpp_authplain.js',
-		'zxmpp_authdigestmd5.js'
+		'zxmpp_authdigestmd5.js',
+		'zxmpp_authanonymous.js'
 		);
 }
 

@@ -540,9 +540,12 @@ zxmppClass.prototype.stream = function (zxmpp)
 			// 0 is the favorite mechanism,
 			// 1 is the less favored mechanism,
 			// etc.
+			// FIXME: server should be deciding the order of preference
+			// for mechanisms
 			var supportedMechanisms = new Array();
 			supportedMechanisms.push(["DIGEST-MD5", this.zxmpp.authDigestMD5]);
 			supportedMechanisms.push(["PLAIN", this.zxmpp.authPlain]);
+			supportedMechanisms.push(["ANONYMOUS", this.zxmpp.authAnonymous]);
 
 			var pickedMechanism = false;
 			for(var mechanismId = 0; mechanismId < supportedMechanisms.length; mechanismId++)
