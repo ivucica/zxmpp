@@ -31,7 +31,7 @@ zxmppClass.prototype.authDigestMD5 = function (zxmpp)
 			}
 			else
 			{
-				zxmppConsole.error("zxmpp::authDigestMD5::doStep(): plain authentication mechanism unsupported. giving up");
+				zxmppConsole.error("zxmpp::authDigestMD5::doStep(): digestmd5 authentication mechanism unsupported. giving up");
 
 				this.zxmpp.stream.terminate();
 	
