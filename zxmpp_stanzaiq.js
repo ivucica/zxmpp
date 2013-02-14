@@ -234,6 +234,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 					if(child.firstChild)
 					{
 						this.zxmpp.fullJid = child.firstChild.nodeValue;
+						this.zxmpp.bareJid = child.firstChild.nodeValue.split("/")[0];
 						this.zxmpp.getPresence(this.zxmpp.fullJid);
 					}
 					break;
@@ -579,7 +580,6 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		packet.iqStanza = this;
 			
 		// remember we wait for a result or error <iq> stanza
-		zxmppConsole.log("appended " + this.type);
 		if(this.type == "set" || this.type == "get")
 		{
 			//zxmppConsole.log("remembering " + this.id);
