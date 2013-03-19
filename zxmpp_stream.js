@@ -700,7 +700,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 
 		var packet = new this.zxmpp.packet(this.zxmpp);
 		var iq = new this.zxmpp.stanzaIq(this.zxmpp);
-		iq.appendIqToPacket(packet, "session", "set", this.zxmpp.cfg["domain"]);
+		iq.appendIqToPacket(packet, "session", "set", this.zxmpp.cfg["domain"].split(":")[0]);
 		iq.appendSessionToPacket(packet);
 		
 		this.hasSentSessionRequest=true;
