@@ -74,7 +74,8 @@ zxmppClass.prototype.packet = function (zxmpp)
 	
 	this.send = function zxmppPacket_send(send_style)
 	{
-		tthis = this;
+		var tthis = this;
+		zxmppConsole.log("<< " + tthis.zxmpp.util.serializedXML(tthis.xml));
 		// queue for wire
 		// FIXME ignores send_style!
 		if(send_style=="hold")

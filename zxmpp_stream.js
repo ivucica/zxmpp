@@ -523,6 +523,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 			{
 				return;
 			}
+			zxmppConsole.log(">> " + this.zxmpp.util.serializedXML(responseXML));
 
 			this.zxmpp.notifyPacket(packet);
 
