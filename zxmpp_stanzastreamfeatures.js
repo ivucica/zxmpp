@@ -52,7 +52,7 @@ zxmppClass.prototype.stanzaStreamFeatures = function(zxmpp)
 				}
 				else
 				{
-					console.warn("zxmpp::stanzaStreamFeatures::parseXML(): Unparsed " + child.nodeName + " in namespace " + child.attr["xmlns"]  + ": " + this.zxmpp.util.serializedXML(child));
+					zxmppConsole.warn("zxmpp::stanzaStreamFeatures::parseXML(): Unparsed " + child.nodeName + " in namespace " + child.attr["xmlns"]  + ": " + this.zxmpp.util.serializedXML(child));
 				}
 				
 				
@@ -85,7 +85,7 @@ zxmppClass.prototype.stanzaStreamFeatures = function(zxmpp)
 	this.toJSON = function()
 	{
 		// TODO
-		console.warn("skipping encoding of stanzaStreamFeatures");
+		zxmppConsole.warn("skipping encoding of stanzaStreamFeatures");
 		return "< not encoding stanzaStreamFeatures >";
 	}
 	
