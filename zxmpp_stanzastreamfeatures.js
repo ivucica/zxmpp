@@ -70,16 +70,21 @@ zxmppClass.prototype.stanzaStreamFeatures = function(zxmpp)
 	
 	this.parseMechanisms = function(xml)
 	{
-		var saslMechanisms = [];
+		var saslMechanismsList = [];
+		var saslMechanismsSet = {};
 		for(var i in xml.childNodes)
 		{
 			var child = xml.childNodes[i];
 			if(child.nodeName=="mechanism")
 			{
-				saslMechanisms[child.firstChild.nodeValue.toUpperCase()] = true;
+				var mechanism = child.firstChild.nodeValue.toUpperCase();
+
+				saslMechanismsList.push(mechanism);
+				saslMechanismsSet[mechanism] = true;
 			}
 		}
-		return saslMechanisms;
+
+		return {'list' : saslMechanismsList, 'set' : saslMechanismsSet};
 	}
 
 	this.toJSON = function()

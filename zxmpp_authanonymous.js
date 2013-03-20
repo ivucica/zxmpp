@@ -25,7 +25,7 @@ zxmppClass.prototype.authAnonymous = function (zxmpp)
 		{
 			
 			if(this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"] && 
-			   this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"]["mechanisms"]["ANONYMOUS"])
+			   this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"]["mechanisms"]["set"]["ANONYMOUS"])
 			{
 				this.sendAnonymousAuth("poll");
 			}
@@ -47,7 +47,7 @@ zxmppClass.prototype.authAnonymous = function (zxmpp)
 	{
 		// ANONYMOUS should never have to handle a challenge.
 		// For now, we just won't respond to the challenge.
-		zxmppConsole.log("zxmpp::authPlain::handleChallenge: ignoring challenge!");
+		zxmppConsole.log("zxmpp::authAnonymous::handleChallenge: ignoring challenge!");
 	}
 	this.handleSuccess = function zxmppAuthAnonymous_handleSuccess(xml)
 	{
@@ -61,7 +61,7 @@ zxmppClass.prototype.authAnonymous = function (zxmpp)
 	{
 		this.authSuccess = false;
 	}
-	this.sendAnonymousAuth = function zxmppAuthAnonymous_sendPlainAuth()
+	this.sendAnonymousAuth = function zxmppAuthAnonymous_sendAnonymousAuth()
 	{
 		// send authorization
 		var packet = new this.zxmpp.packet(this.zxmpp);

@@ -537,17 +537,42 @@ zxmppClass.prototype.stream = function (zxmpp)
 		
 		if(!this.auth)
 		{
+
+			var knownMechanisms = {
+				'ANONYMOUS' : this.zxmpp.authAnonymous,
+				'PLAIN' : this.zxmpp.authPlain,
+				'DIGEST-MD5' : this.zxmpp.authDigestMD5,
+			};
+
 			// Weighted, ordered list of supported mechanisms.
 			// 0 is the favorite mechanism,
 			// 1 is the less favored mechanism,
 			// etc.
-			// FIXME: server should be deciding the order of preference
-			// for mechanisms
 			var supportedMechanisms = new Array();
-			supportedMechanisms.push(["DIGEST-MD5", this.zxmpp.authDigestMD5]);
-			supportedMechanisms.push(["PLAIN", this.zxmpp.authPlain]);
-			supportedMechanisms.push(["ANONYMOUS", this.zxmpp.authAnonymous]);
+			if(this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"])
+			{
+				// server decides order of preference.
+				var mechanisms = this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"]["mechanisms"]["list"];
+				for (var mechanismId in mechanisms)
+				{
+					var mechanism = mechanisms[mechanismId];
+					if(knownMechanisms[mechanism])
+					{
+						supportedMechanisms.push([mechanism, knownMechanisms[mechanism]]);
+					}
+				}
+			}
+			else
+			{
+				// a default in case of some breakage.
+				// should never happen.
+				supportedMechanisms.push(["PLAIN", this.zxmpp.authPlain]);
+			}
 
+
+			// TODO: simplify.
+			// We already only permit server-supported mechanisms. We should easily
+			// be able to simply use the top mechanism.
 			var pickedMechanism = false;
 			for(var mechanismId = 0; mechanismId < supportedMechanisms.length; mechanismId++)
 			{
@@ -556,7 +581,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 				var mechanismClass = mechanism[1];
 
 				if(this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"] &&
-				   this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"]["mechanisms"][mechanismName])
+				   this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"]["mechanisms"]["set"][mechanismName])
 				{
 					pickedMechanism = mechanism;
 					break;

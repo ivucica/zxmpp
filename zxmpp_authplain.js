@@ -25,7 +25,7 @@ zxmppClass.prototype.authPlain = function (zxmpp)
 		{
 			
 			if(this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"] && 
-			   this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"]["mechanisms"]["PLAIN"])
+			   this.zxmpp.stream.features["urn:ietf:params:xml:ns:xmpp-sasl"]["mechanisms"]["set"]["PLAIN"])
 			{
 				this.sendPlainAuth("poll");
 			}
@@ -82,7 +82,7 @@ zxmppClass.prototype.authPlain = function (zxmpp)
 		this.hasSentAuth=true;
 		packet.send();
 	}
-	this.authSucceeded = function zxmppAuthPLain_authSucceeded()
+	this.authSucceeded = function zxmppAuthPlain_authSucceeded()
 	{
 		return this.authSuccess;
 	}
