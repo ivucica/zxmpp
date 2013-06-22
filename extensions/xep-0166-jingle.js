@@ -51,7 +51,7 @@ function zxmpp_xep0166_iqhandler(zxmpp, iqstanza, xml)
 	{
 		var packet = new zxmpp.packet(zxmpp);
 		var iq = new zxmpp.stanzaIq(zxmpp);
-		iq.appendIqToPacket(packet, "jingle", "result", iqstanza.from);
+		iq.appendIqToPacket(packet, false, "result", iqstanza.from, iqstanza.id);
 		packet.send();
 
 		
