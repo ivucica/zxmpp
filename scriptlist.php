@@ -21,7 +21,8 @@ function zxmppGetZXMPPScripts()
 
 		'zxmpp_authplain.js',
 		'zxmpp_authdigestmd5.js',
-		'zxmpp_authanonymous.js'
+		'zxmpp_authanonymous.js',
+		'zxmpp_authfb.js'
 		);
 }
 
@@ -34,6 +35,11 @@ function zxmppGetAllScripts()
 	$scripts[] = 'stacktrace.js';
 	$scripts[] = 'md5_2.js';
 	$scripts[] = 'sdptojingle.js';
+
+	// phpjs functions, for authfb:
+	$scripts[] = 'parse_str.js';
+	$scripts[] = 'http_build_query.js';
+	$scripts[] = 'urlencode.js'; // http_build_query depends on this
 
 	return $scripts;
 }

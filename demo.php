@@ -117,6 +117,12 @@ function createzxmpp()
 		"domain": <?=isset($_GET["domain"]) ? '"' . $_GET["domain"] . '"' : "window.location.hostname"?>,
 		"boshwait": 15
 	}
+	var fbcfg = {
+		"bind-url": "punjab-bind/",
+		"route": "xmpp:chat.facebook.com:5222",
+		"domain": "chat.facebook.com",
+		"boshwait": 15
+	}
 	var cfg = <?=isset($_GET["cfg"]) ? $_GET["cfg"] : "relativecfg"?>;
 
 	zxmpp = new zxmppClass();

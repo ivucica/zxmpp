@@ -542,6 +542,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 				'ANONYMOUS' : this.zxmpp.authAnonymous,
 				'PLAIN' : this.zxmpp.authPlain,
 				'DIGEST-MD5' : this.zxmpp.authDigestMD5,
+				'X-FACEBOOK-PLATFORM': this.zxmpp.authFB
 			};
 
 			// Weighted, ordered list of supported mechanisms.
@@ -556,9 +557,11 @@ zxmppClass.prototype.stream = function (zxmpp)
 				for (var mechanismId in mechanisms)
 				{
 					var mechanism = mechanisms[mechanismId];
+					zxmppConsole.log("Was offered " + mechanism);
 					if(knownMechanisms[mechanism])
 					{
 						supportedMechanisms.push([mechanism, knownMechanisms[mechanism]]);
+						zxmppConsole.log("Matched SASL mechanism: " + mechanism);
 					}
 				}
 			}
