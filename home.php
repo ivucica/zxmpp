@@ -75,7 +75,8 @@ BitBucket's web interface.
 </ul>
 </p>
 
-<p><b>Urgently wanted!</b> Someone needs to rewrite the bar interface ASAP.
+<p>
+<b>A suggestion:</b> Someone could rewrite the bar interface.
 JQuery ninjas are especially welcome to contribute (although anything decently
 written will be accepted). You don't need to worry about networking; as long as
 you provide me with a nice&amp;simple API to: 1. add users to roster, 2. remove
@@ -85,11 +86,15 @@ well, that's it! The UI should be bar-based, since that is most useful for
 most people; otherwise, the field is yours!
 </p>
 
+<p>
+Grouping users would also be appreciated, but is not required.
+</p>
+
 
 <h3>How was it implemented?</h3>
 <p>
 This client is written in pure JavaScript. It communicates with the server 
-using two <code>XMLHTTPRequest</code>-based connections, in accordance to the 
+using two <code>XMLHttpRequest</code>-based connections, in accordance to the 
 <a href="http://xmpp.org/about-xmpp/technology-overview/bosh/">BOSH</a> 
 specifications: <a href="http://xmpp.org/extensions/xep-0124.html">XEP-0124</a> 
 and <a href="http://xmpp.org/extensions/xep-0206.html">XEP-0206</a>. In short,
@@ -136,10 +141,11 @@ short list of the current major issues if you're not super careful.
 </p>
 
 <ul>
-<li><b>plaintext authentication only.</b> Z-XMPP is unable to authenticate user
-if the server doesn't accept plaintext auth. This also means that unless
-security is provided using HTTPS, your user's password will be transmitted
-in clear.</li>
+<li><b>plaintext authentication supported.</b> Z-XMPP will happily
+authenticate the user even with plaintext auth. This also means that unless
+security is provided using HTTPS, your user's password may be transmitted
+in clear. Try ensuring that the server supports one of other supported
+authentication mechanisms.</li>
 <li><b>inherent insecurity of HTTP.</b> Your user's traffic is not
 encrypted if Z-XMPP is used over HTTP. Use only HTTPS wherever you implement
 Z-XMPP, or make sure your users are aware that they are using an insecure
@@ -155,7 +161,8 @@ site, resist the temptation to just <code>echo</code> user's permanent
 credentials onto the web site. This means someone could dig the cache and
 take a look at what password the user uses. Instead, upon page access, 
 dynamically create a one shot authentication key which will be accessible only
-by the external authentication library of the XMPP server.
+by the external authentication library of the XMPP server. Make this token
+time limited.
 </ul>
 
 <h3>Basic setup</h3>
@@ -188,18 +195,33 @@ make my heart all warm and fuzzy.
 <h3>Browser compatibility</h3>
 <ul>
 <li>Firefox: 3.6+ (3.5, if you don't care about serialization; window.sessionStorage doesn't seem to work in onUnload); 4.0beta7 tested</li>
-<li>MSIE: n/a (only standards-based XHR is used, plus I don't like MSIE nor use Windows most of the time)</li>
+<li>MSIE: n/a (only standards-based XHR is used, plus I don't use Windows most of the time)</li>
 <li>Opera: not tested</li>
 <li>Chrome: 8.0 tested, may work in earlier versions</li>
 <li>Safari: 5.0 tested, may work in earlier versions</li>
 </ul>
 
+<h3>SASL authentication mechanisms</h3>
+<p>
+Supported mechanisms:
+</p>
+<ul>
+<li>PLAIN</li>
+<li>DIGEST-MD5</li>
+<li>ANONYMOUS</li>
+<li>X-FACEBOOK-PLATFORM</li>
+</ul>
+<p>
+You need to implement your own Facebook authentication, either using Facebook's JS API or some other method. Then just pass the application ID as username, and access token as password. Also, in configuration, set <code>fb-auth-enabled</code> to a truthful value. This is needed so you can still use other SASL methods when connecting to a server supporting <code>X-FACEBOOK-PLATFORM</code>.
+</p>
+
 <h3>To do</h3>
+<p>
 My personal want-to-do minilist, in order of necessity:
+</p>
 <ul>
 <li>serialize UI state, not just stream state</li>
 <li>create a Prosody-like plugin API, and rewrite existing code to use it</li>
-<li>add <code>ANONYMOUS</code> authentication</li>
 <li>rewrite UI (or accept a contribution of a rewritten UI)</li>
 <li>fix bugs in <code>BUGS</code> file :-)</li>
 </ul>
@@ -214,6 +236,6 @@ http://ivan.vucica.net/<br>
 http://blog.vucica.net/<br>
 http://twitter.com/ivucica</p>
 
-<h6>&copy; 2010-2012 Ivan Vučica</h6>
+<h6>&copy; 2010-2013 Ivan Vučica</h6>
 </body>
 </html>
