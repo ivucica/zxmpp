@@ -121,6 +121,7 @@ function createzxmpp()
 		"bind-url": "punjab-bind/",
 		"route": "xmpp:chat.facebook.com:5222",
 		"domain": "chat.facebook.com",
+		"fb-auth-enabled": 1,
 		"boshwait": 15
 	}
 	var cfg = <?=isset($_GET["cfg"]) ? $_GET["cfg"] : "relativecfg"?>;

@@ -542,8 +542,11 @@ zxmppClass.prototype.stream = function (zxmpp)
 				'ANONYMOUS' : this.zxmpp.authAnonymous,
 				'PLAIN' : this.zxmpp.authPlain,
 				'DIGEST-MD5' : this.zxmpp.authDigestMD5,
-				'X-FACEBOOK-PLATFORM': this.zxmpp.authFB
 			};
+			if(this.zxmpp.cfg['fb-auth-enabled'])
+			{
+				knownMechanisms['X-FACEBOOK-PLATFORM'] = this.zxmpp.authFB;
+			}
 
 			// Weighted, ordered list of supported mechanisms.
 			// 0 is the favorite mechanism,
