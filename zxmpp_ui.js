@@ -31,6 +31,9 @@ zxmppClass.prototype.ui = function() {
 
 		this.bar.hide().fadeIn();
 
+		/////////
+		// TODO: add buttons to roster
+		//this.roster.children('.zxmpp_content').append('<div id="zxmpp_roster_' + safejid + '" class="user' + safejid + ' zxmpp_user zxmpp_status' + icon + '">' + display + '<div class="zxmpp_statustext">' + status + '</div></div>');
 	}
 
 	this.openWindow = function(title, id) {

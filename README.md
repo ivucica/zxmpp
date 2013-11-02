@@ -21,7 +21,9 @@ Opera, Firefox.
 
 ## User interface ##
 
-While primarily an XMPP library that preserves connection between page switches, Z-XMPP also includes an ugly user interface component for instant messaging. It appears as a bar on the bottom of the screen.
+While primarily an XMPP library that preserves connection between page switches, 
+Z-XMPP also includes an ugly user interface component for instant messaging. 
+It appears as a bar on the bottom of the screen.
 
 ![Screenshot of Z-XMPP UI](http://ivan.vucica.net/zxmpp/screenshot.png)
 
@@ -64,6 +66,13 @@ Following XEPs are partially or fully supported:
 
 There may be additional features supported, but not documented.
 
+### Current version ###
+
+Following SASL authentication methods are added:
+
+* ANONYMOUS
+* X-FACEBOOK-PLATFORM
+
 ## License ##
 
 Please read the [LICENSE](LICENSE) to see current use terms.
@@ -90,13 +99,27 @@ These instructions can, of course, be improved, and the author will be
 happy to answer your questions on how to get Z-XMPP to connect to your
 XMPP server on your web site (to the extent of his ability, of course).
 
+## Facebook authentication ##
+
+Z-XMPP does not include a sample Facebook application. You need to
+implement yourself the Facebook authentication, either using the JS
+SDK or some other method of obtaining the required authentication
+details.
+
+Pass the application ID as username, and access token as password.
+It'll be automatically passed correctly when the server supports the
+`X-FACEBOOK-PLATFORM` method. Also, in configuration, pass 
+`fb-auth-enabled` with a truthful value (e.g. 'true'). This is done
+so you can also use `PLAIN` or `DIGEST-MD5` when connecting to a
+server supporting `X-FACEBOOK-PLATFORM`.
+
 ## Contributing ##
 
 Patches and good natured criticism can be directed to <zxmpp@vucica.net>.
 
-You can also contact me via [xmpp:ivucica@gmail.com](xmpp:ivucica@gmail.com)
+You can also contact me via [xmpp:ivan@vucica.net](xmpp:ivan@vucica.net)
 
 - - -
 
-Copyright 2010-2012 Ivan Vučica
+Copyright 2010-2013 Ivan Vučica
 
