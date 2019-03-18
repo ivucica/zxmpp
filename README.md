@@ -1,14 +1,19 @@
 # Z-XMPP #
 
-For more info, visit <http://ivan.vucica.net/zxmpp/>.
+For more info, visit <https://ivan.vucica.net/zxmpp/>.
 
 ## What is it? ##
-This is an implementation of an XMPP client in JavaScript. It uses BOSH concept 
-of HTTP binding as defined by XEP-0124 and XEP-0206. 
+
+This is an implementation of an XMPP client in JavaScript. It uses BOSH
+concept of HTTP binding as defined by XEP-0124 and XEP-0206. 
 
 It is a semi-structured hack, assembled not so much as a planned effort by 
-a JavaScript expert; it's more of a thing that's here just to serve its purpose,
-and that purpose is luckily for its internals to be pretty. So hacker: beware!
+a JavaScript expert.
+
+**Use is not recommended**: There are other, immensely better UI and client
+libraries today. The author is open to admit he barely knew what he was doing
+back in 2010. In 2019, the author would recommend projects such as Strophe.js
+for the in-browser client library, and Converse.js for the full client UI.
 
 ## Goal ##
 
@@ -29,10 +34,10 @@ It appears as a bar on the bottom of the screen.
 
 ## Compatibility ##
 
-It is expected that the client will cover at least XEP-0242: XMPP Client
-Compliance 2009 Core Client profile. Of course, almost anything goes that
-doesn't require additional socket connections (since they're a bit... tricky
-to do in JavaScript, you'll surely agree).
+The original plan was that the client will eventually cover at least XEP-0242:
+XMPP Client Compliance 2009 Core Client profile. 
+
+It's unlikely it'll get anywhere close to any compatibility profile.
 
 Z-XMPP has been tested with the following BOSH connection managers:
 
@@ -66,12 +71,17 @@ Following XEPs are partially or fully supported:
 
 There may be additional features supported, but not documented.
 
-### Current version ###
+### Version 1.1 ###
 
 Following SASL authentication methods are added:
 
 * ANONYMOUS
 * X-FACEBOOK-PLATFORM
+
+There is some very experimental code to support Jingle calls with an early
+version of WebRTC APIs.
+
+This version contains a variety of fixes for compatibility.
 
 ## License ##
 
@@ -85,6 +95,7 @@ Here's how to set up `demo.php` to work.
 referring to the server's manual. Alternatively, set up a connection
 manager for BOSH (a BOSH service that acts as a proxy to the real XMPP
 server). A good connection manager is Punjab.
+
 2. Get your HTTP server to forward requests from a directory in the
 same domain and port that your site (or `demo.php`) is hosted on.
 If you use Apache, `.htaccess` shipping with Z-XMPP is a good starting 
@@ -92,6 +103,7 @@ point. This is required due to Javascript cross-domain scripting
 access policies on modern browsers, which would prevent Z-XMPP
 and any other Javascript XMPP library from accessing the actual BOSH 
 server directly.
+
 3. Edit `demo.php` to point to the directory that now redirects to
 the proper path and port of your BOSH server.
 
@@ -117,9 +129,10 @@ server supporting `X-FACEBOOK-PLATFORM`.
 
 Patches and good natured criticism can be directed to <zxmpp@vucica.net>.
 
-You can also contact me via [xmpp:ivan@vucica.net](xmpp:ivan@vucica.net)
+You can also contact me on XMPP if I whitelist you. Reach out to me on
+the address above.
 
 - - -
 
-Copyright 2010-2013 Ivan Vučica
+Copyright 2010-2019 Ivan Vučica
 
