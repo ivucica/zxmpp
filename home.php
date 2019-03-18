@@ -25,6 +25,14 @@ switches, Z-XMPP also includes an ugly user interface component for
 instant messaging. It appears as a bar on the bottom of the screen.
 </p>
 
+<p><b>WARNING: Use is not recommended</b>:
+     There are other, immensely better UI and client
+libraries today. The author is open to admit he barely knew what he was doing
+back in 2010. In 2019, the author would recommend projects such as Strophe.js
+for the in-browser client library, and Converse.js for the full client UI.
+</p>
+
+
 <h3>What does it do?</h3>
 
 <p>
@@ -64,6 +72,7 @@ BitBucket's web interface.
 
 <ul>
 <li><a href="downloads/zxmpp-1.0.tar.gz">Version 1.0</a> - released on Oct/22/2011, 13:35 CET</li>
+<li><a href="downloads/zxmpp-1.1.tar.gz">Version 1.1</a> - released on Mar/18/2019, 23:30 GMT</li>
 </ul>
 
 <h3>How to contribute?</h3>
@@ -236,6 +245,6 @@ http://ivan.vucica.net/<br>
 http://blog.vucica.net/<br>
 http://twitter.com/ivucica</p>
 
-<h6>&copy; 2010-2013 Ivan Vučica</h6>
+<h6>&copy; 2010-2019 Ivan Vučica</h6>
 </body>
 </html>
