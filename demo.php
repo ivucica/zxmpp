@@ -100,9 +100,9 @@ function createzxmpp()
 		"boshwait": 15
 	};
 	var relativecfg = {
-		"bind-url": "http-bind/",
-		"route": "xmpp:" + window.location.hostname + ":5222",
-		"domain": window.location.hostname,
+		"bind-url": "http-bind",
+		"route": <?=isset($_GET["route"]) ? '"' . $_GET["route"] . '"' : "'xmpp:' + window.location.hostname + ':5222'"?>,
+		"domain": <?=isset($_GET["domain"]) ? '"' . $_GET["domain"] . '"' : "window.location.hostname"?>,
 		"boshwait": 15
 	};
 	var gtalkcfg = {
