@@ -198,6 +198,8 @@ function createzxmpp()
 		zxmpp.enableClientFeatureExtension("camera-v1");
 	}
 
+	zxmpp_xep0050_init(zxmpp);
+
 	window.zxmppui = new zxmpp.ui;
 	window.zxmppui.backend = zxmpp;
 	window.zxmppui.inject('body');

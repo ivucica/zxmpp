@@ -12,6 +12,7 @@ function zxmppGetZXMPPScripts()
 		'zxmpp_caps.js',
 		'zxmpp_itemroster.js',
 		'zxmpp_vcard.js',
+		'zxmpp_cmds.js',
 
 		'zxmpp_stanzaiq.js',
 		'zxmpp_stanzapresence.js',
@@ -47,8 +48,10 @@ function zxmppGetAllScripts()
 function zxmppGetScriptsForExtensions()
 {
 	return array(
+        'extensions/xep-0050-ad-hoc-commands.js',
+
 		'extensions/xep-0166-jingle.js',
-		'extensions/xep-xxxx-gingle.js'
+		'extensions/xep-xxxx-gingle.js',
 	);
 }
 

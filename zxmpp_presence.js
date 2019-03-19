@@ -1,3 +1,4 @@
+/* -*- Mode: Javascript; indent-tabs-mode: t; tab-width: 4 -*- */
 /* 
  * Z-XMPP
  * A Javascript XMPP client.
@@ -35,6 +36,7 @@ zxmppClass.prototype.presence = function (zxmpp)
 	
 	this.caps = new this.zxmpp.caps(this.zxmpp);
 	this.chatState = false; // XEP-0085 - last registered chat state (e.g. false, 'composing', 'active', ...)
+	this.cmds = new this.zxmpp.cmds(this.zxmpp);
 
 	this.toJSON = function zxmppPresence_toJSON(key)
 	{

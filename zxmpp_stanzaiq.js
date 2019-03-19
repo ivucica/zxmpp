@@ -1,3 +1,4 @@
+/* -*- Mode: Javascript; indent-tabs-mode: t; tab-width: 4 -*- */
 /* 
  * Z-XMPP
  * A Javascript XMPP client.
@@ -587,7 +588,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		}
 	}
 
-	this.appendQueryToPacket = function(packet, namespace)
+	this.appendQueryToPacket = function(packet, namespace, nodevalue)
 	{
 		// For a given packet initialized with an <iq>,
 		// append a <query>, initializing this.query
@@ -597,10 +598,33 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 		var iq = this.iqXML = packet.iqXML;
 		var query = this.query = packet.xml.createElementNS(namespace, "query");
 		iq.appendChild(query);
-		
+
+		if (nodevalue)
+			query.setAttribute("node", nodevalue);
+
 		packet.iqStanza = this;	
 
 		return query;
+	}
+
+	this.appendCustomToPacket = function(packet, namespace, tagname, nodevalue)
+	{
+		// For a given packet initialized with an <iq>,
+		// append a <tagname>, initializing this.query
+		
+		// Also, attach that <iq> to this class, 
+		// initializing this.iqXML
+		var iq = this.iqXML = packet.iqXML;
+		var custom = this.query = packet.xml.createElementNS(namespace, tagname);
+		iq.appendChild(custom);
+
+		if (nodevalue)
+			query.setAttribute("node", nodevalue);
+
+		
+		packet.iqStanza = this;	
+
+		return custom;
 	}
 	
 	this.appendErrorToPacket = function(packet, type, details)

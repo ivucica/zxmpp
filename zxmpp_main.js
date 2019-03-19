@@ -1,3 +1,4 @@
+/* -*- Mode: Javascript; indent-tabs-mode: t; tab-width: 4 -*- */
 /* 
  * Z-XMPP
  * A Javascript XMPP client.
@@ -127,6 +128,7 @@ zxmppClass.prototype.getPresence = function zxmppMain_getPresence(fullJid)
 	presence.bareJid = bareJid;
 	presence.resource = resource;
 	presence.caps.ownerJid = fullJid;
+	presence.cmds.ownerJid = fullJid;
 	
 	this.presences[bareJid][resource] = presence;
 	

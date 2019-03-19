@@ -1,3 +1,4 @@
+/* -*- Mode: Javascript; indent-tabs-mode: t; tab-width: 4 -*- */
 /* 
  * Z-XMPP
  * A Javascript XMPP client.
