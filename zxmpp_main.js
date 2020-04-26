@@ -25,9 +25,11 @@ function zxmppClass()
 	
 	// Event handlers
 	// this is not stored nor restored by design!
+	this.onDiscoItemsXMLUpdate = [];
 	this.onConnectionTerminate = [];
 	this.onPresenceUpdate = [];
 	this.onRosterUpdate = [];
+	this.onCapsUpdate = [];
 	this.onMessage = [];
 	this.onPacket = [];
 	
@@ -281,8 +283,38 @@ zxmppClass.prototype.notifyPacket = function zxmppMain_notifyPacket(thePacket)
 	}
 }
 
+zxmppClass.prototype.notifyCapsUpdate = function zmxppMain_notifyCapsUpdate(jid, node, hashOrFalsy, iqID, theCaps)
+{
+	for(var capsHandlerId in this.onCapsUpdate)
+	{
+		var capsHandler = this.onCapsUpdate[capsHandlerId];
+		if(capsHandler.func)
+			capsHandler.func(capsHandler.context, this, jid, node, hashOrFalsy, iqID, theCaps);
+		else
+			capsHandler(this, jid, node, hashOrFalsy, iqID, theCaps);
+	}
+}
 
+zxmppClass.prototype.notifyDiscoItemsXMLUpdate = function zmxppMain_notifyDiscoItemsXMLUpdate(jid, node, iqID, theDiscoItemsXML)
+{
+	for(var discoItemsXMLHandlerId in this.onDiscoItemsXMLUpdate)
+	{
+		var discoItemsXMLHandler = this.onDiscoItemsXMLUpdate[discoItemsXMLHandlerId];
+		if(discoItemsXMLHandler.func)
+			discoItemsXMLHandler.func(discoItemsXMLHandler.context, this, jid, node, iqID, theDiscoItemsXML);
+		else
+			discoItemsXMLHandler(this, jid, node, iqID, theDiscoItemsXML);
+	}
+}
 
+zxmppClass.prototype.streamDomain = function zxmppMain_streamDomain(allowFromCfg=false)
+{
+	if (this.fullJid)
+		return this.domainForJid(this.bareJid);
+	if (!allowFromCfg)
+		return null;
+	return this.cfg['domain'];
+}
 zxmppClass.prototype.sendMessage = function zxmppMain_sendMessage(to, body)
 {
 	this.stream.sendMessage("poll", this.fullJid, to, "chat", body);
@@ -315,6 +347,16 @@ zxmppClass.prototype.transmitOwnPresence = function zxmppMain_transmitOwnPresenc
 		this.stream.sendCurrentPresence();
 	else
 		zxmppConsole.log("Not sending presence since there is either no stream or initial presence wasn't already sent");
+}
+
+zxmppClass.prototype.domainForJid = function zxmppMain_domainForJid(jid)
+{
+	var compos = jid.split('@');
+	if (compos.length > 1)
+		compos = compos.slice(1);
+	compos = compos[0].split('/')[0];	
+	compos = compos.split('#')[0];
+	return compos;
 }
 
 zxmppClass.prototype.serialized = function zxmppMain_serialized()

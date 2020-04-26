@@ -269,7 +269,11 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				case "http://jabber.org/protocol/disco#info":
 				this.parseQueryDiscoInfoXML(xml);
 				break;
-				
+
+				case "http://jabber.org/protocol/disco#items":
+				this.parseQueryDiscoItemsXML(xml);
+				break;
+
 				default:
 				zxmppConsole.warn("zxmpp::stanzaIq::parseQueryXML(): Unknown namespace " + xml.attr["xmlns"] + " (iqtype=result)");
 				this.iqFail();
@@ -403,8 +407,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				this.iqFail();
 				return; // FIXME make sure that, after failing, we give up on processing <iq> completely
 			}
-			
-			
+
 			for(var i in xml.childNodes)
 			{
 				var child = xml.childNodes[i];
@@ -463,7 +466,7 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 				}
 			}
 			
-			caps.finishProcessing(); // add to cache db or whatever
+			caps.finishProcessing(this.id); // add to cache db or whatever
 			
 			break;
 			
@@ -518,6 +521,51 @@ zxmppClass.prototype.stanzaIq = function(zxmpp)
 			default:
 			zxmppConsole.warn("zxmpp::stanzaIq::parseQueryDiscoInfoXML(): unimplemented response to iq's of type " + this.type);
 			this.iqFail();
+		}
+	}
+
+	this.parseQueryDiscoItemsXML = function(xml)
+	{
+		//zxmppConsole.log("disco info: " + this.zxmpp.util.serializedXML(xml));
+		
+		
+		var node = xml.attr["node"];
+		
+		
+		switch(this.type)
+		{
+			case "result":
+			
+			var presence = this.zxmpp.getPresence(this.from);
+			var caps = presence.caps;
+			
+			var askingIq = (this.zxmpp.stream.iqsAwaitingReply[this.id]);
+			if(!askingIq)
+			{
+				zxmppConsole.error("No asking iq for id " + this.id);
+				zxmppConsole.log(xml);
+				zxmppConsole.log(this.zxmpp.stream.iqsAwaitingReply);
+				this.iqFail();
+				return; // FIXME make sure that, after failing, we give up on processing <iq> completely
+			}
+
+			var discoItemsXML = [];
+			for(var i in xml.childNodes)
+			{
+				var child = xml.childNodes[i];
+				if(!child.nodeName) continue;
+				
+				this.zxmpp.util.easierAttrs(child);
+
+				discoItemsXML.push(child);
+			}
+			caps.discoItemsXML[node] = discoItemsXML;
+
+			this.zxmpp.notifyDiscoItemsXMLUpdate(this.from, node, this.id, discoItemsXML);
+			break;
+			default:
+			console.warn("cannot handle disco#items except the result");
+			break;
 		}
 	}
 	

@@ -634,6 +634,9 @@ zxmppClass.prototype.stream = function (zxmpp)
 			this.sendIqQuery("jabber:iq:roster", "get");//, this.zxmpp.bareJid);
 			this.hasSentRosterRequest = true;
 			zxmppConsole.log("ROSTER REQUEST SENT");
+			// also sneak in disco#info for the server and for the account
+			this.sendIqQuery("http://jabber.org/protocol/disco#info", "get"); // account
+		 	this.sendIqQuery("http://jabber.org/protocol/disco#info", "get", this.zxmpp.domainForJid(this.zxmpp.bareJid), false, {}); // server
 		} else if (this.hasSentRosterRequest && !this.hasSentInitialPresence)
 		{
 			// set up initial presence
@@ -762,13 +765,13 @@ zxmppClass.prototype.stream = function (zxmpp)
 	}
 	
 	
-	this.sendIqQuery = function zxmppStream_sendIqQuery(namespace, type, destination, send_style, extra_query_attribs)
+ 	this.sendIqQuery = function zxmppStream_sendIqQuery(namespace, type, destination, send_style, extra_query_attribs, forced_id=undefined)
 	{
 		// FIXME move packet fillout to zxmpp_packet.js
 		
 		var packet = new this.zxmpp.packet(this.zxmpp);
 		var iq = new this.zxmpp.stanzaIq(this.zxmpp);
-		iq.appendIqToPacket(packet, "query", type, destination);
+		iq.appendIqToPacket(packet, "query", type, destination, forced_id);
 
 		iq.appendQueryToPacket(packet, namespace);
 		

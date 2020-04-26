@@ -83,10 +83,12 @@ foreach(zxmppGetScriptsForExtensions() as $fn)
 <button onclick="enablevideo(); enableaudio();">enable both</button>
 <button onclick="enablenotifications();" style="display: none;" id="notificationsbtn">enable webkit notifications</button><br>
 <input id="calldestination"><button onclick="call();">call</button><button onclick="if(jingleCall) jingleCall.close(); jingleCall = undefined;">hang up</button>
+<input id="commandsjid"><button onclick="commandslist();">fetch commands</button>
 <br>
 <textarea cols="80" rows="15" id="serialized_output"></textarea>
 <video id="monitor"></video><audio id="player"></audio>
 <video id="remotemonitor"></video><audio id="remoteplayer"></audio>
+<div id="commandlists"></div>
 <script defer="defer">
 var zxmpp;
 var webrtc_videostream;
@@ -128,8 +130,10 @@ function createzxmpp()
 
 	zxmpp = new zxmppClass();
 	zxmpp.onConnectionTerminate.push(handler_connectionterminate);
+	zxmpp.onDiscoItemsXMLUpdate.push(handler_discoitemsxmlupdate);
 	zxmpp.onPresenceUpdate.push(handler_presenceupdate);
 	zxmpp.onRosterUpdate.push(handler_rosterupdate);
+	zxmpp.onCapsUpdate.push(handler_capsupdate);
 	zxmpp.onMessage.push(handler_message);
 	zxmpp.onPacket.push(handler_packet);
 	zxmpp.addIqParser("jingle#urn:xmpp:jingle:1", handler_jingle); // we could also register just "jingle", but this is more specific!
@@ -791,6 +795,46 @@ function handler_rosterupdate(sender, item)
 		zxmppui.rosterRemoved(item.bareJid);
 	}
 }
+
+function handler_capsupdate(sender, jid, node, hashOrFalsy, iqID, caps)
+{
+    console.log("CAPS update for " + jid + " node " + node + " hash " + hashOrFalsy + " iqID " + iqID);
+    console.log(caps);
+    if (jid == sender.streamDomain())
+    {
+        // server caps
+        if(caps.supports("http://jabber.org/protocol/commands"))
+        {
+            var id = sender.stream.uniqueId("commandsdisco");
+            sender.stream.sendIqQuery("http://jabber.org/protocol/disco#items", "get", jid, false, {"node": "http://jabber.org/protocol/commands"}, id);
+        }
+    }
+}
+function handler_discoitemsxmlupdate(sender, jid, node, iqID, discoitemsxml)
+{
+    console.log("discoitems from " + jid + " for " + node + " iqid " + iqID);
+    if (node == "http://jabber.org/protocol/commands")
+    {
+        var cmdContainer = document.getElementById('commands-' + jid + '-' + node);
+        if(!cmdContainer) {
+            var cmdLists = document.getElementById('commandlists');
+            cmdContainer = document.createElement('div');
+            cmdContainer.id = 'commands-' + jid + '-' + node;
+            cmdLists.appendChild(cmdContainer);
+        }
+        var inner = "<h1>" + jid + " : " + node + "</h1><ul>";
+        for (var cmdId in discoitemsxml) {
+            console.log(cmdId);
+            var cmd = discoitemsxml[cmdId];
+            console.log(cmd);
+            sender.util.easierAttrs(cmd);
+            
+            inner += "<li>" + cmd.attr["jid"] + " - " + cmd.attr["node"] + " - " + cmd.attr["name"] + "</li>";
+        }
+        inner += "</ul>";
+        cmdContainer.innerHTML = inner;
+    }
+}
 function handler_message(sender, messagestanza)
 {
 	console.log("> " + messagestanza.from + ": " + messagestanza.body);
@@ -833,6 +877,10 @@ function handler_jingle(sender, iqStanza, xml)
 	// however, instead, it's better to implement it as
 	// a plugin instead of in your own code.
 	return false;
+}
+
+function commandslist() {
+    this.zxmpp.stream.sendIqQuery("http://jabber.org/protocol/disco#items", "get", document.getElementById("commandsjid").value, false, {"node": "http://jabber.org/protocol/commands"}); 
 }
 
 // for use in notifications:

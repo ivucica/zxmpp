@@ -31,7 +31,9 @@ zxmppClass.prototype.caps = function(zxmpp)
 	this.nodeCategory = false;
 	this.nodeType = false;
 	this.nodeName = false;
-	
+
+	this.discoItemsXML = []; // FIXME: as this is XML, can it be json stringified?
+
 	// FIXME hash="sha-1"; perhaps dont use it in database key?
 	
 	
@@ -124,24 +126,26 @@ zxmppClass.prototype.caps = function(zxmpp)
 		
 	}
 
-	this.finishProcessing = function zxmppCaps_finishProcessing()
+	this.finishProcessing = function zxmppCaps_finishProcessing(iqID)
 	{
 		
 		// TODO must copy, not reference, and then replace ownerJid with 'false'!
-
+		var caps = this.zxmpp.util.cloneObject(this);
 		if(this.hash)
 		{
 			// TODO add hash spoofing verification!
 			
-			this.zxmpp.capsNodes[this.ownerNode + "#" + this.hash] = this.zxmpp.util.cloneObject(this);
+			this.zxmpp.capsNodes[this.ownerNode + "#" + this.hash] = caps;
 		}
 		else
 		{
 			// TODO decide if we should trust the client without a hash!
 			// let's still cache based on ver, and trust
 			
-			this.zxmpp.capsNodes[this.ownerNode] = this.zxmpp.util.cloneObject(this);
+			this.zxmpp.capsNodes[this.ownerNode] = caps;
 		}
+
+		this.zxmpp.notifyCapsUpdate(this.ownerJid, this.ownerNode, this.hash, iqID, caps);
 	}
 
 	this.applyThisClientsCaps = function zxmpp_applyThisClientsCaps()
