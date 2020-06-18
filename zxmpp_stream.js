@@ -1,3 +1,4 @@
+/* -*- Mode: Javascript; indent-tabs-mode: t; tab-width: 4 -*- */
 /* 
  * Z-XMPP
  * A Javascript XMPP client.
@@ -765,7 +766,7 @@ zxmppClass.prototype.stream = function (zxmpp)
 	}
 	
 	
- 	this.sendIqQuery = function zxmppStream_sendIqQuery(namespace, type, destination, send_style, extra_query_attribs, forced_id=undefined)
+ 	this.sendIqQuery = function zxmppStream_sendIqQuery(namespace, type, destination, send_style, extra_query_attribs, forced_id=undefined, on_reply=undefined)
 	{
 		// FIXME move packet fillout to zxmpp_packet.js
 		
@@ -784,6 +785,15 @@ zxmppClass.prototype.stream = function (zxmpp)
 				iq.query.setAttribute(attrib, val);
 			}
 		}
+
+		if(on_reply && on_reply.length)
+		{
+			for (var i in on_reply)
+			{
+				iq.onReply.push(on_reply[i]);
+			}
+		}
+
 		packet.send(send_style);
 		
 		// in case caller wants to add something

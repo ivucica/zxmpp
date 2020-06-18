@@ -42,8 +42,8 @@ function zxmpp_xep0050_cmdlist(zxmpp, destination, cb_list, cb_error)
 	var iq = new zxmpp.stanzaIq(zxmpp);
     iq.appendIqToPacket(packet, "cmdlistinquiry", "get", destination);
 	iq.appendQueryToPacket(packet, "http://jabber.org/protocol/disco#items", "http://jabber.org/protocol/commands");
-    
-	iq.onReply.push(function(zxmpp, original, response)
+
+	var onReplyFunc = function(zxmpp, original, response)
 	{
 		if(response.type == "error")
 		{
@@ -60,7 +60,8 @@ function zxmpp_xep0050_cmdlist(zxmpp, destination, cb_list, cb_error)
 			return cb_list(response);
 		}
 	}
-	);
+
+	iq.onReply.push(onReplyFunc);
 
 	//var jingleNode = packet.xml.createElementNS("urn:xmpp:jingle:1", "jingle");
 	//packet.iqXML.appendChild(jingleNode);
@@ -68,5 +69,16 @@ function zxmpp_xep0050_cmdlist(zxmpp, destination, cb_list, cb_error)
 	//jingleNode.setAttribute("initiator", zxmpp.getOwnPresence().fullJid);
 	//jingleNode.setAttribute("sid", sessionId);
 
-	packet.send("poll");
+	// Use old or new way to build the packet?
+	// The new one looks messier, but shorter.
+	var useOldPacketBuild = true;
+	
+	if(useOldPacketBuild)
+		packet.send("poll");
+	else
+	{
+		var forced_id = zxmpp.stream.uniqueId("cmdlistinquiry");
+		zxmpp.stream.sendIqQuery("http://jabber.org/protocol/disco#items", "get", destination, false, {"node": "http://jabber.org/protocol/commands"}, forced_id, on_reply=[onReplyFunc]);
+	}
+
 }
