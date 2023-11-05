@@ -4,3 +4,4 @@ syntax: glob
 jquery.min.js
 trackme.php
 sdpToJingle/*
+.git
